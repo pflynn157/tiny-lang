@@ -121,17 +121,6 @@ bool Parser::buildFunction(Token startToken, std::string className) {
     
     // Get arguments
     std::vector<Var> args;
-    if (className != "") {
-        Var classV;
-        classV.name = "this";
-        classV.type = DataType::Struct;
-        classV.subType = DataType::Void;
-        classV.typeName = className;
-        args.push_back(classV);
-        
-        typeMap["this"] = std::pair<DataType, DataType>(classV.type, classV.subType);
-    }
-    
     if (!getFunctionArgs(args)) return false;
 
     // Check to see if there's any return type
@@ -162,8 +151,6 @@ bool Parser::buildFunction(Token startToken, std::string className) {
                     }
                     
                     if (isStruct) {
-                        //v.type = DataType::Struct;
-                        //v.typeName = token.id_val;
                         funcType = DataType::Struct;
                         retName = token.id_val;
                     }
@@ -209,22 +196,10 @@ bool Parser::buildFunction(Token startToken, std::string className) {
     func->setDataType(funcType, ptrType);
     if (funcType == DataType::Struct) func->setDataTypeName(retName);
     func->setArguments(args);
-    
-    //if (className == "") tree->addGlobalStatement(func);
-    //else currentClass->addFunction(func);
     tree->addGlobalStatement(func);
-    if (className != "") {
-        std::string fullName = className + "_" + funcName;
-        func->setName(fullName);
-    }
     
     // Build the body
     int stopLayer = 0;
-    if (className != "") {
-        stopLayer = 1;
-        ++layer;
-    }
-    
     if (!buildBlock(func->getBlock(), stopLayer)) return false;
     
     // Make sure we end with a return statement
@@ -245,16 +220,6 @@ bool Parser::buildFunction(Token startToken, std::string className) {
             syntax->addError(scanner->getLine(), "Expected return statement.");
             return false;
         }
-    }
-    
-    if (className != "") {
-        AstFunction *func2 = new AstFunction(funcName);
-        func2->setDataType(funcType, ptrType);
-        func2->setArguments(args);
-        currentClass->addFunction(func2);
-        
-        AstBlock *block2 = func->getBlock();
-        func2->getBlock()->addStatements(block2->getBlock());
     }
     
     return true;

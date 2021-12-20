@@ -55,8 +55,6 @@ protected:
     bool buildStructMember(AstStruct *str, Token token);
     bool buildStructDec(AstBlock *block);
     bool buildStructAssign(AstBlock *block, Token idToken);
-    bool buildClass();
-    bool buildClassDec(AstBlock *block);
     
     bool buildBlock(AstBlock *block, int stopLayer = 0, AstIfStmt *parentBlock = nullptr, bool inElif = false);
     bool buildExpression(AstStatement *stmt, DataType currentType,
@@ -71,10 +69,8 @@ private:
     AstTree *tree;
     ErrorManager *syntax;
     int layer = 0;
-    AstClass *currentClass = nullptr;
     
     std::map<std::string, std::pair<DataType,DataType>> typeMap;
-    std::map<std::string, std::string> classMap;
     std::map<std::string, std::pair<DataType, AstExpression*>> globalConsts;
     std::map<std::string, std::pair<DataType, AstExpression*>> localConsts;
     std::map<std::string, EnumDec> enums;

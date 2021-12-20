@@ -35,7 +35,6 @@ bool Parser::parse() {
             case Const: code = buildConst(true); break;
             case Enum: code = buildEnum(); break;
             case Struct: code = buildStruct(); break;
-            case Class: code = buildClass(); break;
             
             case Eof:
             case Nl: break;
@@ -70,7 +69,6 @@ bool Parser::buildBlock(AstBlock *block, int stopLayer, AstIfStmt *parentBlock, 
         switch (token.type) {
             case VarD: code = buildVariableDec(block); break;
             case Struct: code = buildStructDec(block); break;
-            case Class: code = buildClassDec(block); break;
             case Const: code = buildConst(false); break;
             
             case Id: {
@@ -222,11 +220,6 @@ bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType
             
             case Id: {
                 lastWasOp = false;
-                
-                /*if (isConst) {
-                    syntax->addError(scanner->getLine(), "Invalid constant value.");
-                    return false;
-                }*/
             
                 std::string name = token.id_val;
                 if (varType == DataType::Void) {
@@ -272,33 +265,8 @@ bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType
                         return false;
                     }
                     
-                    token = scanner->getNext();
-                    if (token.type == LParen) {
-                        std::string className = classMap[name];
-                        className += "_" + idToken.id_val;
-                        
-                        AstFuncCallExpr *fc = new AstFuncCallExpr(className);
-                        
-                        AstID *id = new AstID(name);
-                        fc->addArgument(id);
-                        
-                        AstExpression *fcExpr;
-                        buildExpression(nullptr, varType, RParen, Comma, &fcExpr);
-                        output.push(fc);
-                        
-                        /*AstFuncCallStmt *fc = new AstFuncCallStmt(className);
-                        output.push(fc);
-                        
-                        AstID *id = new AstID(idToken.id_val);
-                        fc->addExpression(id);
-                        
-                        if (!buildExpression(fc, DataType::Void, RParen, Comma)) return false;*/
-                    } else {
-                        scanner->rewind(token);
-                        
-                        AstStructAccess *val = new AstStructAccess(name, idToken.id_val);
-                        output.push(val);
-                    }
+                    AstStructAccess *val = new AstStructAccess(name, idToken.id_val);
+                    output.push(val);
                 } else {
                     int constVal = isConstant(name);
                     if (constVal > 0) {
