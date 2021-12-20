@@ -13,7 +13,8 @@ func main -> int is
     var c : char := 'A';
     var string : char[10];
     
-    for i in 0 .. 10 do
+    var i : int := 0;
+    while i < 10 do
         if i = 0 then string[0] := 'A';
         elif i = 1 then string[1] := 'B';
         elif i = 2 then string[2] := 'C';
@@ -24,10 +25,14 @@ func main -> int is
         elif i = 9 then string[9] := '\n';
         else string[i] := '?';
         end
+        
+        i := i + 1;
     end
     
-    for i in 0 .. 10 do
+    i := 0;
+    while i < 10 do
         printf("%c", string[i]);
+        i := i + 1;
     end
     
     printCharArray(string);

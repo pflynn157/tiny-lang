@@ -18,13 +18,17 @@ extern printf(ln:str, x:int);
 
 func main -> int is
     var numbers : int[10];
+    var i : int := 0;
     
-    for i in 0 .. 10 do
+    while i < 10 do
         numbers[i] := 0;
+        i := i + 1;
     end
     
-    for i in 0 .. 10 step 2 do
+    i := 0;
+    while i < 10 do
         numbers[i] := 100;
+        i := i + 2;
     end
     
     forall i in numbers do

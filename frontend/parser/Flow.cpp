@@ -98,48 +98,6 @@ bool Parser::buildWhile(AstBlock *block) {
     return true;
 }
 
-// Builds a for loop
-bool Parser::buildFor(AstBlock *block) {
-    AstForStmt *loop = new AstForStmt;
-    block->addStatement(loop);
-    
-    // Get the index
-    Token token = scanner->getNext();
-    if (token.type != Id) {
-        syntax->addError(scanner->getLine(), "Expected variable name for index.");
-        return false;
-    }
-    
-    loop->setIndex(new AstID(token.id_val));
-    
-    token = scanner->getNext();
-    if (token.type != In) {
-        syntax->addError(scanner->getLine(), "Expected \"in\".");
-        return false;
-    }
-    
-    // Build the starting and ending expression
-    if (!buildExpression(loop, DataType::Void, Do, Range)) return false;
-    
-    if (loop->getExpressionCount() == 2) {
-        AstExpression *end = loop->getExpressions().back();
-        AstExpression *start = loop->getExpressions().front();
-        
-        loop->clearExpressions();
-        
-        loop->setStartBound(start);
-        loop->setEndBound(end);
-    } else {
-        syntax->addError(scanner->getLine(), "Invalid expression in for loop.");
-        return false;
-    }
-    
-    ++layer;
-    buildBlock(loop->getBlockStmt(), layer);
-    
-    return true;
-}
-
 // Builds a forall loop
 bool Parser::buildForAll(AstBlock *block) {
     AstForAllStmt *loop = new AstForAllStmt;

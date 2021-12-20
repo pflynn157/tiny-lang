@@ -9,8 +9,10 @@
 extern printf(ln:str, x:int);
 
 func main -> int is
-    for i in 0 .. 10 do
+    var i : int := 0;
+    while i < 10 do
         printf("%d|", i);
+        i := i + 1;
     end
     
     printf("\n");

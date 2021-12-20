@@ -272,11 +272,6 @@ void Compiler::compileStatement(AstStatement *stmt) {
             compileWhileStatement(stmt);
         } break;
         
-        // A for loop
-        case AstType::For: {
-            compileForStatement(stmt);
-        } break;
-        
         // A for-all loop
         case AstType::ForAll: compileForAllStatement(stmt); break;
         

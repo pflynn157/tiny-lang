@@ -115,7 +115,6 @@ bool Parser::buildBlock(AstBlock *block, int stopLayer, AstIfStmt *parentBlock, 
             
             // Handle loops
             case While: code = buildWhile(block); break;
-            case For: code = buildFor(block); break;
             case ForAll: code = buildForAll(block); break;
             
             case Break: code = buildLoopCtrl(block, true); break;
@@ -347,24 +346,6 @@ bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType
             case LT: opStack.push(new AstLTOp); lastWasOp = true; break;
             case GTE: opStack.push(new AstGTEOp); lastWasOp = true; break;
             case LTE: opStack.push(new AstLTEOp); lastWasOp = true; break;
-            
-            case Step: {
-                lastWasOp = false;       
-                
-                if (stmt->getType() != AstType::For) {
-                    syntax->addError(scanner->getLine(), "Step is only valid with for loops");
-                    return false;
-                }
-                
-                token = scanner->getNext();
-                if (token.type != Int32) {
-                    syntax->addError(scanner->getLine(), "Expected integer literal with \"step\"");
-                    return false;
-                }
-                
-                AstForStmt *forStmt = static_cast<AstForStmt *>(stmt);
-                forStmt->setStep(token.i32_val);
-            } break;
             
             default: {}
         }
