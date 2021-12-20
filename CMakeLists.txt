@@ -12,7 +12,7 @@ endif()
 
 option(BUILD_GUI "Build GUI components")
 
-include_directories(frontend compiler/LLIR compiler/LLVM)
+include_directories(frontend compiler)
 include_directories(ide/src ide/lib)
 
 include_directories(${LLVM_INCLUDE_DIRS})
