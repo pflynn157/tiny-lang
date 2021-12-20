@@ -1,20 +1,23 @@
-## Orka
+## Tiny Lang
 
-Welcome to Orka! Orka is yet another one of my compiler/programming language projects. The language itself is similar to Ida, but there are enough changes to make it its own thing. Backwards compatibility is not possible or intended. The primary goal of this project is to learn LLVM. See the section on the compiler for more information.
+Welcome to Tiny Lang! Tiny Lang is a fork of my Orka compiler/programming language project. Unlike my other forks, however, this is not meant to be some new and improved version. This is a simplified version that adheres to a spec that I wrote for a very simple programming language. In other words, it's an example implementation.
 
-Note that this is not ready for heavy production use. It's mainly meant as a learning project, so treat it as such :)
+This project was born out of another one. I started a project to test implementing a compiler in another programming language, and I got stuck not really knowing what I was implementing. Most of my previous languages are broken in some way (to date, Orka is my most complete and functional language). However, Orka and many of the other languages for that matter are too big for quick implementations. I thought about C, but C is a real language designed for serious, real-world work, and it has its share of quirks I didn't want to deal with. Finally, I'm lazy, and I didn't want to have to create some example implementation from scratch.
+
+The solution: Create a downsided version of Orka that contains the most essential programming elements. This downsized language is meant to be usable for most real-world tasks, but simple enough to where a compiler or interpreter can be implemented quickly.
 
 ### The Language
 
-For full language documenation, see here: [https://patrickflynn.co/orka-language](https://patrickflynn.co/orka-language/). Language features include:
-
-* i8, i16, i32, i64, char, string, float, and bool data types
+The language is very simple. It contains only these structures:
+* Functions
+* i8, i16, i32, i64 (signed and unsigned), char, string, and bool data types
+* Constants
 * Arrays (all dynamically allocated on the heap)
-* Integer-based enums
-* Structs
-* Modern and varied control structures
-* Standard and core libraries
-* Preprocessor for the libraries
+* Structures
+* If/elif/else conditional statements
+* While loops
+
+And that's all!
 
 Here's a sample of the language:
 
@@ -22,14 +25,14 @@ Here's a sample of the language:
 import std.io;
 
 struct S1 is
-    x : int := 10;
-    y : int := 20;
+    x : i32 := 10;
+    y : i32 := 20;
 end
 
-func main -> int is
+func main -> i32 is
     struct s : S1;
 
-    var v1 : int := s.x;
+    var v1 : i32 := s.x;
     
     printf("X: %d\n", v1);
     printf("Y: %d\n", s.y);
@@ -43,10 +46,8 @@ end
 
 ### The Compiler
 
-The primary aim of this project was to learn how to use LLVM. Up until now, I wrote my compilers completely from scratch, including the backends. While this is fun, its also bug-prone.
-
-The compiler is written in C++, and only uses the standard libraries for the frontend. An AST is generated, and passed to a rather simple backend which converts it to LLVM. LLVM takes it from there, and creates the assembly.
+The compiler is completely written in C++ and uses only the standard library and LLVM. The lexer, parser, and AST (the frontend) is written from scratch. The backend uses LLVM for simplicity.
 
 ### License
 
-This program is licensed under the BSD-3 License.
+This program is licensed under the BSD-3 License. The language spec is in the Public Domain.
