@@ -33,14 +33,14 @@ bool Parser::getFunctionArgs(std::vector<Var> &args) {
             switch (t3.type) {
                 case Bool: v.type = DataType::Bool; break;
                 case Char: v.type = DataType::Char; break;
-                case Byte: v.type = DataType::I8; break;
-                case UByte: v.type = DataType::U8; break;
-                case Short: v.type = DataType::I16; break;
-                case UShort: v.type = DataType::U16; break;
-                case Int: v.type = DataType::I32; break;
-                case UInt: v.type = DataType::U32; break;
-                case Int64: v.type = DataType::I64; break;
-                case UInt64: v.type = DataType::U64; break;
+                case I8: v.type = DataType::I8; break;
+                case U8: v.type = DataType::U8; break;
+                case I16: v.type = DataType::I16; break;
+                case U16: v.type = DataType::U16; break;
+                case I32: v.type = DataType::I32; break;
+                case U32: v.type = DataType::U32; break;
+                case I64: v.type = DataType::I64; break;
+                case U64: v.type = DataType::U64; break;
                 case Str: v.type = DataType::String; break;
                 
                 case Id: {
@@ -131,7 +131,7 @@ bool Parser::buildFunction(Token startToken, std::string className) {
     if (token.type == Arrow) {
         token = scanner->getNext();
         switch (token.type) {
-            case Int: funcType = DataType::I32; break;
+            case I32: funcType = DataType::I32; break;
             case Str: funcType = DataType::String; break;
             
             case Id: {

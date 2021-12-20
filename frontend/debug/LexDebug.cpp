@@ -32,14 +32,14 @@ void Token::print() {
         
         case Bool: std::cout << "BOOL"; break;
         case Char: std::cout << "CHAR"; break;
-        case Byte: std::cout << "BYTE"; break;
-        case UByte: std::cout << "UBYTE"; break;
-        case Short: std::cout << "SHORT"; break;
-        case UShort: std::cout << "USHORT"; break;
-        case Int: std::cout << "INT"; break;
-        case UInt: std::cout << "UINT"; break;
-        case Int64: std::cout << "INT64"; break;
-        case UInt64: std::cout << "UINT64"; break;
+        case I8: std::cout << "BYTE"; break;
+        case U8: std::cout << "UBYTE"; break;
+        case I16: std::cout << "SHORT"; break;
+        case U16: std::cout << "USHORT"; break;
+        case I32: std::cout << "INT"; break;
+        case U32: std::cout << "UINT"; break;
+        case I64: std::cout << "INT64"; break;
+        case U64: std::cout << "UINT64"; break;
         case Str: std::cout << "STR"; break;
         
         case Id: std::cout << "ID "; break;

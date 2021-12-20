@@ -36,15 +36,11 @@ enum TokenType {
     // Datatype Keywords
     Bool,
     Char,
-    Byte,
-    UByte,
-    Short,
-    UShort,
-    Int,
-    UInt,
-    Int64,
-    UInt64,
     Str,
+    I8, U8,
+    I16, U16,
+    I32, U32,
+    I64, U64,
     
     // Literals
     Id,
