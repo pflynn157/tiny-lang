@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<syntax>
+    <name>Orka</name>
+    <format>
+        <class id="keywords" style="keywords">\b$\b</class>
+        <class id="operators" style="keywords">\b$\b</class>
+        <class id="types" style="types">\b$\b</class>
+        <class id="storage-class" style="types">\b$\b</class>
+        
+        <regex style="literal">".*"</regex>
+        <regex style="literal">[-+]?\b\d+\b</regex>
+        <regex style="literal">\b0[xX][0-9a-fA-F]+\b</regex>
+        <regex style="literal">(\b[0-9]+\.([0-9]+\b)?|\.[0-9]+\b)</regex>
+        <regex style="literal">\b[0-9]+(\.[0-9]+)?(e[+-]?[0-9]+)?\b</regex>
+        <regex style="literal">\btrue\b</regex>
+        <regex style="literal">\bfalse\b</regex>
+        
+        <regex style="preprocessor">\bimport\b</regex>
+        
+        <comment style="comment">#</comment>
+        <multiline style="comment">
+            <start>/#</start>
+            <end>#/</end>
+        </multiline>
+    </format>
+    <data>
+        <class id="keywords">
+            <item>func</item>
+            <item>enum</item>
+            <item>struct</item>
+            <item>class</item>
+            <item>end</item>
+            <item>return</item>
+            <item>var</item>
+            <item>if</item>
+            <item>elif</item>
+            <item>else</item>
+            <item>while</item>
+            <item>repeat</item>
+            <item>for</item>
+            <item>forall</item>
+            <item>is</item>
+            <item>then</item>
+            <item>do</item>
+            <item>break</item>
+            <item>continue</item>
+            <item>in</item>
+            <item>extends</item>
+        </class>
+        <class id="operators">
+            <item>sizeof</item>
+            <item>step</item>
+        </class>
+        <class id="storage-class">
+            <item>const</item>
+            <item>extern</item>
+        </class>
+        <class id="types">
+            <item>void</item>
+            <item>bool</item>
+            <item>char</item>
+            <item>byte</item>
+            <item>ubyte</item>
+            <item>short</item>
+            <item>ushort</item>
+            <item>int</item>
+            <item>uint</item>
+            <item>int64</item>
+            <item>uint64</item>
+            <item>str</item>
+            <item>double</item>
+            <item>float</item>
+        </class>
+    </data>
+</syntax>
+

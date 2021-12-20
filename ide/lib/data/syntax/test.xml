@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<syntax>
+    <name>Test</name>
+    <format>
+        <class id="keywords" style="keywords">\b$\b</class>
+        <regex style="literal">".*"</regex>
+        <regex style="comment">//[^\n]*</regex>
+        
+        <multiline style="comment">
+            <start>/*</start>
+            <end>*/</end>
+        </multiline>
+        
+        <multiline style="comment">
+            <start>/+</start>
+            <end>+/</end>
+        </multiline>
+    </format>
+    <data>
+        <class id="keywords">
+            <item>const</item>
+            <item>int</item>
+            <item>void</item>
+        </class>
+    </data>
+</syntax>
+

@@ -1,0 +1,53 @@
+
+#OUTPUT
+#Hi!
+#How are you?
+#Good!
+#END
+
+#RET 0
+
+import std.io;
+
+func vecadd(result:int[], x:int[], y:int[]) is
+    for i in 0 .. sizeof(result) do
+        result[i] := x[i] + y[i];
+    end
+end
+
+func main is
+    var x1 : int[100];
+    var x2 : int[100];
+    
+    var y1 : int[100];
+    var y2 : int[100];
+    
+    var result1 : int[100];
+    var result2 : int[100];
+    
+    for i in 0 .. 100 do
+        x1[i] := i * 2;
+        x2[i] := i * 2;
+        
+        y1[i] := i * 5;
+        y2[i] := i * 5;
+        
+        result1[i] := x1[i] + y1[i];
+    end
+    
+    vecadd(result2, x2, y2);
+    
+    # Error check
+    var errors : int := 0;
+    
+    for i in 0 .. 100 do
+        if result1[i] != result2[i] then
+            errors := errors + 1;
+            if errors < 10 then
+                printf("Result1: %d | Result2: %d\n", result1[i], result2[i]);
+            end
+        end
+    end
+    
+    printf("Errors: %d\n", errors);
+end

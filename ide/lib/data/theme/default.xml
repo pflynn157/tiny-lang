@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<theme>
+    <name>Classic</name>
+    
+    <category id="types">
+        <fg>#009933</fg>
+        <bg>none</bg>
+        <b>true</b>
+        <i>false</i>
+    </category>
+    
+    <category id="keywords">
+        <fg>#990033</fg>
+        <bg>none</bg>
+        <b>true</b>
+        <i>false</i>
+    </category>
+    
+    <category id="literal">
+        <fg>#ff00ff</fg>
+        <bg>none</bg>
+        <b>false</b>
+        <i>false</i>
+    </category>
+    
+    <category id="comment">
+        <fg>#0066cc</fg>
+        <bg>none</bg>
+        <b>true</b>
+        <i>false</i>
+    </category>
+    
+    <category id="preprocessor">
+        <fg>#9999ff</fg>
+        <bg>none</bg>
+        <b>true</b>
+        <i>false</i>
+    </category>
+</theme>

@@ -1,0 +1,10 @@
+<RCC version="1.0">
+    <qresource>
+        <file>data/syntax/test.xml</file>
+        <file>data/syntax/orka.xml</file>
+        
+        <file>data/theme/default.xml</file>
+        <file>data/theme/kate.xml</file>
+    </qresource>
+</RCC>
+

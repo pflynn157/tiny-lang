@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<theme>
+    <name>Kate</name>
+    
+    <category id="keywords">
+        <fg>#000000</fg>
+        <bg>none</bg>
+        <b>true</b>
+        <i>false</i>
+    </category>
+    
+    <category id="literal">
+        <fg>#ff3333</fg>
+        <bg>none</bg>
+        <b>false</b>
+        <i>false</i>
+    </category>
+    
+    <category id="comment">
+        <fg>#669999</fg>
+        <bg>none</bg>
+        <b>true</b>
+        <i>false</i>
+    </category>
+</theme>
