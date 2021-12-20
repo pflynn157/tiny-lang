@@ -225,14 +225,6 @@ public:
     void print();
 };
 
-// Represents an infinite loop statement
-class AstRepeatStmt : public AstBlockStmt {
-public:
-    explicit AstRepeatStmt() : AstBlockStmt(AstType::Repeat) {}
-    
-    void print();
-};
-
 // Represents a for loop
 class AstForStmt : public AstBlockStmt {
 public:

@@ -98,17 +98,6 @@ bool Parser::buildWhile(AstBlock *block) {
     return true;
 }
 
-// Builds an infinite loop statement
-bool Parser::buildRepeat(AstBlock *block) {
-    AstRepeatStmt *loop = new AstRepeatStmt;
-    block->addStatement(loop);
-    
-    ++layer;
-    buildBlock(loop->getBlockStmt(), layer);
-
-    return true;
-}
-
 // Builds a for loop
 bool Parser::buildFor(AstBlock *block) {
     AstForStmt *loop = new AstForStmt;

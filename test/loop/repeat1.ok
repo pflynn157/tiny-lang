@@ -11,7 +11,7 @@ extern printf(ln:str, x:int);
 func main -> int is
     var i : int := 0;
     
-    repeat
+    while true do
         printf("%d|", i);
         i := i + 2;
         
