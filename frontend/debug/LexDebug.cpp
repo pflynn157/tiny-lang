@@ -14,7 +14,6 @@ void Token::print() {
         
         case Extern: std::cout << "EXTERN "; break;
         case Func: std::cout << "FUNC "; break;
-        case Enum: std::cout << "ENUM "; break;
         case Struct: std::cout << "STRUCT "; break;
         case End: std::cout << "END "; break;
         case Return: std::cout << "RETURN "; break;
@@ -24,18 +23,12 @@ void Token::print() {
         case Elif: std::cout << "ELIF"; break;
         case Else: std::cout << "ELSE"; break;
         case While: std::cout << "WHILE"; break;
-        case For: std::cout << "FOR"; break;
-        case ForAll: std::cout << "FORALL"; break;
-        case Repeat: std::cout << "REPEAT"; break;
         case Is: std::cout << "IS"; break;
         case Then: std::cout << "THEN"; break;
         case Do: std::cout << "DO"; break;
         case Break: std::cout << "BREAK"; break;
         case Continue: std::cout << "CONTINUE"; break;
-        case In: std::cout << "IN"; break;
-        case Sizeof: std::cout << "SIZEOF"; break;
         case Import: std::cout << "IMPORT"; break;
-        case Step: std::cout << "STEP"; break;
         
         case Bool: std::cout << "BOOL"; break;
         case Char: std::cout << "CHAR"; break;
@@ -64,9 +57,7 @@ void Token::print() {
         case RBracket: std::cout << "]"; break;
         case Comma: std::cout << ", "; break;
         case Dot: std::cout << ". "; break;
-        case Range: std::cout << ".. "; break;
         case Arrow: std::cout << "-> "; break;
-        case Scope: std::cout << ":: "; break;
         
         case Plus: std::cout << "+ "; break;
         case Minus: std::cout << "- "; break;

@@ -154,9 +154,6 @@ Token Scanner::getNext() {
             } else if (isHex()) {
                 token.type = Int32;
                 token.i32_val = std::stoi(buffer, 0, 16);
-            } else if (isFloat()) {
-                token.type = FloatL;
-                token.flt_val = std::stof(buffer);
             } else {
                 token.type = Id;
                 token.id_val = buffer;
@@ -204,9 +201,7 @@ bool Scanner::isSymbol(char c) {
 TokenType Scanner::getKeyword() {
     if (buffer == "extern") return Extern;
     else if (buffer == "func") return Func;
-    else if (buffer == "enum") return Enum;
     else if (buffer == "struct") return Struct;
-    else if (buffer == "class") return Class;
     else if (buffer == "end") return End;
     else if (buffer == "return") return Return;
     else if (buffer == "var") return VarD;
@@ -226,23 +221,14 @@ TokenType Scanner::getKeyword() {
     else if (buffer == "elif") return Elif;
     else if (buffer == "else") return Else;
     else if (buffer == "while") return While;
-    else if (buffer == "repeat") return Repeat;
-    else if (buffer == "for") return For;
-    else if (buffer == "forall") return ForAll;
     else if (buffer == "is") return Is;
     else if (buffer == "then") return Then;
     else if (buffer == "do") return Do;
     else if (buffer == "break") return Break;
     else if (buffer == "continue") return Continue;
-    else if (buffer == "in") return In;
-    else if (buffer == "sizeof") return Sizeof;
     else if (buffer == "import") return Import;
     else if (buffer == "true") return True;
     else if (buffer == "false") return False;
-    else if (buffer == "step") return Step;
-    else if (buffer == "float") return Float;
-    else if (buffer == "double") return Double;
-    else if (buffer == "extends") return Extends;
     return EmptyToken;
 }
 
@@ -258,15 +244,13 @@ TokenType Scanner::getSymbol(char c) {
         case '*': return Mul;
         case '/': return Div;
         case '=': return EQ;
+        case '.': return Dot;
         
         case ':': {
             char c2 = reader.get();
             if (c2 == '=') {
                 rawBuffer += c2;
                 return Assign;
-            } else if (c2 == ':') {
-                rawBuffer += c2;
-                return Scope;
             } else {
                 reader.unget();
                 return Colon;
@@ -305,17 +289,6 @@ TokenType Scanner::getSymbol(char c) {
             }
         } break;
         
-        case '.': {
-            char c2 = reader.get();
-            if (c2 == '.') {
-                rawBuffer += c2;
-                return Range;
-            } else {
-                reader.unget();
-                return Dot;
-            }
-        } break;
-        
         case '-': {
             char c2 = reader.get();
             if (c2 == '>') {
@@ -344,19 +317,5 @@ bool Scanner::isHex() {
     for (int i = 2; i<buffer.length(); i++) {
         if (!isxdigit(buffer[i])) return false;
     }
-    return true;
-}
-
-bool Scanner::isFloat() {
-    bool foundDot = false;
-    for (char c : buffer) {
-        if (c == '.') {
-            if (foundDot) return false;
-            foundDot = true;
-        } else if (!isdigit(c)) {
-            return false;
-        }
-    }
-    if (!foundDot) return false;
     return true;
 }
