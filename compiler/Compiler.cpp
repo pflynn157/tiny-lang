@@ -424,7 +424,7 @@ Value *Compiler::compileValue(AstExpression *expr, DataType dataType) {
                     strOp = true;
                     rvalStr = true;
                 } else if (typeTable[rvalID->getValue()] == DataType::Char ||
-                           typeTable[rvalID->getValue()] == DataType::Byte) {
+                           typeTable[rvalID->getValue()] == DataType::I8) {
                     strOp = true;          
                 }
             }
@@ -490,18 +490,18 @@ Type *Compiler::translateType(DataType dataType, DataType subType, std::string t
             
     switch (dataType) {
         case DataType::Char:
-        case DataType::Byte:
-        case DataType::UByte: type = Type::getInt8Ty(*context); break;
+        case DataType::I8:
+        case DataType::U8: type = Type::getInt8Ty(*context); break;
         
-        case DataType::Short:
-        case DataType::UShort: type = Type::getInt16Ty(*context); break;
+        case DataType::I16:
+        case DataType::U16: type = Type::getInt16Ty(*context); break;
         
         case DataType::Bool:
-        case DataType::Int32:
-        case DataType::UInt32: type = Type::getInt32Ty(*context); break;
+        case DataType::I32:
+        case DataType::U32: type = Type::getInt32Ty(*context); break;
         
-        case DataType::Int64:
-        case DataType::UInt64: type = Type::getInt64Ty(*context); break;
+        case DataType::I64:
+        case DataType::U64: type = Type::getInt64Ty(*context); break;
         
         case DataType::String: type = Type::getInt8PtrTy(*context); break;
         
@@ -509,11 +509,11 @@ Type *Compiler::translateType(DataType dataType, DataType subType, std::string t
             switch (subType) {
                 case DataType::Char: type = i8ArrayType; break;
                 
-                case DataType::UInt32:
-                case DataType::Int32: type = i32ArrayType; break;
+                case DataType::I32:
+                case DataType::U32: type = i32ArrayType; break;
                 
-                case DataType::Int64:
-                case DataType::UInt64: type = i64ArrayType; break;
+                case DataType::I64:
+                case DataType::U64: type = i64ArrayType; break;
                 
                 case DataType::String: type = strArrayType; break;
                 
@@ -524,8 +524,8 @@ Type *Compiler::translateType(DataType dataType, DataType subType, std::string t
         case DataType::Ptr: {
             switch (subType) {
                 case DataType::Char: type = Type::getInt8PtrTy(*context); break;
-                case DataType::Int32: type = Type::getInt32PtrTy(*context); break;
-                case DataType::Int64: type = Type::getInt64PtrTy(*context); break;
+                case DataType::I32: type = Type::getInt32PtrTy(*context); break;
+                case DataType::U32: type = Type::getInt64PtrTy(*context); break;
                 
                 case DataType::String: type = strArrayType; break;
                 

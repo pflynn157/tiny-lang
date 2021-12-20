@@ -49,14 +49,14 @@ bool Parser::buildVariableDec(AstBlock *block) {
     switch (token.type) {
         case Bool: dataType = DataType::Bool; break;
         case Char: dataType = DataType::Char; break;
-        case Byte: dataType = DataType::Byte; break;
-        case UByte: dataType = DataType::UByte; break;
-        case Short: dataType = DataType::Short; break;
-        case UShort: dataType = DataType::UShort; break;
-        case Int: dataType = DataType::Int32; break;
-        case UInt: dataType = DataType::UInt32; break;
-        case Int64: dataType = DataType::Int64; break;
-        case UInt64: dataType = DataType::UInt64; break;
+        case Byte: dataType = DataType::I8; break;
+        case UByte: dataType = DataType::U8; break;
+        case Short: dataType = DataType::I16; break;
+        case UShort: dataType = DataType::U16; break;
+        case Int: dataType = DataType::I32; break;
+        case UInt: dataType = DataType::U32; break;
+        case Int64: dataType = DataType::I64; break;
+        case UInt64: dataType = DataType::U64; break;
         case Str: dataType = DataType::String; break;
         
         default: {}
@@ -67,7 +67,7 @@ bool Parser::buildVariableDec(AstBlock *block) {
     // We have an array
     if (token.type == LBracket) {
         AstVarDec *empty = new AstVarDec("", DataType::Array);
-        if (!buildExpression(empty, DataType::Int32, RBracket)) return false;   
+        if (!buildExpression(empty, DataType::I32, RBracket)) return false;   
         
         token = scanner->getNext();
         if (token.type != SemiColon) {
@@ -97,7 +97,7 @@ bool Parser::buildVariableDec(AstBlock *block) {
             callMalloc->clearArguments();
             
             AstInt *size;
-            if (dataType == DataType::Int32) size = new AstInt(4);
+            if (dataType == DataType::I32) size = new AstInt(4);
             else if (dataType == DataType::String) size = new AstInt(8);
             else size = new AstInt(1);
             
@@ -164,7 +164,7 @@ bool Parser::buildArrayAssign(AstBlock *block, Token idToken) {
     pa->setPtrType(dataType);
     block->addStatement(pa);
     
-    if (!buildExpression(pa, DataType::Int32, RBracket)) return false;
+    if (!buildExpression(pa, DataType::I32, RBracket)) return false;
     
     Token token = scanner->getNext();
     if (token.type != Assign) {
@@ -202,14 +202,14 @@ bool Parser::buildConst(bool isGlobal) {
     switch (token.type) {
         case Bool: dataType = DataType::Bool; break;
         case Char: dataType = DataType::Char; break;
-        case Byte: dataType = DataType::Byte; break;
-        case UByte: dataType = DataType::UByte; break;
-        case Short: dataType = DataType::Short; break;
-        case UShort: dataType = DataType::UShort; break;
-        case Int: dataType = DataType::Int32; break;
-        case UInt: dataType = DataType::UInt32; break;
-        case Int64: dataType = DataType::Int64; break;
-        case UInt64: dataType = DataType::UInt64; break;
+        case Byte: dataType = DataType::I8; break;
+        case UByte: dataType = DataType::U8; break;
+        case Short: dataType = DataType::I16; break;
+        case UShort: dataType = DataType::U16; break;
+        case Int: dataType = DataType::I32; break;
+        case UInt: dataType = DataType::U32; break;
+        case Int64: dataType = DataType::I64; break;
+        case UInt64: dataType = DataType::U64; break;
         case Str: dataType = DataType::String; break;
         
         default: {

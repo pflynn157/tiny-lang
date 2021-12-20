@@ -219,7 +219,7 @@ bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType
                 token = scanner->getNext();
                 if (token.type == LBracket) {
                     AstExpression *index = nullptr;
-                    buildExpression(nullptr, DataType::Int32, RBracket, EmptyToken, &index);
+                    buildExpression(nullptr, DataType::I32, RBracket, EmptyToken, &index);
                     
                     AstArrayAccess *acc = new AstArrayAccess(name);
                     acc->setIndex(index);
@@ -378,19 +378,19 @@ AstExpression *Parser::checkExpression(AstExpression *expr, DataType varType) {
     switch (expr->getType()) {
         case AstType::IntL: {
             // Change to byte literals
-            if (varType == DataType::Byte || varType == DataType::UByte) {
+            if (varType == DataType::I8 || varType == DataType::U8) {
                 AstInt *i32 = static_cast<AstInt *>(expr);
                 AstByte *byte = new AstByte(i32->getValue());
                 expr = byte;
                 
             // Change to word literals
-            } else if (varType == DataType::Short || varType == DataType::UShort) {
+            } else if (varType == DataType::I16 || varType == DataType::U16) {
                 AstInt *i32 = static_cast<AstInt *>(expr);
                 AstWord *i16 = new AstWord(i32->getValue());
                 expr = i16;
                 
             // Change to qword literals
-            } else if (varType == DataType::Int64 || varType == DataType::UInt64) {
+            } else if (varType == DataType::I64 || varType == DataType::U64) {
                 AstInt *i32 = static_cast<AstInt *>(expr);
                 AstQWord *i64 = new AstQWord(i32->getValue());
                 expr = i64;

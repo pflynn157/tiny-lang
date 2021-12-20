@@ -18,7 +18,6 @@
 class AstStatement;
 class AstExpression;
 class AstStruct;
-class AstClass;
 
 // Represents an AST tree
 class AstTree {
@@ -34,10 +33,6 @@ public:
         return structs;
     }
     
-    std::vector<AstClass *> getClasses() {
-        return classes;
-    }
-    
     void addGlobalStatement(AstGlobalStatement *stmt) {
         global_statements.push_back(stmt);
     }
@@ -46,14 +41,9 @@ public:
         structs.push_back(s);
     }
     
-    void addClass(AstClass *c) {
-        classes.push_back(c);
-    }
-    
     void print();
 private:
     std::string file = "";
     std::vector<AstGlobalStatement *> global_statements;
     std::vector<AstStruct *> structs;
-    std::vector<AstClass *> classes;
 };
