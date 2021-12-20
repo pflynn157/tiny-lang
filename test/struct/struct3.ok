@@ -11,11 +11,11 @@
 #RET 0
 
 #import std.io;
-extern printf(s:str);
+extern printf(s:string);
 
 struct S1 is
-    x : int := 10;
-    y : int := 20;
+    x : i32 := 10;
+    y : i32 := 20;
 end
 
 func printStruct(s:S1) is
@@ -28,7 +28,7 @@ func updateStruct(s:S1) is
     s.y := 35;
 end
 
-func main -> int is
+func main -> i32 is
     struct s : S1;
     
     println("Before:");

@@ -8,17 +8,17 @@
 
 #RET 0
 
-func main(args:str[]) -> int is
-    var str1 : str := "Hello!";
-    var str2 : str := " How are you?";
+func main(args:string[]) -> i32 is
+    var str1 : string := "Hello!";
+    var str2 : string := " How are you?";
     
     println(str1);
     println(str2);
     
-    var str3 : str := str1 + str2;
+    var str3 : string := str1 + str2;
     println(str3);
     
-    var str4 : str := str1 + '!';
+    var str4 : string := str1 + '!';
     println(str4);
     
     return 0;

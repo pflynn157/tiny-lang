@@ -5,13 +5,13 @@
 
 #RET 0
 
-extern printf(line:str, x:int);
+extern printf(line:string, x:i32);
 
-func main -> int is
-    var numbers : int[5];
+func main -> i32 is
+    var numbers : i32[5];
     numbers[2] := 242;
     
-    var x : int := numbers[2];
+    var x : i32 := numbers[2];
     printf("%d\n", x);
     return 0;
 end

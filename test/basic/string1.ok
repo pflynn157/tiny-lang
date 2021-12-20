@@ -6,14 +6,14 @@
 
 #RET 0
 
-extern println(line:str);
-extern printf(line:str, x:int);
+extern println(line:string);
+extern printf(line:string, x:i32);
 
-func main -> int is
-    var string : str := "Hello!";
-    var c : char := string[3];
+func main -> i32 is
+    var str : string := "Hello!";
+    var c : char := str[3];
     
-    println(string);
+    println(str);
     printf("%c\n", c);
     
     return 0;

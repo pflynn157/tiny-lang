@@ -5,12 +5,12 @@
 
 #RET 0
 
-extern printf(ln:str, x:int);
+extern printf(ln:string, x:i32);
 
-const Top : int := 30;
+const Top : i32 := 30;
 
-func main -> int is
-    const x : int := 20;
+func main -> i32 is
+    const x : i32 := 20;
     
     printf("CONST: %d, %d\n", x, Top);
     

@@ -9,10 +9,10 @@
 
 #RET 0
 
-extern printf(ln:str, x:int);
-extern println(ln:str);
+extern printf(ln:string, x:i32);
+extern println(ln:string);
 
-func cmp(x:int) is
+func cmp(x:i32) is
     if x > 20 then
         println("X greater than 20.");
     elif x > 10 then
@@ -24,7 +24,7 @@ func cmp(x:int) is
     end
 end
 
-func main -> int is
+func main -> i32 is
     cmp(25);
     cmp(4);
     cmp(15);

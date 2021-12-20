@@ -14,9 +14,9 @@
 
 #RET 0
 
-extern println(ln : str);
+extern println(ln : string);
 
-func compare(x:int) is
+func compare(x:i32) is
     if x > 10 then
         println("Greater than 10");
         if x > 15 then
@@ -30,8 +30,8 @@ func compare(x:int) is
     end
 end
 
-func main -> int is
-    var x : int := 40;
+func main -> i32 is
+    var x : i32 := 40;
     
     compare(x);
     println("---");

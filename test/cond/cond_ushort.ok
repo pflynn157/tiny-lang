@@ -9,9 +9,9 @@
 #RET 0
 
 #import std.io;
-extern printf(s:str);
+extern printf(s:string);
 
-func test1(x:ushort) is
+func test1(x:u16) is
     if x = 20 then println("True");
     else println("False");
     end
@@ -19,7 +19,7 @@ func test1(x:ushort) is
     printf("%d\n", x);
 end
 
-func test2(x:ushort) is
+func test2(x:u16) is
     if x = 20 then println("True");
     else println("False");
     end
@@ -27,9 +27,9 @@ func test2(x:ushort) is
     printf("%d\n", x);
 end
 
-func main -> int is
-    var x1 : ushort := 20;
-    var x2 : ushort := 31;
+func main -> i32 is
+    var x1 : u16 := 20;
+    var x2 : u16 := 31;
     
     test1(x1);
     test2(x2);

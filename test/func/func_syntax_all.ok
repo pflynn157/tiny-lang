@@ -12,36 +12,36 @@
 #RET 0
 
 #import std.io;
-extern printf(s:str);
+extern printf(s:string);
 
 func func1 is
     println("Func1");
 end
 
-func func2 -> int is
+func func2 -> i32 is
     println("Func2");
     return 0;
 end
 
-func func3(x:int) is
+func func3(x:i32) is
     printf("Func3: %d\n", x);
 end
 
-func func4(x:int, y:int) is
+func func4(x:i32, y:i32) is
     printf("Func4: %d, %d\n", x, y);
 end
 
-func func5(x:int) -> int is
+func func5(x:i32) -> i32 is
     printf("Func5: %d\n", x);
     return 0;
 end
 
-func func6(x:int, y:int) -> int is
+func func6(x:i32, y:i32) -> i32 is
     printf("Func6: %d, %d\n", x, y);
     return 0;
 end
 
-func main -> int is
+func main -> i32 is
     println("Main!");
     
     func1();

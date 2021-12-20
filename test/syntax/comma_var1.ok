@@ -7,10 +7,10 @@
 #RET 0
 
 #import std.io;
-extern printf(s:str);
+extern printf(s:string);
 
-func main -> int is
-    var x, y : int := 20;
+func main -> i32 is
+    var x, y : i32 := 20;
     
     printf("X: %d | Y: %d\n", x, y);
     

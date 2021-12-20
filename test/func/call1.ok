@@ -5,14 +5,14 @@
 
 #RET 0
 
-extern printf(line:str, x:int);
+extern printf(line:string, x:i32);
 
-func getNumber(x:int, y:int) -> int is
+func getNumber(x:i32, y:i32) -> i32 is
     return 20 + x + y;
 end
 
-func main -> int is
-    var x : int := getNumber(23, 10);
+func main -> i32 is
+    var x : i32 := getNumber(23, 10);
     printf("X: %d\n", x);
     
     return 0;

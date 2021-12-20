@@ -14,13 +14,13 @@
 
 #RET 0
 
-extern printf(line:str, x:int);
+extern printf(line:string, x:i32);
 
-func main -> int is
-    var numbers : int[10];
-    var x : int := 0;
+func main -> i32 is
+    var numbers : i32[10];
+    var x : i32 := 0;
     
-    var i : int := 0;
+    var i : i32 := 0;
     while i < 10 do
         numbers[i] := i;
         i := i + 1;

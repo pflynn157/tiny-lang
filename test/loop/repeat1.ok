@@ -6,10 +6,10 @@
 
 #RET 0
 
-extern printf(ln:str, x:int);
+extern printf(ln:string, x:i32);
 
-func main -> int is
-    var i : int := 0;
+func main -> i32 is
+    var i : i32 := 0;
     
     while true do
         printf("%d|", i);

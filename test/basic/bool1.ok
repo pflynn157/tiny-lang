@@ -7,9 +7,9 @@
 
 #import std.io;
 
-extern println(ln:str);
+extern println(ln:string);
 
-func main -> int is
+func main -> i32 is
     var x : bool := true;
     
     if x then println("True");
