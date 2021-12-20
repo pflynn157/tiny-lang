@@ -266,31 +266,6 @@ bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType
                 }
             } break;
             
-            case Sizeof: {
-                lastWasOp = false;
-                
-                if (isConst) {
-                    syntax->addError(scanner->getLine(), "Invalid constant value.");
-                    return false;
-                }
-                
-                std::string name = token.id_val;
-                
-                Token token1 = scanner->getNext();
-                Token token2 = scanner->getNext();
-                Token token3 = scanner->getNext();
-                
-                if (token1.type != LParen || token2.type != Id || token3.type != RParen) {
-                    syntax->addError(scanner->getLine(), "Invalid token in sizeof.");
-                    token.print();
-                    return false;
-                }
-                
-                AstID *id = new AstID(token2.id_val);
-                AstSizeof *size = new AstSizeof(id);
-                output.push(size);
-            } break;
-            
             case Plus: 
             case Minus: {
                 if (opStack.size() > 0) {

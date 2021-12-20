@@ -8,18 +8,18 @@
 
 extern printf(line:str, x:int);
 
-func printArray(numbers:int[]) is
+func printArray(numbers:int[], size:int) is
     var x : int := numbers[2];
     
     printf("%d\n", x);
-    printf("Size: %d\n", sizeof(numbers));
+    printf("Size: %d\n", size);
 end
 
 func main -> int is
     var numbers : int[10];
     numbers[2] := 242;
     
-    printArray(numbers);
+    printArray(numbers, 10);
     
     return 0;
 end

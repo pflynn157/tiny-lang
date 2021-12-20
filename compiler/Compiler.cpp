@@ -340,19 +340,6 @@ Value *Compiler::compileValue(AstExpression *expr, DataType dataType) {
             return builder->CreateLoad(type, ptr);
         } break;
         
-        case AstType::Sizeof: {
-            AstSizeof *sizeOf = static_cast<AstSizeof *>(expr);
-            AstID *array = sizeOf->getValue();
-            
-            DataType subType = ptrTable[array->getValue()];
-            Type *arrayPtrType = translateType(DataType::Array, subType);
-            Type *i32Type = Type::getInt32Ty(*context);
-            
-            AllocaInst *ptr = symtable[array->getValue()];
-            Value *sizePtr = builder->CreateStructGEP(arrayPtrType, ptr, 1);
-            return builder->CreateLoad(i32Type, sizePtr);
-        } break;
-        
         case AstType::ArrayAccess: {
             AstArrayAccess *acc = static_cast<AstArrayAccess *>(expr);
             AllocaInst *ptr = symtable[acc->getValue()];
