@@ -11,9 +11,8 @@
 
 #RET 0
 
-import std.io;
-
-extern println(ln:str);
+#import std.io;
+extern printf(s:str);
 
 func func1 is
     println("Func1");

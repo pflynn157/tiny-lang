@@ -7,7 +7,8 @@
 
 #RET 0
 
-import std.io;
+#import std.io;
+extern printf(s:str);
 
 struct S1 is
     x : int := 10;

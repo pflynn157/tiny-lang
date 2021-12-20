@@ -7,10 +7,6 @@
 
 #RET 0
 
-import std.io;
-
-extern println(s:str);
-
 func main -> int is
     var args : str[3];
     args[0] := "Hi!";

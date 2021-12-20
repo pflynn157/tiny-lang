@@ -8,9 +8,8 @@
 
 #RET 0
 
-import std.io;
-
-extern println(ln:str);
+#import std.io;
+extern printf(s:str);
 
 func test1(x:byte) is
     if x = 20 then println("True");

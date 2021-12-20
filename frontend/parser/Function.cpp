@@ -42,8 +42,6 @@ bool Parser::getFunctionArgs(std::vector<Var> &args) {
                 case Int64: v.type = DataType::Int64; break;
                 case UInt64: v.type = DataType::UInt64; break;
                 case Str: v.type = DataType::String; break;
-                case Float: v.type = DataType::Float; break;
-                case Double: v.type = DataType::Double; break;
                 
                 case Id: {
                     bool isStruct = false;
@@ -62,6 +60,7 @@ bool Parser::getFunctionArgs(std::vector<Var> &args) {
                 
                 default: {
                     syntax->addError(scanner->getLine(), "Invalid function argument: Unknown type.");
+                    token.print();
                     return false;
                 }
             }

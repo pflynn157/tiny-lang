@@ -73,8 +73,6 @@ enum class DataType {
     String,
     Array,
     Ptr,
-    Double,
-    Float,
     Struct
 };
 

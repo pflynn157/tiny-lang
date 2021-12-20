@@ -8,8 +8,6 @@
 
 #RET 0
 
-import std.io;
-
 func main(args:str[]) -> int is
     var str1 : str := "Hello!";
     var str2 : str := " How are you?";

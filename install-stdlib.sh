@@ -3,7 +3,7 @@
 ./build-stdlib.sh
 
 LIB_INSTALL=/usr/local/lib/orka
-INCLUDE_INSTALL=/usr/local/include/orka
+INCLUDE_INSTALL=/usr/local/include/tiny_lang
 
 if [[ ! -d $LIB_INSTALL ]] ; then
     sudo mkdir -p $LIB_INSTALL

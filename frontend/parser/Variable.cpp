@@ -58,8 +58,6 @@ bool Parser::buildVariableDec(AstBlock *block) {
         case Int64: dataType = DataType::Int64; break;
         case UInt64: dataType = DataType::UInt64; break;
         case Str: dataType = DataType::String; break;
-        case Float: dataType = DataType::Float; break;
-        case Double: dataType = DataType::Double; break;
         
         default: {}
     }

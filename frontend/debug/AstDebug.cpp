@@ -23,8 +23,6 @@ std::string printDataType(DataType dataType) {
         case DataType::String: return "string";
         case DataType::Array: return "array";
         case DataType::Ptr: return "ptr";
-        case DataType::Float: return "float";
-        case DataType::Double: return "double";
         case DataType::Struct: return "struct";
     }
     return "";
@@ -357,10 +355,6 @@ void AstInt::print() {
 }
 
 void AstQWord::print() {
-    std::cout << val;
-}
-
-void AstFloat::print() {
     std::cout << val;
 }
 

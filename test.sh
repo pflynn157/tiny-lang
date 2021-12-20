@@ -60,7 +60,6 @@ run_test 'test/loop/*.ok' 'sys' $flags
 run_test 'test/array/*.ok' 'sys' $flags
 run_test 'test/func/*.ok' 'sys' $flags
 run_test 'test/struct/*.ok' 'sys' $flags
-run_test 'test/float/*.ok' 'sys' $flags
 run_test 'test/str/*.ok' 'sys' $flags
 
 echo ""

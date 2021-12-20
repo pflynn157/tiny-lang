@@ -201,12 +201,6 @@ bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType
                 output.push(i32);
             } break;
             
-            case FloatL: {
-                lastWasOp = false;
-                AstFloat *flt = new AstFloat(token.flt_val);
-                output.push(flt);
-            } break;
-            
             case String: {
                 lastWasOp = false;
                 AstString *str = new AstString(token.id_val);

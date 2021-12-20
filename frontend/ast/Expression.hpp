@@ -227,19 +227,6 @@ private:
     uint64_t val = 0;
 };
 
-// Represents a floating-point literal
-class AstFloat : public AstExpression {
-public:
-    explicit AstFloat(double val) : AstExpression(AstType::FloatL) {
-        this->val = val;
-    }
-    
-    double getValue() { return val; }
-    void print();
-private:
-    double val = 0;
-};
-
 // Represents a string literal
 class AstString : public AstExpression {
 public:

@@ -309,13 +309,6 @@ Value *Compiler::compileValue(AstExpression *expr, DataType dataType) {
             return builder->getInt64(i64->getValue());
         } break;
         
-        case AstType::FloatL: {
-            AstFloat *flt = static_cast<AstFloat *>(expr);
-            if (dataType == DataType::Double)
-                return ConstantFP::get(Type::getDoubleTy(*context), flt->getValue());
-            return ConstantFP::get(Type::getFloatTy(*context), flt->getValue());
-        } break;
-        
         case AstType::CharL: {
             AstChar *cval = static_cast<AstChar *>(expr);
             return builder->getInt8(cval->getValue());
@@ -411,30 +404,6 @@ Value *Compiler::compileValue(AstExpression *expr, DataType dataType) {
             Value *lval = compileValue(lvalExpr, dataType);
             Value *rval = compileValue(rvalExpr, dataType);
             
-            bool fltOp = false;
-            if (lvalExpr->getType() == AstType::FloatL || rvalExpr->getType() == AstType::FloatL) {
-                fltOp = true;
-                
-                if (lvalExpr->getType() == AstType::ID) {
-                    AstID *lvalID = static_cast<AstID *>(lvalExpr);
-                    if (typeTable[lvalID->getValue()] == DataType::Double)
-                        rval = compileValue(rvalExpr, DataType::Double);
-                } else if (rvalExpr->getType() == AstType::ID) {
-                    AstID *rvalID = static_cast<AstID *>(rvalExpr);
-                    if (typeTable[rvalID->getValue()] == DataType::Double)
-                        lval = compileValue(lvalExpr, DataType::Double);
-                }
-            } else if (lvalExpr->getType() == AstType::ID && rvalExpr->getType() == AstType::ID) {
-                AstID *lvalID = static_cast<AstID *>(lvalExpr);
-                AstID *rvalID = static_cast<AstID *>(rvalExpr);
-                
-                DataType lvalType = typeTable[lvalID->getValue()];
-                DataType rvalType = typeTable[rvalID->getValue()];
-                
-                if (lvalType == DataType::Float || lvalType == DataType::Double) fltOp = true;
-                if (rvalType == DataType::Float || rvalType == DataType::Double) fltOp = true;
-            }
-            
             bool strOp = false;
             bool rvalStr = false;
             
@@ -493,38 +462,20 @@ Value *Compiler::compileValue(AstExpression *expr, DataType dataType) {
             }
             
             // Otherwise, build a normal comparison
-            if ((dataType == DataType::Float || dataType == DataType::Double) || fltOp) {
-                switch (expr->getType()) {
-                    case AstType::Add: return builder->CreateFAdd(lval, rval);
-                    case AstType::Sub: return builder->CreateFSub(lval, rval);
-                    case AstType::Mul: return builder->CreateFMul(lval, rval);
-                    case AstType::Div: return builder->CreateFDiv(lval, rval);
+            switch (expr->getType()) {
+                case AstType::Add: return builder->CreateAdd(lval, rval);
+                case AstType::Sub: return builder->CreateSub(lval, rval);
+                case AstType::Mul: return builder->CreateMul(lval, rval);
+                case AstType::Div: return builder->CreateSDiv(lval, rval);
                     
-                    case AstType::EQ: return builder->CreateFCmpOEQ(lval, rval);
-                    case AstType::NEQ: return builder->CreateFCmpONE(lval, rval);
-                    case AstType::GT: return builder->CreateFCmpOGT(lval, rval);
-                    case AstType::LT: return builder->CreateFCmpOLT(lval, rval);
-                    case AstType::GTE: return builder->CreateFCmpOGE(lval, rval);
-                    case AstType::LTE: return builder->CreateFCmpOLE(lval, rval);
+                case AstType::EQ: return builder->CreateICmpEQ(lval, rval);
+                case AstType::NEQ: return builder->CreateICmpNE(lval, rval);
+                case AstType::GT: return builder->CreateICmpSGT(lval, rval);
+                case AstType::LT: return builder->CreateICmpSLT(lval, rval);
+                case AstType::GTE: return builder->CreateICmpSGE(lval, rval);
+                case AstType::LTE: return builder->CreateICmpSLE(lval, rval);
                     
-                    default: {}
-                }
-            } else {
-                switch (expr->getType()) {
-                    case AstType::Add: return builder->CreateAdd(lval, rval);
-                    case AstType::Sub: return builder->CreateSub(lval, rval);
-                    case AstType::Mul: return builder->CreateMul(lval, rval);
-                    case AstType::Div: return builder->CreateSDiv(lval, rval);
-                    
-                    case AstType::EQ: return builder->CreateICmpEQ(lval, rval);
-                    case AstType::NEQ: return builder->CreateICmpNE(lval, rval);
-                    case AstType::GT: return builder->CreateICmpSGT(lval, rval);
-                    case AstType::LT: return builder->CreateICmpSLT(lval, rval);
-                    case AstType::GTE: return builder->CreateICmpSGE(lval, rval);
-                    case AstType::LTE: return builder->CreateICmpSLE(lval, rval);
-                    
-                    default: {}
-                }
+                default: {}
             }
         } break;
         
@@ -553,9 +504,6 @@ Type *Compiler::translateType(DataType dataType, DataType subType, std::string t
         case DataType::UInt64: type = Type::getInt64Ty(*context); break;
         
         case DataType::String: type = Type::getInt8PtrTy(*context); break;
-        
-        case DataType::Float: type = Type::getFloatTy(*context); break;
-        case DataType::Double: type = Type::getDoubleTy(*context); break;
         
         case DataType::Array: {
             switch (subType) {

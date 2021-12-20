@@ -6,9 +6,8 @@
 
 #RET 0
 
-import std.io;
-
-extern println(ln:str);
+#import std.io;
+extern printf(s:str);
 
 func main -> int is
     var x, y : int := 20;
