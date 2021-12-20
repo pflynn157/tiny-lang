@@ -61,14 +61,6 @@ bool Parser::buildVariableDec(AstBlock *block) {
         case Float: dataType = DataType::Float; break;
         case Double: dataType = DataType::Double; break;
         
-        case Id: {
-            if (enums.find(token.id_val) != enums.end()) {
-                EnumDec dec = enums[token.id_val];
-                dataType = dec.type;
-                break;
-            }
-        } break;
-        
         default: {}
     }
     

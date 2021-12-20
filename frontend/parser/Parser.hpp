@@ -50,7 +50,6 @@ protected:
     bool buildLoopCtrl(AstBlock *block, bool isBreak);
     
     // Structure.cpp
-    bool buildEnum();
     bool buildStruct();
     bool buildStructMember(AstStruct *str, Token token);
     bool buildStructDec(AstBlock *block);
@@ -73,6 +72,5 @@ private:
     std::map<std::string, std::pair<DataType,DataType>> typeMap;
     std::map<std::string, std::pair<DataType, AstExpression*>> globalConsts;
     std::map<std::string, std::pair<DataType, AstExpression*>> localConsts;
-    std::map<std::string, EnumDec> enums;
 };
 

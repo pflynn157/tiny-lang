@@ -91,25 +91,3 @@ private:
     DataType ptrType = DataType::Void;
     std::string dtName = "";
 };
-
-// Represents a class
-class AstClass {
-public:
-    explicit AstClass(std::string name) {
-        this->name = name;
-    }
-    
-    void addFunction(AstFunction *func) {
-        functions.push_back(func);
-    }
-    
-    std::string getName() { return name; }
-    std::vector<AstFunction *> getFunctions() {
-        return functions;
-    }
-    
-    void print();
-private:
-    std::string name = "";
-    std::vector<AstFunction *> functions;
-};

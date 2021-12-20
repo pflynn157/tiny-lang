@@ -34,8 +34,6 @@ void AstTree::print() {
     std::cout << "FILE: " << file << std::endl;
     std::cout << std::endl;
     
-    for (auto c : classes) c->print();
-    
     for (auto str : structs) str->print();
     
     for (auto stmt : global_statements) {
@@ -95,16 +93,6 @@ void AstStruct::print() {
         std::cout << " ";
         defaultExpressions[var.name]->print();
         std::cout << std::endl;
-    }
-    std::cout << std::endl;
-}
-
-void AstClass::print() {
-    std::cout << "CLASS " << name << std::endl;
-    
-    for (auto stmt : functions) {
-        std::cout << "  ";
-        stmt->print();
     }
     std::cout << std::endl;
 }

@@ -90,18 +90,11 @@ struct Var {
     std::string typeName;
 };
 
-// Represents an ENUM
+// Forward declarations
 class AstExpression;
-
-struct EnumDec {
-    std::string name;
-    DataType type;
-    std::map<std::string, AstExpression*> values;
-};
-
-// Represents a block
 class AstStatement;
 
+// Represents a block
 class AstBlock {
 public:
     void addStatement(AstStatement *stmt) { block.push_back(stmt); }

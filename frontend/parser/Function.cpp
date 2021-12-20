@@ -136,24 +136,18 @@ bool Parser::buildFunction(Token startToken, std::string className) {
             case Str: funcType = DataType::String; break;
             
             case Id: {
-                if (enums.find(token.id_val) != enums.end()) {
-                    EnumDec dec = enums[token.id_val];
-                    funcType = dec.type;
-                    break;
-                }
-                
                 bool isStruct = false;
-                    for (auto s : tree->getStructs()) {
-                        if (s->getName() == token.id_val) {
-                            isStruct = true;
-                            break;
-                        }
+                for (auto s : tree->getStructs()) {
+                    if (s->getName() == token.id_val) {
+                        isStruct = true;
+                        break;
                     }
+                }
                     
-                    if (isStruct) {
-                        funcType = DataType::Struct;
-                        retName = token.id_val;
-                    }
+                if (isStruct) {
+                    funcType = DataType::Struct;
+                    retName = token.id_val;
+                }
             } break;
             
             default: {}
