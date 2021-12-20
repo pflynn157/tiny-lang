@@ -115,8 +115,6 @@ bool Parser::buildBlock(AstBlock *block, int stopLayer, AstIfStmt *parentBlock, 
             
             // Handle loops
             case While: code = buildWhile(block); break;
-            case ForAll: code = buildForAll(block); break;
-            
             case Break: code = buildLoopCtrl(block, true); break;
             case Continue: code = buildLoopCtrl(block, false); break;
             

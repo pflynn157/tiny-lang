@@ -48,7 +48,6 @@ protected:
     // Flow.cpp
     void compileIfStatement(AstStatement *stmt);
     void compileWhileStatement(AstStatement *stmt);
-    void compileForAllStatement(AstStatement *stmt);
 private:
     AstTree *tree;
     CFlags cflags;

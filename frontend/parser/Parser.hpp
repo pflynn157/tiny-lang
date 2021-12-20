@@ -44,7 +44,6 @@ protected:
     bool buildElif(AstIfStmt *block);
     bool buildElse(AstIfStmt *block);
     bool buildWhile(AstBlock *block);
-    bool buildForAll(AstBlock *block);
     bool buildLoopCtrl(AstBlock *block, bool isBreak);
     
     // Structure.cpp

@@ -98,48 +98,6 @@ bool Parser::buildWhile(AstBlock *block) {
     return true;
 }
 
-// Builds a forall loop
-bool Parser::buildForAll(AstBlock *block) {
-    AstForAllStmt *loop = new AstForAllStmt;
-    block->addStatement(loop);
-    
-    // Get the index
-    Token token = scanner->getNext();
-    if (token.type != Id) {
-        syntax->addError(scanner->getLine(), "Expected variable name for index.");
-        return false;
-    }
-    
-    loop->setIndex(new AstID(token.id_val));
-    
-    token = scanner->getNext();
-    if (token.type != In) {
-        syntax->addError(scanner->getLine(), "Expected \"in\".");
-        return false;
-    }
-    
-    // Get the array we are iterating through
-    token = scanner->getNext();
-    if (token.type != Id) {
-        syntax->addError(scanner->getLine(), "Expected array for iteration value.");
-        return false;
-    }
-    
-    loop->setArray(new AstID(token.id_val));
-    
-    // Make sure we end with the "do" keyword
-    token = scanner->getNext();
-    if (token.type != Do) {
-        syntax->addError(scanner->getLine(), "Expected \"do\".");
-        return false;
-    }
-    
-    ++layer;
-    buildBlock(loop->getBlockStmt(), layer);
-    
-    return true;
-}
-
 // Builds a loop keyword
 bool Parser::buildLoopCtrl(AstBlock *block, bool isBreak) {
     if (isBreak) block->addStatement(new AstBreak);

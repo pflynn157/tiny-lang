@@ -31,8 +31,10 @@ func main -> int is
         i := i + 2;
     end
     
-    forall i in numbers do
-        printf("%d\n", i);
+    i := 0;
+    while i < 10 do
+        printf("%d\n", numbers[i]);
+        i := i + 1;
     end
     
     return 0;

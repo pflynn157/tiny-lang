@@ -225,22 +225,6 @@ public:
     void print();
 };
 
-// Represents a for-all loop
-class AstForAllStmt : public AstBlockStmt {
-public:
-    explicit AstForAllStmt() : AstBlockStmt(AstType::ForAll) {}
-    
-    void setIndex(AstID *indexVar) { this->indexVar = indexVar; }
-    void setArray(AstID *arrayVar) { this->arrayVar = arrayVar; }
-    
-    AstID *getIndex() { return indexVar; }
-    AstID *getArray() { return arrayVar; }
-    
-    void print();
-private:
-    AstID *indexVar, *arrayVar;
-};
-
 // Represents a break statement for a loop
 class AstBreak : public AstStatement {
 public:
