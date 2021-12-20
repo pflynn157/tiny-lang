@@ -160,19 +160,6 @@ public:
     void print();
 };
 
-// Represents a boolean literal
-class AstBool : public AstExpression {
-public:
-    explicit AstBool(int val) : AstExpression(AstType::BoolL) {
-        this->val = val;
-    }
-    
-    int getValue() { return val; }
-    void print();
-private:
-    int val = 0;
-};
-
 // Represents a character literal
 class AstChar : public AstExpression {
 public:

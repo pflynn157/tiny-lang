@@ -289,11 +289,6 @@ void Compiler::compileStatement(AstStatement *stmt) {
 // Converts an AST value to an LLVM value
 Value *Compiler::compileValue(AstExpression *expr, DataType dataType) {
     switch (expr->getType()) {
-        case AstType::BoolL: {
-            AstBool *b = static_cast<AstBool *>(expr);
-            return builder->getInt1(b->getValue());
-        } break;
-    
         case AstType::ByteL: {
             AstByte *i8 = static_cast<AstByte *>(expr);
             return builder->getInt8(i8->getValue());
@@ -543,8 +538,6 @@ Type *Compiler::translateType(DataType dataType, DataType subType, std::string t
     Type *type;
             
     switch (dataType) {
-        case DataType::Bool: type = Type::getInt1Ty(*context); break;
-    
         case DataType::Char:
         case DataType::Byte:
         case DataType::UByte: type = Type::getInt8Ty(*context); break;
@@ -552,6 +545,7 @@ Type *Compiler::translateType(DataType dataType, DataType subType, std::string t
         case DataType::Short:
         case DataType::UShort: type = Type::getInt16Ty(*context); break;
         
+        case DataType::Bool:
         case DataType::Int32:
         case DataType::UInt32: type = Type::getInt32Ty(*context); break;
         

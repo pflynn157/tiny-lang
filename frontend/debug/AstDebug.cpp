@@ -340,11 +340,6 @@ void AstLTEOp::print() {
     std::cout << ")";
 }
 
-void AstBool::print() {
-    if (val == 0) std::cout << "FALSE";
-    else std::cout << "TRUE";
-}
-
 void AstChar::print() {
     std::cout << "CHAR(" << val << ")";
 }

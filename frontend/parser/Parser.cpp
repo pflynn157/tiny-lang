@@ -181,12 +181,12 @@ bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType
         switch (token.type) {
             case True: {
                 lastWasOp = false;
-                output.push(new AstBool(1));
+                output.push(new AstInt(1));
             } break;
             
             case False: {
                 lastWasOp = false;
-                output.push(new AstBool(0));
+                output.push(new AstInt(0));
             } break;
             
             case CharL: {

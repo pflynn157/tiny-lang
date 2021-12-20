@@ -46,7 +46,6 @@ enum class AstType {
     GTE,
     LTE,
     
-    BoolL,
     CharL,
     ByteL,
     WordL,

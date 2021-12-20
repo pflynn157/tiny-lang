@@ -21,7 +21,7 @@ AstExpression *Parser::checkCondExpression(AstExpression *toCheck) {
             eq->setLVal(id);
             
             switch (dataType) {
-                case DataType::Bool: eq->setRVal(new AstBool(1)); break;
+                case DataType::Bool: eq->setRVal(new AstInt(1)); break;
                 case DataType::Byte:
                 case DataType::UByte: eq->setRVal(new AstByte(1)); break;
                 case DataType::Short:
