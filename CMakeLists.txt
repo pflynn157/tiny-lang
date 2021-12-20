@@ -22,19 +22,4 @@ add_definitions(${LLVM_DEFINITIONS})
 add_subdirectory(frontend)
 add_subdirectory(compiler)
 add_subdirectory(src)
-add_subdirectory(lib)
 
-if (BUILD_GUI)
-    set(CMAKE_AUTOMOC ON)
-    set(CMAKE_AUTORCC ON)
-    set(CMAKE_AUTOUIC ON)
-    
-    find_package(Qt5 REQUIRED COMPONENTS
-        Core
-        Widgets
-        Gui
-        Xml
-    )
-    
-    add_subdirectory(ide)
-endif()
