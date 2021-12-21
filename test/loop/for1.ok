@@ -6,17 +6,14 @@
 
 #RET 0
 
-extern printf(ln:string, x:i32);
-
 func main -> i32 is
     var i : i32 := 0;
     while i < 10 do
-        printf("%d|", i);
+        print("%d|", i);
         i := i + 1;
     end
     
-    printf("\n");
-    printf("Done\n");
+    println("\nDone");
     
     return 0;
 end

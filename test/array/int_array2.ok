@@ -14,8 +14,6 @@
 
 #RET 0
 
-extern printf(line:string, x:i32);
-
 func main -> i32 is
     var numbers : i32[10];
     var x : i32 := 0;
@@ -28,7 +26,7 @@ func main -> i32 is
     
     i := 0;
     while i < 10 do
-        printf("%d\n", numbers[i]);
+        println("%d", numbers[i]);
         i := i + 1;
     end
     

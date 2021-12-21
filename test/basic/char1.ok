@@ -6,14 +6,12 @@
 
 #RET 0
 
-extern printf(line:string, x:i32);
-
 func main -> i32 is
     var c : char := 'A';
     var c2 : char := c;
     
-    printf("%c\n", c);
-    printf("%c\n", c2);
+    println("%c", c);
+    println("%c", c2);
     return 0;
 end
 

@@ -60,7 +60,7 @@ std::string preprocessFile(std::string input) {
         
         // Load the include path
         // TODO: We need better path support
-        path = "/usr/local/include/orka/" + path + ".oh";
+        path = "/usr/local/include/tinylang/" + path + ".th";
         std::string preprocInclude = preprocessFile(path);
         
         std::ifstream reader(preprocInclude.c_str());

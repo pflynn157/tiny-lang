@@ -8,15 +8,12 @@
 
 #RET 0
 
-#import std.io;
-extern printf(s:string);
-
 func test1(x:i16) is
     if x = 20 then println("True");
     else println("False");
     end
     
-    printf("%d\n", x);
+    println("%d", x);
 end
 
 func test2(x:i16) is
@@ -24,7 +21,7 @@ func test2(x:i16) is
     else println("False");
     end
     
-    printf("%d\n", x);
+    println("%d", x);
 end
 
 func main -> i32 is

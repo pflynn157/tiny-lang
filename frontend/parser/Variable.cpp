@@ -97,7 +97,8 @@ bool Parser::buildVariableDec(AstBlock *block) {
             callMalloc->clearArguments();
             
             AstInt *size;
-            if (dataType == DataType::I32) size = new AstInt(4);
+            if (dataType == DataType::I32 | dataType == DataType::U32) size = new AstInt(4);
+            else if (dataType == DataType::I64 || dataType == DataType::U64) size = new AstInt(8);
             else if (dataType == DataType::String) size = new AstInt(8);
             else size = new AstInt(1);
             

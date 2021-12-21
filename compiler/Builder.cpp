@@ -93,28 +93,15 @@ void Compiler::assemble() {
     std::string cmd = "as /tmp/" + cflags.name + ".asm -o /tmp/" + cflags.name + ".o";
     system(cmd.c_str());
 }
-#include <iostream>
+
 // Link
 // TODO: Same as above...
-// Also... We shouldn't be using GCC to link
 void Compiler::link() {
     std::string cmd = "ld ";
-#ifdef LINK_FEDORA
-    //cmd += "/usr/lib64/crt1.o /usr/lib64/crti.o /usr/lib64/crtn.o ";
-#else
-    //cmd += "/usr/lib/x86_64-linux-gnu/crt1.o /usr/lib/x86_64-linux-gnu/crti.o /usr/lib/x86_64-linux-gnu/crtn.o ";
-#endif
-    cmd += "/usr/local/lib/orka/occ_start.o ";
+    cmd += "/usr/local/lib/tinylang/ti_start.o ";
     cmd += "/tmp/" + cflags.name + ".o -o " + cflags.name;
     cmd += " -dynamic-linker /lib64/ld-linux-x86-64.so.2 ";
-    //cmd += "-lc";
-    if (cflags.clib) {
-        cmd += "-lorka_clib -lc";
-    } else if (cflags.local_clib) {
-        cmd += "-L./lib/clib -lorka_clib2 -lc";
-    } else {
-        cmd += "-lorka -lorka_corelib";
-    }
+    cmd += "-ltinylang -lc";
     system(cmd.c_str());
 }
 

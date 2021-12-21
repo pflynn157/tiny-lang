@@ -6,15 +6,12 @@
 
 #RET 0
 
-extern printf(line:string, x:i32);
-
 func printArray(str:char[], size:i32) is
     var i : i32 := 0;
     while i < size do
-        printf("%c", str[i]);
+        print("%c", str[i]);
         i := i + 1;
     end
-    #println("");
 end
 
 func main -> i32 is
@@ -39,7 +36,7 @@ func main -> i32 is
     
     i := 0;
     while i < 10 do
-        printf("%c", str[i]);
+        print("%c", str[i]);
         i := i + 1;
     end
     

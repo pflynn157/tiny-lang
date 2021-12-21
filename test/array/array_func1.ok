@@ -6,13 +6,11 @@
 
 #RET 0
 
-extern printf(line:string, x:i32);
-
 func printArray(numbers:i32[], size:i32) is
     var x : i32 := numbers[2];
     
-    printf("%d\n", x);
-    printf("Size: %d\n", size);
+    println("%d", x);
+    println("Size: %d", size);
 end
 
 func main -> i32 is

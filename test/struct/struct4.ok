@@ -10,9 +10,6 @@
 
 #RET 0
 
-#import std.io;
-extern printf(s:string);
-
 struct S1 is
     x : i32 := 10;
     y : i32 := 20;
@@ -26,8 +23,8 @@ func initStruct -> S1 is
 end
 
 func printStruct(s:S1) is
-    printf("X: %d\n", s.x);
-    printf("Y: %d\n", s.y);
+    println("X: %d", s.x);
+    println("Y: %d", s.y);
 end
 
 func updateStruct(s:S1) is

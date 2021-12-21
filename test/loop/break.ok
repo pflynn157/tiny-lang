@@ -9,15 +9,13 @@
 
 #RET 0
 
-extern printf(ln:string, x:i32);
-
 func main -> i32 is
     var x : i32 := 0;
     
     while x < 10 do
         if x = 5 then break; end
         
-        printf("%d\n", x);
+        println("%d", x);
         x := x + 1;
     end
     

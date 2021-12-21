@@ -5,14 +5,12 @@
 
 #RET 0
 
-extern printf(ln:string, x:i32);
-
 const Top : i32 := 30;
 
 func main -> i32 is
     const x : i32 := 20;
     
-    printf("CONST: %d, %d\n", x, Top);
+    println("CONST: %d, %d", x, Top);
     
     return 0;
 end

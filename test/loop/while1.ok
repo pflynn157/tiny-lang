@@ -14,17 +14,15 @@
 
 #RET 0
 
-extern printf(ln:string, x:i32);
-
 func main -> i32 is
     var x : i32 := 0;
     
     while x < 10 do
         if x > 5 then
-            printf("^ ");
+            print("^ ");
         end
         
-        printf("X: %d\n", x);
+        println("X: %d", x);
         x := x + 1;
     end
 

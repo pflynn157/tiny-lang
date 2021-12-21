@@ -12,8 +12,6 @@
 
 #RET 0
 
-extern printf(ln:string, x:i32);
-
 func main -> i32 is
     var x : i32 := 0;
     
@@ -23,7 +21,7 @@ func main -> i32 is
             continue;
         end
         
-        printf("%d\n", x);
+        println("%d", x);
         x := x + 1;
     end
     

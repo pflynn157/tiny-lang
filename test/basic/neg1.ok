@@ -5,13 +5,10 @@
 
 #RET 0
 
-#import std.io;
-extern printf(s:string);
-
 func main -> i32 is
     var x : i32 := -1 + -2;
     
-    printf("%d\n", x);
+    println("%d", x);
     
     return 0;
 end

@@ -14,8 +14,6 @@
 
 #RET 0
 
-extern printf(ln:string, x:i32);
-
 func main -> i32 is
     var x : i32 := 0;
     var i : i32 := 0;
@@ -24,15 +22,15 @@ func main -> i32 is
         i := 1;
         while i <= x + 1 do
             if i = 5 then
-                printf("!===!");
+                print("!===!");
                 i := i + 1;
                 continue;
             end
         
-            printf("*");
+            print("*");
             i := i + 1;
         end
-        printf("\n");
+        println("");
         
         x := x + 1;
     end

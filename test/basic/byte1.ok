@@ -5,12 +5,9 @@
 
 #RET 0
 
-extern println(line:string);
-extern printf(line:string, x:i32);
-
 func main -> i32 is
     var x : i8 := 0x21;
-    printf("%x\n", x);
+    println("%x", x);
     
     return 0;
 end
