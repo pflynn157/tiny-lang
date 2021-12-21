@@ -18,7 +18,7 @@ std::string getInputPath(std::string input) {
         else name += c;
     }
     
-    name += "_pre.ok";
+    name += "_pre.tl";
     return name;
 }
 
@@ -29,7 +29,7 @@ std::string preprocessFile(std::string input) {
         return "";
     }
     
-    std::ofstream writer(newPath);
+    std::string content = "";
     
     // Read until the end of the file
     Token token;
@@ -37,7 +37,7 @@ std::string preprocessFile(std::string input) {
         token = scanner->getNext();
         
         if (token.type != Import) {
-            writer << scanner->getRawBuffer();
+            content += scanner->getRawBuffer();
             continue;
         }
         
@@ -71,7 +71,7 @@ std::string preprocessFile(std::string input) {
         
         std::string line = "";
         while (std::getline(reader, line)) {
-            writer << line;
+            content += line + "\n";
         }
         
         reader.close();
@@ -79,6 +79,14 @@ std::string preprocessFile(std::string input) {
         
         // Drop the buffer so we don't put the include line back in
         scanner->getRawBuffer();
+    }
+    
+    std::ofstream writer(newPath, std::ios_base::out | std::ios_base::trunc);
+    if (writer.is_open()) {
+        writer << content;
+        writer.close();
+    } else {
+        std::cerr << "Unable to open new file in preproc" << std::endl;
     }
     
     delete scanner;

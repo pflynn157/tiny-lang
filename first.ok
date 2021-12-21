@@ -8,18 +8,37 @@
 
 #RET 0
 
-func main(args:string[]) -> i32 is
-    var str1 : string := "Hello!";
-    var str2 : string := " How are you?";
+import std.fs;
+
+func main() -> i32 is
+    var fd : i32 := fs_open("../first.ok", 1);
+    if fd = 0 then
+        println("Unable to open.");
+        return 1;
+    end
     
-    println(str1);
-    println(str2);
+    while fs_eof(fd) = false do
+        var c : char := fs_get(fd);
+        
+        if fs_eof(fd) = false then
+            print("%c", c);
+        end
+    end
     
-    var str3 : string := str1 + str2;
-    println(str3);
+    fs_close(fd);
     
-    var str4 : string := str1 + '!';
-    println(str4);
+    #
+    # Now, write
+    #
+    fd := fs_open("test.txt", 2);
+    if fd = 0 then
+        println("Unable to open for write.");
+        return 1;
+    end
+    
+    fs_writeln(fd, "Hello!");
+    fs_writeln(fd, "How are you?");
+    fs_close(fd);
     
     return 0;
 end

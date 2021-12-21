@@ -131,7 +131,16 @@ bool Parser::buildFunction(Token startToken, std::string className) {
     if (token.type == Arrow) {
         token = scanner->getNext();
         switch (token.type) {
+            case Bool: funcType = DataType::Bool; break;
+            case Char: funcType = DataType::Char; break;
+            case I8: funcType = DataType::I8; break;
+            case U8: funcType = DataType::U8; break;
+            case I16: funcType = DataType::I16; break;
+            case U16: funcType = DataType::U16; break;
             case I32: funcType = DataType::I32; break;
+            case U32: funcType = DataType::U32; break;
+            case I64: funcType = DataType::I64; break;
+            case U64: funcType = DataType::U64; break;
             case Str: funcType = DataType::String; break;
             
             case Id: {

@@ -52,7 +52,8 @@ bool Parser::buildStructMember(AstStruct *str, Token token) {
     // Get the data type
     token = scanner->getNext();
     if (token.type != Colon) {
-        syntax->addError(scanner->getLine(), "Expected \':\'.");
+        syntax->addError(scanner->getLine(), "Expected \':\' in structure member.");
+        token.print();
         return false;
     }
     
