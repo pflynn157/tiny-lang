@@ -67,7 +67,6 @@ enum class DataType {
     I32, U32,
     I64, U64,
     String,
-    Array,
     Ptr,
     Struct
 };

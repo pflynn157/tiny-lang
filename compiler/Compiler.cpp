@@ -25,32 +25,6 @@ Compiler::Compiler(AstTree *tree, CFlags cflags) {
     context = std::make_unique<LLVMContext>();
     mod = std::make_unique<Module>(cflags.name, *context);
     builder = std::make_unique<IRBuilder<>>(*context);
-    
-    // Create the global structure type
-    std::vector<Type *> arrayTypes;
-    arrayTypes.push_back(Type::getInt32PtrTy(*context));
-    arrayTypes.push_back(Type::getInt32Ty(*context));
-    i32ArrayType = StructType::create(*context, arrayTypes);
-    i32ArrayType->setName("IntArrayType");
-    
-    arrayTypes.clear();
-    arrayTypes.push_back(Type::getInt64PtrTy(*context));
-    arrayTypes.push_back(Type::getInt32Ty(*context));
-    i64ArrayType = StructType::create(*context, arrayTypes);
-    i64ArrayType->setName("Int64ArrayType");
-    
-    arrayTypes.clear();
-    arrayTypes.push_back(Type::getInt8PtrTy(*context));
-    arrayTypes.push_back(Type::getInt32Ty(*context));
-    i8ArrayType = StructType::create(*context, arrayTypes);
-    i8ArrayType->setName("CharArrayType");
-    
-    auto strList = PointerType::getUnqual(Type::getInt8PtrTy(*context));
-    arrayTypes.clear();
-    arrayTypes.push_back(strList);
-    arrayTypes.push_back(Type::getInt32Ty(*context));
-    strArrayType = StructType::create(*context, arrayTypes);
-    strArrayType->setName("StrArrayType");
 
     //
     // Add declarations for built-in functions
@@ -149,13 +123,6 @@ void Compiler::compileStatement(AstStatement *stmt) {
             symtable[vd->getName()] = var;
             typeTable[vd->getName()] = vd->getDataType();
             ptrTable[vd->getName()] = vd->getPtrType();
-            
-            // If we have an array, set the size of the structure
-            if (vd->getDataType() == DataType::Array) {
-                Value *size = compileValue(vd->getPtrSize());
-                Value *sizePtr = builder->CreateStructGEP(type, var, 1);
-                builder->CreateStore(size, sizePtr);
-            }
         } break;
         
         // A structure declaration
@@ -199,13 +166,7 @@ void Compiler::compileStatement(AstStatement *stmt) {
             DataType ptrType = typeTable[va->getName()];
             Value *val = compileValue(stmt->getExpressions().at(0), ptrType);
             
-            if (ptrType == DataType::Array) {
-                Type *type = translateType(ptrType, ptrTable[va->getName()]);
-                Value *arrayPtr = builder->CreateStructGEP(type, ptr, 0);
-                builder->CreateStore(val, arrayPtr);
-            } else {
-                builder->CreateStore(val, ptr);
-            }
+            builder->CreateStore(val, ptr);
         } break;
         
         // An array assignment
@@ -227,11 +188,10 @@ void Compiler::compileStatement(AstStatement *stmt) {
                 builder->CreateStore(val, ep);
             } else {
                 DataType subType = ptrTable[pa->getName()];
-                StructType *arrayPtrType = static_cast<StructType *>(translateType(ptrType, subType));
+                Type *arrayPtrType = translateType(ptrType, subType);
                 Type *arrayElementType = translateType(subType);
-            
-                Value *arrayPtr = builder->CreateStructGEP(arrayPtrType, ptr, 0);
-                Value *ptrLd = builder->CreateLoad(arrayPtrType->getElementType(0), arrayPtr);
+                
+                Value *ptrLd = builder->CreateLoad(arrayPtrType, ptr);
                 Value *ep = builder->CreateGEP(arrayElementType, ptrLd, index);
                 builder->CreateStore(val, ep);
             }
@@ -343,11 +303,10 @@ Value *Compiler::compileValue(AstExpression *expr, DataType dataType) {
                 return builder->CreateLoad(i8Type, ep);
             } else {
                 DataType subType = ptrTable[acc->getValue()];
-                StructType *arrayPtrType = static_cast<StructType *>(translateType(ptrType, subType));
+                Type *arrayPtrType = translateType(ptrType, subType);
                 Type *arrayElementType = translateType(subType);
-            
-                Value *arrayPtr = builder->CreateStructGEP(arrayPtrType, ptr, 0);
-                Value *ptrLd = builder->CreateLoad(arrayPtrType->getElementType(0), arrayPtr);
+                
+                Value *ptrLd = builder->CreateLoad(arrayPtrType, ptr);
                 Value *ep = builder->CreateGEP(arrayElementType, ptrLd, index);
                 return builder->CreateLoad(arrayElementType, ep);
             }
@@ -505,29 +464,22 @@ Type *Compiler::translateType(DataType dataType, DataType subType, std::string t
         
         case DataType::String: type = Type::getInt8PtrTy(*context); break;
         
-        case DataType::Array: {
-            switch (subType) {
-                case DataType::Char: type = i8ArrayType; break;
-                
-                case DataType::I32:
-                case DataType::U32: type = i32ArrayType; break;
-                
-                case DataType::I64:
-                case DataType::U64: type = i64ArrayType; break;
-                
-                case DataType::String: type = strArrayType; break;
-                
-                default: {}
-            }
-        } break;
-        
         case DataType::Ptr: {
             switch (subType) {
-                case DataType::Char: type = Type::getInt8PtrTy(*context); break;
-                case DataType::I32: type = Type::getInt32PtrTy(*context); break;
-                case DataType::U32: type = Type::getInt64PtrTy(*context); break;
+                case DataType::Char:
+                case DataType::I8:
+                case DataType::U8: type = Type::getInt8PtrTy(*context); break;
                 
-                case DataType::String: type = strArrayType; break;
+                case DataType::I16:
+                case DataType::U16: type = Type::getInt16PtrTy(*context); break;
+                
+                case DataType::I32:
+                case DataType::U32: type = Type::getInt32PtrTy(*context); break;
+                
+                case DataType::I64:
+                case DataType::U64: type = Type::getInt64PtrTy(*context); break;
+                
+                case DataType::String: type = PointerType::getUnqual(Type::getInt8PtrTy(*context)); break;
                 
                 default: {}
             }

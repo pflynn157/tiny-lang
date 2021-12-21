@@ -66,7 +66,7 @@ bool Parser::buildVariableDec(AstBlock *block) {
     
     // We have an array
     if (token.type == LBracket) {
-        AstVarDec *empty = new AstVarDec("", DataType::Array);
+        AstVarDec *empty = new AstVarDec("", DataType::Ptr);
         if (!buildExpression(empty, DataType::I32, RBracket)) return false;   
         
         token = scanner->getNext();
@@ -76,14 +76,14 @@ bool Parser::buildVariableDec(AstBlock *block) {
         }
         
         for (std::string name : toDeclare) {
-            AstVarDec *vd = new AstVarDec(name, DataType::Array);
+            AstVarDec *vd = new AstVarDec(name, DataType::Ptr);
             block->addStatement(vd);
             vd->addExpression(empty->getExpression());
             vd->setPtrType(dataType);
             
             // Create an assignment to a malloc call
             AstVarAssign *va = new AstVarAssign(name);
-            va->setDataType(DataType::Array);
+            va->setDataType(DataType::Ptr);
             va->setPtrType(dataType);
             block->addStatement(va);
             
@@ -109,7 +109,7 @@ bool Parser::buildVariableDec(AstBlock *block) {
             // Finally, set the size of the declaration
             vd->setPtrSize(arg);
             
-            typeMap[name] = std::pair<DataType, DataType>(DataType::Array, dataType);
+            typeMap[name] = std::pair<DataType, DataType>(DataType::Ptr, dataType);
         }
     
     // We're at the end of the declaration

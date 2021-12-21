@@ -91,7 +91,7 @@ bool Parser::buildStructMember(AstStruct *str, Token token) {
             
         Var v;
         v.name = valName;
-        v.type = DataType::Array;
+        v.type = DataType::Ptr;
         v.subType = dataType;
             
         str->addItem(v, expr);

@@ -83,7 +83,7 @@ bool Parser::getFunctionArgs(std::vector<Var> &args) {
                 else token = token2;
                 
                 v.subType = v.type;
-                v.type = DataType::Array;
+                v.type = DataType::Ptr;
             }
             
             args.push_back(v);
@@ -161,7 +161,7 @@ bool Parser::buildFunction(Token startToken, std::string className) {
             }
             
             ptrType = funcType;
-            funcType = DataType::Array;
+            funcType = DataType::Ptr;
             
             token = scanner->getNext();
         }

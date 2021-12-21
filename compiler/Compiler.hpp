@@ -60,12 +60,6 @@ private:
     DataType currentFuncType = DataType::Void;
     std::string funcTypeStruct = "";
     
-    // The array types
-    StructType *i8ArrayType;
-    StructType *i32ArrayType;
-    StructType *i64ArrayType;
-    StructType *strArrayType;
-    
     // The user-defined structure table
     std::map<std::string, StructType*> structTable;
     std::map<std::string, std::string> structVarTable;

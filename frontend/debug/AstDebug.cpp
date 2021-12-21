@@ -21,7 +21,6 @@ std::string printDataType(DataType dataType) {
         case DataType::I64: return "i64";
         case DataType::U64: return "u64";
         case DataType::String: return "string";
-        case DataType::Array: return "array";
         case DataType::Ptr: return "ptr";
         case DataType::Struct: return "struct";
     }

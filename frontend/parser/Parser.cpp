@@ -213,7 +213,7 @@ bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType
                 std::string name = token.id_val;
                 if (varType == DataType::Void) {
                     varType = typeMap[name].first;
-                    if (varType == DataType::Array) varType = typeMap[name].second;
+                    if (varType == DataType::Ptr) varType = typeMap[name].second;
                 }
                 
                 token = scanner->getNext();
