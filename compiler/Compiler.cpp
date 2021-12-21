@@ -350,6 +350,9 @@ Value *Compiler::compileValue(AstExpression *expr, DataType dataType) {
         case AstType::Sub: 
         case AstType::Mul:
         case AstType::Div:
+        case AstType::And:
+        case AstType::Or:
+        case AstType::Xor:
         case AstType::EQ:
         case AstType::NEQ:
         case AstType::GT:
@@ -426,6 +429,10 @@ Value *Compiler::compileValue(AstExpression *expr, DataType dataType) {
                 case AstType::Sub: return builder->CreateSub(lval, rval);
                 case AstType::Mul: return builder->CreateMul(lval, rval);
                 case AstType::Div: return builder->CreateSDiv(lval, rval);
+                
+                case AstType::And: return builder->CreateAnd(lval, rval);
+                case AstType::Or:  return builder->CreateOr(lval, rval);
+                case AstType::Xor: return builder->CreateXor(lval, rval);
                     
                 case AstType::EQ: return builder->CreateICmpEQ(lval, rval);
                 case AstType::NEQ: return builder->CreateICmpNE(lval, rval);

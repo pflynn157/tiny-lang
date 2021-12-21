@@ -261,7 +261,10 @@ bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType
             } break;
             
             case Plus: 
-            case Minus: {
+            case Minus:
+            case And:
+            case Or:
+            case Xor: {
                 if (opStack.size() > 0) {
                     AstType type = opStack.top()->getType();
                     if (type == AstType::Mul || type == AstType::Div) {
@@ -283,6 +286,12 @@ bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType
                 if (token.type == Plus) {
                     AstAddOp *add = new AstAddOp;
                     opStack.push(add);
+                } else if (token.type == And) {
+                    opStack.push(new AstAndOp);
+                } else if (token.type == Or) {
+                    opStack.push(new AstOrOp);
+                } else if (token.type == Xor) {
+                    opStack.push(new AstXorOp);
                 } else {
                     if (lastWasOp) {
                         opStack.push(new AstNegOp);

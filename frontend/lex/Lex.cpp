@@ -190,7 +190,10 @@ bool Scanner::isSymbol(char c) {
         case '+': 
         case '-': 
         case '*': 
-        case '/': 
+        case '/':
+        case '&':
+        case '|':
+        case '^': 
         case '>':
         case '<': 
         case '!': return true;
@@ -245,6 +248,9 @@ TokenType Scanner::getSymbol(char c) {
         case '/': return Div;
         case '=': return EQ;
         case '.': return Dot;
+        case '&': return And;
+        case '|': return Or;
+        case '^': return Xor;
         
         case ':': {
             char c2 = reader.get();

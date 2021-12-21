@@ -100,6 +100,36 @@ public:
     void print();
 };
 
+// Represents a division operation
+class AstAndOp : public AstBinaryOp {
+public:
+    AstAndOp() {
+        this->type = AstType::And;
+    }
+    
+    void print();
+};
+
+// Represents an or operation
+class AstOrOp : public AstBinaryOp {
+public:
+    AstOrOp() {
+        this->type = AstType::Or;
+    }
+    
+    void print();
+};
+
+// Represents a xor operation
+class AstXorOp : public AstBinaryOp {
+public:
+    AstXorOp() {
+        this->type = AstType::Xor;
+    }
+    
+    void print();
+};
+
 // Represents an equal-to operation
 class AstEQOp : public AstBinaryOp {
 public:

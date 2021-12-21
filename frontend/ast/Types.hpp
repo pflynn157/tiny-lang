@@ -39,6 +39,10 @@ enum class AstType {
     Mul,
     Div,
     
+    And,
+    Or,
+    Xor,
+    
     EQ,
     NEQ,
     GT,

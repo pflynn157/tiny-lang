@@ -68,6 +68,10 @@ enum TokenType {
     Mul,
     Div,
     
+    And,
+    Or,
+    Xor,
+    
     EQ,
     NEQ,
     GT,
