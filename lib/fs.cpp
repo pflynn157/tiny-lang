@@ -4,7 +4,7 @@
 #include <cstring>
 
 std::map<int, std::ifstream *> file_map;
-std::map<int, std::ofstream *> writer_map;
+std::map<int, FILE *> writer_map;
 int idx = 1;
 
 extern "C" {
@@ -18,11 +18,10 @@ int fs_open(const char *path, int mode) {
             return idx;
         }
     } else if (mode == 2) {
-        std::ofstream *writer = new std::ofstream(path);
-        writer->open(path);
-        if (writer->is_open()) {
+        FILE *file = fopen(path, "w");
+        if (file != NULL) {
             ++idx;
-            writer_map[idx] = writer;
+            writer_map[idx] = file;
             return idx;
         }
     }
@@ -42,19 +41,24 @@ int fs_get(int fd) {
 }
 
 void fs_writeln(int fd, const char *input) {
-    std::ofstream *writer = writer_map[fd];
-    if (writer == nullptr) return;
-    //writer->write(input, strlen(input));
-    *writer << std::string(input);
-    *writer << std::endl;
+    FILE *writer = writer_map[fd];
+    if (writer == NULL) return;
+    fputs(input, writer);
+    fputc('\n', writer);
+}
+
+void fs_write(int fd, const unsigned char *input, int size, int count) {
+    FILE *writer = writer_map[fd];
+    if (writer == NULL) return;
+    fwrite(input, size, count, writer);
 }
 
 void fs_close(int fd) {
     std::ifstream *reader = file_map[fd];
     if (reader == nullptr) {
-        std::ofstream *writer = writer_map[fd];
-        if (writer == nullptr) return;
-        writer->close();
+        FILE *writer = writer_map[fd];
+        if (writer == NULL) return;
+        fclose(writer);
         return;
     }
     reader->close();
