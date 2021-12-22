@@ -1,7 +1,7 @@
 #!/bin/bash
 
 test_count=0
-OCC="build/src/occ"
+OCC="build/src/tlc"
 
 function run_test() {
     for entry in $1

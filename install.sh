@@ -7,7 +7,7 @@ fi
 
 echo "Installing..."
 
-if [[ ! -f build/src/occ ]] ; then
+if [[ ! -f build/src/tlc ]] ; then
     echo "Error: The compiler does not seem to be built."
     echo ""
     exit 1
@@ -15,7 +15,7 @@ fi
 
 ./install-stdlib.sh
 
-install ./build/src/occ /usr/local/bin/okcc
+install ./build/src/tlc /usr/local/bin/tlc
 
 echo "Done"
 

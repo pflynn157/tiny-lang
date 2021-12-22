@@ -1,14 +1,14 @@
 cmake_minimum_required(VERSION 3.0.0)
-project(orka_main)
+project(tl_main)
 
 set(SRC
     main.cpp
 )
 
-add_executable(occ ${SRC})
+add_executable(tlc ${SRC})
 
-target_link_libraries(occ
-    ocparser
-    occompiler_llvm
+target_link_libraries(tlc
+    tlparser
+    tlcompiler_llvm
 )
 

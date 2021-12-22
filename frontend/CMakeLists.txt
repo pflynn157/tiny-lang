@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.0)
-project(orka_frontend)
+project(tl_frontend)
 
 set(SRC
     lex/Lex.cpp
@@ -18,5 +18,5 @@ set(SRC
     preproc/Preproc.cpp
 )
 
-add_library(ocparser STATIC ${SRC})
+add_library(tlparser STATIC ${SRC})
 
