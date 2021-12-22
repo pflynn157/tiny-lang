@@ -4,6 +4,7 @@ project(tinylang_lib)
 set(SRC
     fs.cpp
     io.cpp
+    num.cpp
     str.cpp
 )
 

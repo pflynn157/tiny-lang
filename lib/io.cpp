@@ -97,5 +97,12 @@ extern "C" {
         str[line.length()] = '\0';
         return str;
     }
+    
+    // Read an integer from standard input
+    int readint() {
+        int x = 0;
+        std::cin >> x;
+        return x;
+    }
 }
 
