@@ -63,10 +63,12 @@ void Compiler::compileIfStatement(AstStatement *stmt) {
             
             builder->SetInsertPoint(trueBlock2);
             bool hasBreak = false;
+            bool hasEndingRet = false;
             for (auto stmt2 : elifStmt->getBlock()) {
                 compileStatement(stmt2);
             }
-            if (!hasBreak) builder->CreateBr(endBlock);
+            if (elifStmt->getBlock().back()->getType() == AstType::Return) hasEndingRet = true;
+            if (!hasBreak && !hasEndingRet) builder->CreateBr(endBlock);
             
             builder->SetInsertPoint(falseBlock2);
             hadElif = true;
@@ -76,10 +78,12 @@ void Compiler::compileIfStatement(AstStatement *stmt) {
             if (!hadElif) builder->SetInsertPoint(falseBlock);
             
             bool hasBreak = false;
+            bool hasEndingRet = false;
             for (auto stmt2 : elseStmt->getBlock()) {
                 compileStatement(stmt2);
             }
-            if (!hasBreak) builder->CreateBr(endBlock);
+            if (elseStmt->getBlock().back()->getType() == AstType::Return) hasEndingRet = true;
+            if (!hasBreak && !hasEndingRet) builder->CreateBr(endBlock);
             
             hadElse = true;
         }

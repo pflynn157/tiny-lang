@@ -86,4 +86,16 @@ extern "C" {
         std::cout << std::endl;
         fflush(stdout);
     }
+    
+    // The readline function
+    char *readline() {
+        std::string line = "";
+        std::getline(std::cin, line);
+        
+        char *str = (char *)malloc(line.length());
+        for (int i = 0; i<line.length(); i++) str[i] = line[i];
+        str[line.length()] = '\0';
+        return str;
+    }
 }
+

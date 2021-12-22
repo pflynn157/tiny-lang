@@ -5,7 +5,7 @@ extern "C" {
 
 // stringcmp
 int stringcmp(const char *str1, const char *str2) {
-    return strlen(str1) - strlen(str2);
+    return strcmp(str1, str2);
 }
 
 //strcat_char
