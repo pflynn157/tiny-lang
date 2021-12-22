@@ -9,6 +9,8 @@ core (NOTE: These functions are unneccessary if the implementation is interprete
 std.io
 * print(string, ...)
 * println(string, ...)
+- readline() -> string
+- readint() -> i32
 
 std.fs
 - fs_open(string, i32) -> i32
@@ -22,3 +24,7 @@ std.string
 * stringcmp(string, string) -> i32
 * strcat_str(string, string) -> string
 * strcat_char(string, char) -> string
+
+std.num
+* rand_init()
+* rand_int(i32, i32) -> i32

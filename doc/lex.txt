@@ -19,12 +19,13 @@ false
 struct
 var
 const
-array
 if
 elif
 else
 then
+do
 while
+import
 
 Symbols
 ====================
