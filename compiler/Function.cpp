@@ -45,10 +45,6 @@ void Compiler::compileFunction(AstGlobalStatement *global) {
     
     Function *func = Function::Create(FT, Function::ExternalLinkage, astFunc->getName(), mod.get());
     currentFunc = func;
-    
-    if (cflags.nvptx) {
-        func->setCallingConv(CallingConv::PTX_Kernel);
-    }
 
     BasicBlock *mainBlock = BasicBlock::Create(*context, "entry", func);
     builder->SetInsertPoint(mainBlock);

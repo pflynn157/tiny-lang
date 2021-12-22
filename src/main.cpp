@@ -46,7 +46,7 @@ AstTree *getAstTree(std::string input, bool testLex, bool printAst) {
     return tree;
 }
 
-int compileLLVM(AstTree *tree, CFlags flags, bool printLLVM, bool emitLLVM, bool emitNVPTX) {
+int compileLLVM(AstTree *tree, CFlags flags, bool printLLVM, bool emitLLVM) {
     Compiler *compiler = new Compiler(tree, flags);
     compiler->compile();
         
@@ -66,11 +66,8 @@ int compileLLVM(AstTree *tree, CFlags flags, bool printLLVM, bool emitLLVM, bool
     }
         
     compiler->writeAssembly();
-    
-    if (!emitNVPTX) {
-        compiler->assemble();
-        compiler->link();
-    }
+    compiler->assemble();
+    compiler->link();
     
     return 0;
 }
@@ -84,9 +81,6 @@ int main(int argc, char **argv) {
     // Compiler (codegen) flags
     CFlags flags;
     flags.name = "a.out";
-    flags.nvptx = false;
-    flags.clib = false;
-    flags.local_clib = false;
     
     // Other flags
     std::string input = "";
@@ -94,8 +88,6 @@ int main(int argc, char **argv) {
     bool printAst = false;
     bool printLLVM = false;
     bool emitLLVM = false;
-    bool emitNVPTX = false;
-    bool useLLVM = true;
     
     for (int i = 1; i<argc; i++) {
         std::string arg = argv[i];
@@ -108,13 +100,6 @@ int main(int argc, char **argv) {
             printLLVM = true;
         } else if (arg == "--emit-llvm") {
             emitLLVM = true;
-        } else if (arg == "--emit-nvptx") {
-            emitNVPTX = true;
-            flags.nvptx = true;
-        } else if (arg == "--clib") {
-            flags.clib = true;
-        } else if (arg == "--clib-local") {
-            flags.local_clib = true;
         } else if (arg == "-o") {
             flags.name = argv[i+1];
             i += 1;
@@ -137,9 +122,7 @@ int main(int argc, char **argv) {
         return 0;
     }
 
-    //test
-    return compileLLVM(tree, flags, printLLVM, emitLLVM, emitNVPTX);
-    
-    return 0;
+    // Compile
+    return compileLLVM(tree, flags, printLLVM, emitLLVM);
 }
 

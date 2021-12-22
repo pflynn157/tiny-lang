@@ -14,8 +14,6 @@ llvm_map_components_to_libnames(llvm_libs support core irreader target asmparser
     X86AsmParser
     X86CodeGen
     X86Info
-    NVPTXCodeGen
-    NVPTXInfo
 )
 
 target_link_libraries(tlcompiler_llvm ${llvm_libs})

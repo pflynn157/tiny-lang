@@ -19,9 +19,6 @@ using namespace llvm;
 
 struct CFlags {
     std::string name;
-    bool nvptx;
-    bool clib;
-    bool local_clib;
 };
 
 class Compiler {
