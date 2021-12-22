@@ -407,7 +407,7 @@ Value *Compiler::compileValue(AstExpression *expr, DataType dataType) {
                     if (!strcmp) std::cerr << "Error: Corelib function \"stringcmp\" not found." << std::endl;
                     Value *strcmpCall = builder->CreateCall(strcmp, args);
                     
-                    int cmpVal = 1;
+                    int cmpVal = 0;
                     if (op->getType() == AstType::NEQ) cmpVal = 0;
                     Value *cmpValue = builder->getInt32(cmpVal);
                     

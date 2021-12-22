@@ -33,11 +33,13 @@ void Compiler::compileIfStatement(AstStatement *stmt) {
 
     builder->SetInsertPoint(trueBlock);
     bool hasBreak = false;
+    bool hasEndingRet = false;
     for (auto stmt : condStmt->getBlock()) {
         compileStatement(stmt);
         if (stmt->getType() == AstType::Break) hasBreak = true;
     }
-    if (!hasBreak) builder->CreateBr(endBlock);
+    if (condStmt->getBlock().back()->getType() == AstType::Return) hasEndingRet = true;
+    if (!hasBreak && !hasEndingRet) builder->CreateBr(endBlock);
 
     // Branches
     bool hadElif = false;
