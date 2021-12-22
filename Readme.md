@@ -6,6 +6,18 @@ This project was born out of another one. I started a project to test implementi
 
 The solution: Create a downsided version of Orka that contains the most essential programming elements. This downsized language is meant to be usable for most real-world tasks, but simple enough to where a compiler or interpreter can be implemented quickly.
 
+See here for the specs and more information: [https://patrickflynn.co/tiny-lang/](https://patrickflynn.co/tiny-lang/)
+
+### Examples
+
+The examples directory contains a few simple yet practical examples of the language in action:
+* Command line arguments
+* cat (clone of UNIX cat)
+* echo (clone of UNIX echo)
+* fs_test (example of reading/writing files)
+* Math Practice
+* Tic-Tac-Toe
+
 ### The Language
 
 The language is very simple. It contains only these structures:
@@ -16,6 +28,8 @@ The language is very simple. It contains only these structures:
 * Structures
 * If/elif/else conditional statements
 * While loops
+* Built-in string support
+* Defined yet minimal standard library
 
 And that's all!
 
@@ -50,4 +64,5 @@ The compiler is completely written in C++ and uses only the standard library and
 
 ### License
 
-This program is licensed under the BSD-3 License. The language spec is in the Public Domain.
+This program is licensed under the BSD-3 License.
+
