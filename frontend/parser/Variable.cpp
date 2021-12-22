@@ -96,11 +96,11 @@ bool Parser::buildVariableDec(AstBlock *block) {
             AstExpression *arg = callMalloc->getArguments().at(0);
             callMalloc->clearArguments();
             
-            AstInt *size;
-            if (dataType == DataType::I32 | dataType == DataType::U32) size = new AstInt(4);
-            else if (dataType == DataType::I64 || dataType == DataType::U64) size = new AstInt(8);
-            else if (dataType == DataType::String) size = new AstInt(8);
-            else size = new AstInt(1);
+            AstI32 *size;
+            if (dataType == DataType::I32 | dataType == DataType::U32) size = new AstI32(4);
+            else if (dataType == DataType::I64 || dataType == DataType::U64) size = new AstI32(8);
+            else if (dataType == DataType::String) size = new AstI32(8);
+            else size = new AstI32(1);
             
             AstMulOp *op = new AstMulOp;
             op->setLVal(size);

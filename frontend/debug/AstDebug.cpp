@@ -365,19 +365,19 @@ void AstChar::print() {
     std::cout << "CHAR(" << val << ")";
 }
 
-void AstByte::print() {
+void AstI8::print() {
     std::cout << val;
 }
 
-void AstWord::print() {
+void AstI16::print() {
     std::cout << val;
 }
 
-void AstInt::print() {
+void AstI32::print() {
     std::cout << val;
 }
 
-void AstQWord::print() {
+void AstI64::print() {
     std::cout << val;
 }
 

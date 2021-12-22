@@ -254,23 +254,23 @@ void Compiler::compileStatement(AstStatement *stmt) {
 // Converts an AST value to an LLVM value
 Value *Compiler::compileValue(AstExpression *expr, DataType dataType) {
     switch (expr->getType()) {
-        case AstType::ByteL: {
-            AstByte *i8 = static_cast<AstByte *>(expr);
+        case AstType::I8L: {
+            AstI8 *i8 = static_cast<AstI8 *>(expr);
             return builder->getInt8(i8->getValue());
         } break;
         
-        case AstType::WordL: {
-            AstWord *i16 = static_cast<AstWord *>(expr);
+        case AstType::I16L: {
+            AstI16 *i16 = static_cast<AstI16 *>(expr);
             return builder->getInt16(i16->getValue());
         } break;
         
-        case AstType::IntL: {
-            AstInt *ival = static_cast<AstInt *>(expr);
+        case AstType::I32L: {
+            AstI32 *ival = static_cast<AstI32 *>(expr);
             return builder->getInt32(ival->getValue());
         } break;
         
-        case AstType::QWordL: {
-            AstQWord *i64 = static_cast<AstQWord *>(expr);
+        case AstType::I64L: {
+            AstI64 *i64 = static_cast<AstI64 *>(expr);
             return builder->getInt64(i64->getValue());
         } break;
         

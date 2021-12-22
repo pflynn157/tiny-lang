@@ -204,9 +204,9 @@ private:
 };
 
 // Represents a byte literal
-class AstByte : public AstExpression {
+class AstI8 : public AstExpression {
 public:
-    explicit AstByte(uint8_t val) : AstExpression(AstType::ByteL) {
+    explicit AstI8(uint8_t val) : AstExpression(AstType::I8L) {
         this->val = val;
     }
     
@@ -217,9 +217,9 @@ private:
 };
 
 // Represents a word literal
-class AstWord : public AstExpression {
+class AstI16 : public AstExpression {
 public:
-    explicit AstWord(uint16_t val) : AstExpression(AstType::WordL) {
+    explicit AstI16(uint16_t val) : AstExpression(AstType::I16L) {
         this->val = val;
     }
     
@@ -230,9 +230,9 @@ private:
 };
 
 // Represents an integer literal
-class AstInt : public AstExpression {
+class AstI32 : public AstExpression {
 public:
-    explicit AstInt(uint64_t val) : AstExpression(AstType::IntL) {
+    explicit AstI32(uint64_t val) : AstExpression(AstType::I32L) {
         this->val = val;
     }
     
@@ -245,9 +245,9 @@ private:
 };
 
 // Represents a QWord literal
-class AstQWord : public AstExpression {
+class AstI64 : public AstExpression {
 public:
-    explicit AstQWord(uint64_t val) : AstExpression(AstType::QWordL) {
+    explicit AstI64(uint64_t val) : AstExpression(AstType::I64L) {
         this->val = val;
     }
     

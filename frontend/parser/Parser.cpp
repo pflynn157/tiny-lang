@@ -181,12 +181,12 @@ bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType
         switch (token.type) {
             case True: {
                 lastWasOp = false;
-                output.push(new AstInt(1));
+                output.push(new AstI32(1));
             } break;
             
             case False: {
                 lastWasOp = false;
-                output.push(new AstInt(0));
+                output.push(new AstI32(0));
             } break;
             
             case CharL: {
@@ -197,7 +197,7 @@ bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType
             
             case Int32: {
                 lastWasOp = false;
-                AstInt *i32 = new AstInt(token.i32_val);
+                AstI32 *i32 = new AstI32(token.i32_val);
                 output.push(i32);
             } break;
             
@@ -385,23 +385,23 @@ bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType
 // the expression agree in type. LLVM will have a problem if not
 AstExpression *Parser::checkExpression(AstExpression *expr, DataType varType) {
     switch (expr->getType()) {
-        case AstType::IntL: {
+        case AstType::I32L: {
             // Change to byte literals
             if (varType == DataType::I8 || varType == DataType::U8) {
-                AstInt *i32 = static_cast<AstInt *>(expr);
-                AstByte *byte = new AstByte(i32->getValue());
+                AstI32 *i32 = static_cast<AstI32 *>(expr);
+                AstI8 *byte = new AstI8(i32->getValue());
                 expr = byte;
                 
             // Change to word literals
             } else if (varType == DataType::I16 || varType == DataType::U16) {
-                AstInt *i32 = static_cast<AstInt *>(expr);
-                AstWord *i16 = new AstWord(i32->getValue());
+                AstI32 *i32 = static_cast<AstI32 *>(expr);
+                AstI16 *i16 = new AstI16(i32->getValue());
                 expr = i16;
                 
             // Change to qword literals
             } else if (varType == DataType::I64 || varType == DataType::U64) {
-                AstInt *i32 = static_cast<AstInt *>(expr);
-                AstQWord *i64 = new AstQWord(i32->getValue());
+                AstI32 *i32 = static_cast<AstI32 *>(expr);
+                AstI64 *i64 = new AstI64(i32->getValue());
                 expr = i64;
             }
         } break;

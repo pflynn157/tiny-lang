@@ -21,15 +21,15 @@ AstExpression *Parser::checkCondExpression(AstExpression *toCheck) {
             eq->setLVal(id);
             
             switch (dataType) {
-                case DataType::Bool: eq->setRVal(new AstInt(1)); break;
+                case DataType::Bool: eq->setRVal(new AstI32(1)); break;
                 case DataType::I8:
-                case DataType::U8: eq->setRVal(new AstByte(1)); break;
+                case DataType::U8: eq->setRVal(new AstI8(1)); break;
                 case DataType::I16:
-                case DataType::U16: eq->setRVal(new AstWord(1)); break;
+                case DataType::U16: eq->setRVal(new AstI16(1)); break;
                 case DataType::I32:
-                case DataType::U32: eq->setRVal(new AstInt(1)); break;
+                case DataType::U32: eq->setRVal(new AstI32(1)); break;
                 case DataType::I64:
-                case DataType::U64: eq->setRVal(new AstQWord(1)); break;
+                case DataType::U64: eq->setRVal(new AstI64(1)); break;
                 
                 default: {}
             }
