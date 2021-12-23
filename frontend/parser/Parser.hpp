@@ -53,7 +53,14 @@ protected:
     bool buildStructAssign(AstBlock *block, Token idToken);
     
     // Expression.cpp
+    struct ExprContext {
+        std::stack<AstExpression *> output;
+        std::stack<AstExpression *> opStack;
+        DataType varType;
+    };
+    
     AstExpression *buildConstExpr(Token token);
+    bool applyHigherPred(ExprContext *ctx);
     bool buildExpression(AstStatement *stmt, DataType currentType,
                         TokenType stopToken = SemiColon, TokenType separateToken = EmptyToken,
                         AstExpression **dest = nullptr, bool isConst = false);

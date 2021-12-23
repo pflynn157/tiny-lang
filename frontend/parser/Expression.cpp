@@ -23,11 +23,39 @@ AstExpression *Parser::buildConstExpr(Token token) {
     return nullptr;
 }
 
+// Applies higher precedence for an operator
+bool Parser::applyHigherPred(ExprContext *ctx) {
+    if (ctx->output.empty()) {
+        syntax->addError(scanner->getLine(), "Invalid expression: No RVAL");
+        return false;
+    }
+    AstExpression *rval = checkExpression(ctx->output.top(), ctx->varType);
+    ctx->output.pop();
+    
+    if (ctx->output.empty()) {
+        syntax->addError(scanner->getLine(), "Invalid expression: No LVAL");
+        return false;
+    }
+    AstExpression *lval = checkExpression(ctx->output.top(), ctx->varType);
+    ctx->output.pop();
+    
+    AstBinaryOp *op = static_cast<AstBinaryOp *>(ctx->opStack.top());
+    ctx->opStack.pop();
+    
+    op->setLVal(lval);
+    op->setRVal(rval);
+    ctx->output.push(op);
+    
+    return true;
+}
+
 // Builds an expression
 bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType stopToken, TokenType separateToken,
                              AstExpression **dest, bool isConst) {
-    std::stack<AstExpression *> output;
-    std::stack<AstExpression *> opStack;
+    //std::stack<AstExpression *> output;
+    //std::stack<AstExpression *> opStack;
+    ExprContext *ctx = new ExprContext;
+    ctx->varType = currentType;
     int currentLine = scanner->getLine();
     
     DataType varType = currentType;
@@ -36,9 +64,9 @@ bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType
 
     Token token = scanner->getNext();
     while (token.type != Eof && token.type != stopToken) {
-        if (token.type == separateToken && output.size() > 0) {
-            AstExpression *expr = output.top();
-            output.pop();
+        if (token.type == separateToken && ctx->output.size() > 0) {
+            AstExpression *expr = ctx->output.top();
+            ctx->output.pop();
             
             if (stmt == nullptr) {
                 if ((*dest)->getType() == AstType::FuncCallExpr) {
@@ -61,7 +89,7 @@ bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType
             case String: {
                 lastWasOp = false;
                 AstExpression *expr = buildConstExpr(token);
-                output.push(expr);
+                ctx->output.push(expr);
             } break;
             
             case Id: {
@@ -80,7 +108,7 @@ bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType
                     
                     AstArrayAccess *acc = new AstArrayAccess(name);
                     acc->setIndex(index);
-                    output.push(acc);
+                    ctx->output.push(acc);
                 } else if (token.type == LParen) {
                     if (currentLine != scanner->getLine()) {
                         syntax->addWarning(scanner->getLine(), "Function call on newline- possible logic error.");
@@ -95,7 +123,7 @@ bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType
                     AstExpression *fcExpr = fc;
                     buildExpression(nullptr, varType, RParen, Comma, &fcExpr);
                     
-                    output.push(fc);
+                    ctx->output.push(fc);
                 } else if (token.type == Dot) {
                     // TODO: Search for structures here
 
@@ -106,21 +134,21 @@ bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType
                     }
                     
                     AstStructAccess *val = new AstStructAccess(name, idToken.id_val);
-                    output.push(val);
+                    ctx->output.push(val);
                 } else {
                     int constVal = isConstant(name);
                     if (constVal > 0) {
                         if (constVal == 1) {
                             AstExpression *expr = globalConsts[name].second;
-                            output.push(expr);
+                            ctx->output.push(expr);
                         } else if (constVal == 2) {
                             AstExpression *expr = localConsts[name].second;
-                            output.push(expr);
+                            ctx->output.push(expr);
                         }
                     } else {
                         if (isVar(name)) {
                             AstID *id = new AstID(name);
-                            output.push(id);
+                            ctx->output.push(id);
                         } else {
                             syntax->addError(scanner->getLine(), "Unknown variable.");
                             return false;
@@ -136,47 +164,28 @@ bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType
             case And:
             case Or:
             case Xor: {
-                if (opStack.size() > 0) {
-                    AstType type = opStack.top()->getType();
+                if (ctx->opStack.size() > 0) {
+                    AstType type = ctx->opStack.top()->getType();
                     if (type == AstType::Mul || type == AstType::Div) {
-                        if (output.empty()) {
-                            syntax->addError(scanner->getLine(), "Invalid expression: No RVAL");
-                            return false;
-                        }
-                        AstExpression *rval = checkExpression(output.top(), varType);
-                        output.pop();
-                        
-                        if (output.empty()) {
-                            syntax->addError(scanner->getLine(), "Invalid expression: No LVAL");
-                            return false;
-                        }
-                        AstExpression *lval = checkExpression(output.top(), varType);
-                        output.pop();
-                        
-                        AstBinaryOp *op = static_cast<AstBinaryOp *>(opStack.top());
-                        opStack.pop();
-                        
-                        op->setLVal(lval);
-                        op->setRVal(rval);
-                        output.push(op);
+                        if (!applyHigherPred(ctx)) return false;
                     }
                 }
                 
                 if (token.type == Plus) {
                     AstAddOp *add = new AstAddOp;
-                    opStack.push(add);
+                    ctx->opStack.push(add);
                 } else if (token.type == And) {
-                    opStack.push(new AstAndOp);
+                    ctx->opStack.push(new AstAndOp);
                 } else if (token.type == Or) {
-                    opStack.push(new AstOrOp);
+                    ctx->opStack.push(new AstOrOp);
                 } else if (token.type == Xor) {
-                    opStack.push(new AstXorOp);
+                    ctx->opStack.push(new AstXorOp);
                 } else {
                     if (lastWasOp) {
-                        opStack.push(new AstNegOp);
+                        ctx->opStack.push(new AstNegOp);
                     } else {
                         AstSubOp *sub = new AstSubOp;
-                        opStack.push(sub);
+                        ctx->opStack.push(sub);
                     }
                 }
                 
@@ -186,26 +195,26 @@ bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType
             case Mul: {
                 lastWasOp = true;
                 AstMulOp *mul = new AstMulOp;
-                opStack.push(mul);
+                ctx->opStack.push(mul);
             } break;
             
             case Div: {
                 lastWasOp = true;
                 AstDivOp *div = new AstDivOp;
-                opStack.push(div);
+                ctx->opStack.push(div);
             } break;
             
-            case EQ: opStack.push(new AstEQOp); lastWasOp = true; break;
-            case NEQ: opStack.push(new AstNEQOp); lastWasOp = true; break;
-            case GT: opStack.push(new AstGTOp); lastWasOp = true; break;
-            case LT: opStack.push(new AstLTOp); lastWasOp = true; break;
-            case GTE: opStack.push(new AstGTEOp); lastWasOp = true; break;
-            case LTE: opStack.push(new AstLTEOp); lastWasOp = true; break;
+            case EQ: ctx->opStack.push(new AstEQOp); lastWasOp = true; break;
+            case NEQ: ctx->opStack.push(new AstNEQOp); lastWasOp = true; break;
+            case GT: ctx->opStack.push(new AstGTOp); lastWasOp = true; break;
+            case LT: ctx->opStack.push(new AstLTOp); lastWasOp = true; break;
+            case GTE: ctx->opStack.push(new AstGTEOp); lastWasOp = true; break;
+            case LTE: ctx->opStack.push(new AstLTEOp); lastWasOp = true; break;
             
             case Logical_And:
             case Logical_Or: {
-                if (opStack.size() > 0) {
-                    AstType type = opStack.top()->getType();
+                if (ctx->opStack.size() > 0) {
+                    AstType type = ctx->opStack.top()->getType();
                     switch (type) {
                         case AstType::EQ:
                         case AstType::NEQ:
@@ -213,34 +222,15 @@ bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType
                         case AstType::LT:
                         case AstType::GTE:
                         case AstType::LTE: {
-                            if (output.empty()) {
-                                syntax->addError(scanner->getLine(), "Invalid expression: No RVAL");
-                                return false;
-                            }
-                            AstExpression *rval = checkExpression(output.top(), varType);
-                            output.pop();
-                            
-                            if (output.empty()) {
-                                syntax->addError(scanner->getLine(), "Invalid expression: No LVAL");
-                                return false;
-                            }
-                            AstExpression *lval = checkExpression(output.top(), varType);
-                            output.pop();
-                            
-                            AstBinaryOp *op = static_cast<AstBinaryOp *>(opStack.top());
-                            opStack.pop();
-                            
-                            op->setLVal(lval);
-                            op->setRVal(rval);
-                            output.push(op);
+                            if (!applyHigherPred(ctx)) return false;
                         } break;
                         
                         default: {}
                     }
                 }
                 
-                if (token.type == Logical_And) opStack.push(new AstLogicalAndOp);
-                else if (token.type == Logical_Or) opStack.push(new AstLogicalOrOp);
+                if (token.type == Logical_And) ctx->opStack.push(new AstLogicalAndOp);
+                else if (token.type == Logical_Or) ctx->opStack.push(new AstLogicalOrOp);
                 
                 lastWasOp = true;
             } break;
@@ -253,15 +243,15 @@ bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType
             }
         }
         
-        if (!lastWasOp && opStack.size() > 0) {
-            if (opStack.top()->getType() == AstType::Neg) {
-                AstExpression *val = checkExpression(output.top(), varType);
-                output.pop();
+        if (!lastWasOp && ctx->opStack.size() > 0) {
+            if (ctx->opStack.top()->getType() == AstType::Neg) {
+                AstExpression *val = checkExpression(ctx->output.top(), varType);
+                ctx->output.pop();
                 
-                AstNegOp *op = static_cast<AstNegOp *>(opStack.top());
-                opStack.pop();
+                AstNegOp *op = static_cast<AstNegOp *>(ctx->opStack.top());
+                ctx->opStack.pop();
                 op->setVal(val);
-                output.push(op);
+                ctx->output.push(op);
             }
         }
         
@@ -274,36 +264,36 @@ bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType
     }
     
     // Build the expression
-    while (opStack.size() > 0) {
-        if (output.empty()) {
+    while (ctx->opStack.size() > 0) {
+        if (ctx->output.empty()) {
             syntax->addError(scanner->getLine(), "Invalid expression: No RVAL");
             return false;
         }
-        AstExpression *rval = checkExpression(output.top(), varType);
-        output.pop();
+        AstExpression *rval = checkExpression(ctx->output.top(), varType);
+        ctx->output.pop();
         
-        if (output.empty()) {
+        if (ctx->output.empty()) {
             syntax->addError(scanner->getLine(), "Invalid expression: No LVAL");
             return false;
         }
-        AstExpression *lval = checkExpression(output.top(), varType);
-        output.pop();
+        AstExpression *lval = checkExpression(ctx->output.top(), varType);
+        ctx->output.pop();
         
-        AstBinaryOp *op = static_cast<AstBinaryOp *>(opStack.top());
-        opStack.pop();
+        AstBinaryOp *op = static_cast<AstBinaryOp *>(ctx->opStack.top());
+        ctx->opStack.pop();
         
         op->setLVal(lval);
         op->setRVal(rval);
-        output.push(op);
+        ctx->output.push(op);
     }
     
     // Add the expressions back
-    if (output.size() == 0) {
+    if (ctx->output.size() == 0) {
         return true;
     }
     
     // Type check the top
-    AstExpression *expr = checkExpression(output.top(), varType);
+    AstExpression *expr = checkExpression(ctx->output.top(), varType);
     
     if (stmt == nullptr) {
         if ((*dest) == nullptr) {
