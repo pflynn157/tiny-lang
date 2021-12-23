@@ -84,6 +84,7 @@ int main(int argc, char **argv) {
     
     // Other flags
     std::string input = "";
+    bool emitPreproc = false;
     bool testLex = false;
     bool printAst = false;
     bool printLLVM = false;
@@ -92,7 +93,9 @@ int main(int argc, char **argv) {
     for (int i = 1; i<argc; i++) {
         std::string arg = argv[i];
         
-        if (arg == "--test-lex") {
+        if (arg == "-E") {
+            emitPreproc = true;
+        } else if (arg == "--test-lex") {
             testLex = true;
         } else if (arg == "--ast") {
             printAst = true;
@@ -111,7 +114,7 @@ int main(int argc, char **argv) {
         }
     }
     
-    std::string newInput = preprocessFile(input);
+    std::string newInput = preprocessFile(input, emitPreproc);
     if (newInput == "") {
         return 1;
     }

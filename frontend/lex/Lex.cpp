@@ -56,11 +56,18 @@ Token Scanner::getNext() {
         rawBuffer += next;
         
         if (next == '#') {
+            std::string comment = "#";
             while (next != '\n' && !reader.eof()) {
                 next = reader.get();
                 rawBuffer += next;
+                comment += next;
             }
-            ++currentLine;
+            if (comment == "#pragma nocount\n") {
+                skipNextLineCount = true;
+            } else {
+               ++currentLine;
+            }
+            continue;
         }
         
         // TODO: This needs some kind of error handleing
@@ -115,7 +122,10 @@ Token Scanner::getNext() {
         }
         
         if (next == ' ' || next == '\n' || isSymbol(next)) {
-            if (next == '\n') ++currentLine;
+            if (next == '\n') {
+                if (skipNextLineCount) skipNextLineCount = false;
+                else ++currentLine;
+            }
         
             if (buffer.length() == 0) {
                 if (isSymbol(next)) {

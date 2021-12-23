@@ -117,6 +117,7 @@ private:
     std::string buffer = "";
     bool inQuote = false;
     int currentLine = 1;
+    bool skipNextLineCount = false;
     
     // Functions
     bool isSymbol(char c);

@@ -22,7 +22,7 @@ std::string getInputPath(std::string input) {
     return name;
 }
 
-std::string preprocessFile(std::string input) {
+std::string preprocessFile(std::string input, bool print) {
     std::string newPath = "/tmp/" + getInputPath(input);
     Scanner *scanner = new Scanner(input);
     if (scanner->isError()) {
@@ -40,6 +40,9 @@ std::string preprocessFile(std::string input) {
             content += scanner->getRawBuffer();
             continue;
         }
+        
+        // Indicate we have an import line
+        content += "#pragma count\n";
         
         // Build the include path
         token = scanner->getNext();
@@ -61,7 +64,7 @@ std::string preprocessFile(std::string input) {
         // Load the include path
         // TODO: We need better path support
         path = "/usr/local/include/tinylang/" + path + ".th";
-        std::string preprocInclude = preprocessFile(path);
+        std::string preprocInclude = preprocessFile(path, false);
         
         std::ifstream reader(preprocInclude.c_str());
         if (!reader.is_open()) {
@@ -71,8 +74,12 @@ std::string preprocessFile(std::string input) {
         
         std::string line = "";
         while (std::getline(reader, line)) {
+            if (line == "" || line.length() == 0) continue;
+            content += "#pragma nocount\n";
             content += line + "\n";
         }
+        int last = content.length() - 1;
+        if (content[last] == '\n') content[last] = ' ';
         
         reader.close();
         remove(preprocInclude.c_str());
@@ -80,6 +87,8 @@ std::string preprocessFile(std::string input) {
         // Drop the buffer so we don't put the include line back in
         scanner->getRawBuffer();
     }
+    
+    if (print) std::cout << content << std::endl;
     
     std::ofstream writer(newPath, std::ios_base::out | std::ios_base::trunc);
     if (writer.is_open()) {

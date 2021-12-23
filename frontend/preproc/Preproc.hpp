@@ -7,5 +7,5 @@
 
 #include <string>
 
-std::string preprocessFile(std::string input);
+std::string preprocessFile(std::string input, bool print = false);
 
