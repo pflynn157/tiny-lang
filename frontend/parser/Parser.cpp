@@ -13,6 +13,54 @@ Parser::Parser(std::string input) {
     
     tree = new AstTree(input);
     syntax = new ErrorManager;
+    
+    // Add the built-in functions
+    //string malloc(string)
+    AstExternFunction *FT1 = new AstExternFunction("malloc");
+    FT1->addArgument(Var(DataType::String));
+    FT1->setDataType(DataType::String);
+    tree->addGlobalStatement(FT1);
+    
+    //println(string)
+    AstExternFunction *FT2 = new AstExternFunction("println");
+    FT2->setVarArgs();
+    FT2->addArgument(Var(DataType::String));
+    FT2->setDataType(DataType::Void);
+    tree->addGlobalStatement(FT2);
+    
+    //print(string)
+    AstExternFunction *FT3 = new AstExternFunction("print");
+    FT3->setVarArgs();
+    FT3->addArgument(Var(DataType::String));
+    FT3->setDataType(DataType::Void);
+    tree->addGlobalStatement(FT3);
+    
+    //i32 strlen(string)
+    AstExternFunction *FT4 = new AstExternFunction("strlen");
+    FT4->addArgument(Var(DataType::String));
+    FT4->setDataType(DataType::I32);
+    tree->addGlobalStatement(FT4);
+    
+    //i32 stringcmp(string, string)
+    AstExternFunction *FT5 = new AstExternFunction("stringcmp");
+    FT5->addArgument(Var(DataType::String));
+    FT5->addArgument(Var(DataType::String));
+    FT5->setDataType(DataType::I32);
+    tree->addGlobalStatement(FT5);
+    
+    //string strcat_str(string, string)
+    AstExternFunction *FT6 = new AstExternFunction("strcat_str");
+    FT6->addArgument(Var(DataType::String));
+    FT6->addArgument(Var(DataType::String));
+    FT6->setDataType(DataType::String);
+    tree->addGlobalStatement(FT6);
+    
+    //string strcat_char(string, char)
+    AstExternFunction *FT7 = new AstExternFunction("strcat_char");
+    FT7->addArgument(Var(DataType::String));
+    FT7->addArgument(Var(DataType::Char));
+    FT7->setDataType(DataType::String);
+    tree->addGlobalStatement(FT7);
 }
 
 Parser::~Parser() {

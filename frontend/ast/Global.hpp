@@ -34,11 +34,15 @@ public:
         this->name = name;
     }
     
+    void addArgument(Var arg) { this->args.push_back(arg); }
     void setArguments(std::vector<Var> args) { this->args = args; }
     
     void setDataType(DataType dataType) {
         this->dataType = dataType;
     }
+    
+    void setVarArgs() { this->varargs = true; }
+    bool isVarArgs() { return this->varargs; }
     
     std::string getName() { return name; }
     DataType getDataType() { return dataType; }
@@ -48,6 +52,7 @@ private:
     std::string name = "";
     std::vector<Var> args;
     DataType dataType = DataType::Void;
+    bool varargs = false;
 };
 
 // Represents a function

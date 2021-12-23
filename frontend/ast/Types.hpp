@@ -75,6 +75,13 @@ enum class DataType {
 };
 
 struct Var {
+    explicit Var() {}
+    explicit Var(DataType type, DataType subType = DataType::Void, std::string name = "") {
+        this->type = type;
+        this->subType = subType;
+        this->name = name;
+    }
+
     std::string name;
     DataType type;
     DataType subType;

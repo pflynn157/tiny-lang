@@ -92,7 +92,7 @@ void Compiler::compileExternFunction(AstGlobalStatement *global) {
     Type *retType = translateType(astFunc->getDataType());
     
     if (astVarArgs.size() == 0) {
-        FT = FunctionType::get(retType, false);
+        FT = FunctionType::get(retType, astFunc->isVarArgs());
     } else {
         std::vector<Type *> args;
         for (auto var : astVarArgs) {
@@ -100,7 +100,7 @@ void Compiler::compileExternFunction(AstGlobalStatement *global) {
             args.push_back(type);
         }
         
-        FT = FunctionType::get(retType, args, false);
+        FT = FunctionType::get(retType, args, astFunc->isVarArgs());
     }
     
     Function::Create(FT, Function::ExternalLinkage, astFunc->getName(), mod.get());

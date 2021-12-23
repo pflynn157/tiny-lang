@@ -26,47 +26,6 @@ Compiler::Compiler(AstTree *tree, CFlags cflags) {
     context = std::make_unique<LLVMContext>();
     mod = std::make_unique<Module>(cflags.name, *context);
     builder = std::make_unique<IRBuilder<>>(*context);
-
-    //
-    // Add declarations for built-in functions
-    // Some are part of the stdlib, others part of our library
-    //
-    
-    // Malloc
-    FunctionType *FT1 = FunctionType::get(Type::getInt8PtrTy(*context), Type::getInt32Ty(*context), false);
-    Function::Create(FT1, Function::ExternalLinkage, "malloc", mod.get());
-    
-    // Println
-    FunctionType *FT2 = FunctionType::get(Type::getVoidTy(*context), Type::getInt8PtrTy(*context), false);
-    Function::Create(FT2, Function::ExternalLinkage, "println", mod.get());
-    
-    // Print
-    FunctionType *FT3 = FunctionType::get(Type::getVoidTy(*context), Type::getInt8PtrTy(*context), false);
-    Function::Create(FT3, Function::ExternalLinkage, "print", mod.get());
-    
-    // strlen
-    FunctionType *FT4 = FunctionType::get(Type::getInt32Ty(*context), Type::getInt8PtrTy(*context), false);
-    Function::Create(FT4, Function::ExternalLinkage, "strlen", mod.get());
-    
-    // strcmp
-    std::vector<Type *> targs;
-    targs.push_back(Type::getInt8PtrTy(*context));
-    targs.push_back(Type::getInt8PtrTy(*context));
-    
-    FunctionType *FT5 = FunctionType::get(Type::getInt32Ty(*context), targs, false);
-    Function::Create(FT5, Function::ExternalLinkage, "stringcmp", mod.get());
-    
-    // strcat_str(str, str)
-    FunctionType *FT6 = FunctionType::get(Type::getInt8PtrTy(*context), targs, false);
-    Function::Create(FT6, Function::ExternalLinkage, "strcat_str", mod.get());
-    
-    // strcat_char(str, char)
-    targs.clear();
-    targs.push_back(Type::getInt8PtrTy(*context));
-    targs.push_back(Type::getInt8Ty(*context));
-    
-    FunctionType *FT7 = FunctionType::get(Type::getInt8PtrTy(*context), targs, false);
-    Function::Create(FT7, Function::ExternalLinkage, "strcat_char", mod.get());
 }
 
 void Compiler::compile() {
