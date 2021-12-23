@@ -36,19 +36,15 @@ func output_file(path:string, num_lines:bool, show_ends:bool) is
         var c : char := fs_get(fd);
         
         if fs_eof(fd) = false then
-            if c = '\n' then
-                if show_ends then
-                    print("$");
-                end
+            if c = '\n' and show_ends = true then
+                print("$");
             end
         
             print("%c", c);
             
-            if c = '\n' then
-                if num_lines then
-                    print("%d ", line_num);
-                    line_num := line_num + 1;
-                end
+            if c = '\n' and num_lines = true then
+                print("%d ", line_num);
+                line_num := line_num + 1;
             end
         end
     end
@@ -75,30 +71,17 @@ func main(args:string[], argc:i32) -> i32 is
     var found_arg : bool := true;
     var arg : string := args[1];
     
-    if arg = "-h" then
+    if arg = "-h" or arg = "--help" then
         help();
         return 0;
-    elif arg = "--help" then
-        help();
-        return 0;
-    elif arg = "-v" then
+    elif arg = "-v" or arg = "--version" then
         version();
         return 0;
-    elif arg = "--version" then
-        version();
-        return 0;
-    elif arg = "-n" then
+    elif arg = "-n" or arg = "--number" then
         num_lines := true;
-    elif arg = "--number" then
-        num_lines := true;
-    elif arg = "-E" then
+    elif arg = "-E" or arg = "--show-ends" then
         show_ends := true;
-    elif arg = "--show-ends" then
-        show_ends := true;
-    elif arg = "-A" then
-        num_lines := true;
-        show_ends := true;
-    elif arg = "--show-all" then
+    elif arg = "-A" or arg = "--show-all" then
         num_lines := true;
         show_ends := true;
     else
@@ -114,4 +97,3 @@ func main(args:string[], argc:i32) -> i32 is
 
     return 0;
 end
-

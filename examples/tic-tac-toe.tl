@@ -19,12 +19,8 @@ func print_board(positions:char[]) is
 end
 
 func check_combo(positions:char[], player:char, p1:i32, p2:i32, p3:i32) -> bool is
-    if positions[p1] = player then
-        if positions[p2] = player then
-            if positions[p3] = player then
-                return true;
-            end
-        end
+    if positions[p1] = player and positions[p2] = player and positions[p3] = player then
+        return true;
     end
     
     return false;
@@ -87,10 +83,8 @@ end
 func check_draw(positions:char[]) -> bool then
     var i : i32 := 0;
     while i < 9 do
-        if positions[i] != 'X' then
-            if positions[i] != 'O' then
-                return false;
-            end
+        if positions[i] != 'X' and positions[i] != 'O' then
+            return false;
         end
         
         i := i + 1;
@@ -126,20 +120,13 @@ func main(args:string[], argc:i32) -> i32 is
         
         var should_switch : bool := true;
         
-        if pos >= 0 then
-            if pos < 9 then
-                if positions[pos] = 'X' then
-                    println("Position already taken!");
-                    should_switch := false;
-                elif positions[pos] = 'O' then
-                    println("Position already taken!");
-                    should_switch := false;
-                else
-                    positions[pos] := player;
-                    print_board(positions);
-                end
-            else
+        if pos >= 0 and pos < 9 then
+            if positions[pos] = 'X' or positions[pos] = 'O' then
+                println("Position already taken!");
                 should_switch := false;
+            else
+                positions[pos] := player;
+                print_board(positions);
             end
         else
             should_switch := false;
@@ -173,4 +160,3 @@ func main(args:string[], argc:i32) -> i32 is
 
     return 0;
 end
-

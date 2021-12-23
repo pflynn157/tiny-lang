@@ -6,15 +6,6 @@
 import std.io;
 import std.num;
 
-func valid_level(level:i32) -> bool is
-    var valid : bool := true;
-    if level > 3 then valid := false;
-    end
-    if level < 1 then valid := false;
-    end
-    return valid;
-end
-
 func practice(min:i32, max:i32) is
     var i : i32 := 0;
     while i < 10 do
@@ -71,7 +62,7 @@ func main(args:string[], argc:i32) -> i32 is
         print("Enter your level (1-3): ");
         level := readint();
         
-        if valid_level(level) then
+        if level >= 1 and level <= 3 then
             break;
         else
             println("Invalid level! Please try again.");
@@ -96,4 +87,3 @@ func main(args:string[], argc:i32) -> i32 is
 
     return 0;
 end
-
