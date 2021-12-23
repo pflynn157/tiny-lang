@@ -52,11 +52,14 @@ protected:
     bool buildStructDec(AstBlock *block);
     bool buildStructAssign(AstBlock *block, Token idToken);
     
-    bool buildBlock(AstBlock *block, int stopLayer = 0, AstIfStmt *parentBlock = nullptr, bool inElif = false);
+    // Expression.cpp
+    AstExpression *buildConstExpr(Token token);
     bool buildExpression(AstStatement *stmt, DataType currentType,
                         TokenType stopToken = SemiColon, TokenType separateToken = EmptyToken,
                         AstExpression **dest = nullptr, bool isConst = false);
     AstExpression *checkExpression(AstExpression *expr, DataType varType);
+    
+    bool buildBlock(AstBlock *block, int stopLayer = 0, AstIfStmt *parentBlock = nullptr, bool inElif = false);
     AstExpression *checkCondExpression(AstExpression *toCheck);
     int isConstant(std::string name);
     bool isVar(std::string name);
