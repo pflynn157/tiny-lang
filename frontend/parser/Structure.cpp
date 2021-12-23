@@ -153,6 +153,7 @@ bool Parser::buildStructDec(AstBlock *block) {
     }
     
     // Now build the declaration and push back
+    vars.push_back(name);
     AstStructDec *dec = new AstStructDec(name, structName);
     block->addStatement(dec);
     

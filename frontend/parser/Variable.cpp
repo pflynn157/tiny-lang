@@ -79,6 +79,7 @@ bool Parser::buildVariableDec(AstBlock *block) {
         }
         
         for (std::string name : toDeclare) {
+            vars.push_back(name);
             AstVarDec *vd = new AstVarDec(name, DataType::Ptr);
             block->addStatement(vd);
             vd->addExpression(empty->getExpression());
@@ -127,6 +128,7 @@ bool Parser::buildVariableDec(AstBlock *block) {
         if (!buildExpression(empty, dataType)) return false;
     
         for (std::string name : toDeclare) {
+            vars.push_back(name);
             AstVarDec *vd = new AstVarDec(name, dataType);
             block->addStatement(vd);
             

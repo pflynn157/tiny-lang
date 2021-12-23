@@ -66,6 +66,7 @@ bool Parser::getFunctionArgs(std::vector<Var> &args) {
             }
             
             v.name = t1.id_val;
+            vars.push_back(t1.id_val);
             
             token = scanner->getNext();
             if (token.type == Comma) {
@@ -100,6 +101,7 @@ bool Parser::getFunctionArgs(std::vector<Var> &args) {
 bool Parser::buildFunction(Token startToken, std::string className) {
     typeMap.clear();
     localConsts.clear();
+    vars.clear();
     
     Token token;
     bool isExtern = false;
@@ -186,6 +188,8 @@ bool Parser::buildFunction(Token startToken, std::string className) {
     }
 
     // Create the function object
+    funcs.push_back(funcName);
+    
     if (isExtern) {
         AstExternFunction *ex = new AstExternFunction(funcName);
         ex->setArguments(args);
@@ -229,6 +233,12 @@ bool Parser::buildFunction(Token startToken, std::string className) {
 
 // Builds a function call
 bool Parser::buildFunctionCallStmt(AstBlock *block, Token idToken) {
+    // Make sure the function exists
+    if (!isFunc(idToken.id_val)) {
+        syntax->addError(scanner->getLine(), "Unknown function.");
+        return false;
+    }
+
     AstFuncCallStmt *fc = new AstFuncCallStmt(idToken.id_val);
     block->addStatement(fc);
     

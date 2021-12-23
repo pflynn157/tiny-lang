@@ -4,6 +4,7 @@
 // Tiny Lang is licensed under the BSD-3 license. See the COPYING file for more information.
 //
 #include <iostream>
+#include <algorithm>
 
 #include <parser/Parser.hpp>
 
@@ -16,12 +17,14 @@ Parser::Parser(std::string input) {
     
     // Add the built-in functions
     //string malloc(string)
+    funcs.push_back("malloc");
     AstExternFunction *FT1 = new AstExternFunction("malloc");
     FT1->addArgument(Var(DataType::String));
     FT1->setDataType(DataType::String);
     tree->addGlobalStatement(FT1);
     
     //println(string)
+    funcs.push_back("println");
     AstExternFunction *FT2 = new AstExternFunction("println");
     FT2->setVarArgs();
     FT2->addArgument(Var(DataType::String));
@@ -29,6 +32,7 @@ Parser::Parser(std::string input) {
     tree->addGlobalStatement(FT2);
     
     //print(string)
+    funcs.push_back("print");
     AstExternFunction *FT3 = new AstExternFunction("print");
     FT3->setVarArgs();
     FT3->addArgument(Var(DataType::String));
@@ -36,12 +40,14 @@ Parser::Parser(std::string input) {
     tree->addGlobalStatement(FT3);
     
     //i32 strlen(string)
+    funcs.push_back("strlen");
     AstExternFunction *FT4 = new AstExternFunction("strlen");
     FT4->addArgument(Var(DataType::String));
     FT4->setDataType(DataType::I32);
     tree->addGlobalStatement(FT4);
     
     //i32 stringcmp(string, string)
+    funcs.push_back("stringcmp");
     AstExternFunction *FT5 = new AstExternFunction("stringcmp");
     FT5->addArgument(Var(DataType::String));
     FT5->addArgument(Var(DataType::String));
@@ -49,6 +55,7 @@ Parser::Parser(std::string input) {
     tree->addGlobalStatement(FT5);
     
     //string strcat_str(string, string)
+    funcs.push_back("strcat_str");
     AstExternFunction *FT6 = new AstExternFunction("strcat_str");
     FT6->addArgument(Var(DataType::String));
     FT6->addArgument(Var(DataType::String));
@@ -56,6 +63,7 @@ Parser::Parser(std::string input) {
     tree->addGlobalStatement(FT6);
     
     //string strcat_char(string, char)
+    funcs.push_back("strcat_char");
     AstExternFunction *FT7 = new AstExternFunction("strcat_char");
     FT7->addArgument(Var(DataType::String));
     FT7->addArgument(Var(DataType::Char));
@@ -277,6 +285,11 @@ bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType
                     if (currentLine != scanner->getLine()) {
                         syntax->addWarning(scanner->getLine(), "Function call on newline- possible logic error.");
                     }
+                    
+                    if (!isFunc(name)) {
+                        syntax->addError(scanner->getLine(), "Unknown function call.");
+                        return false;
+                    }
                 
                     AstFuncCallExpr *fc = new AstFuncCallExpr(name);
                     AstExpression *fcExpr = fc;
@@ -305,8 +318,13 @@ bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType
                             output.push(expr);
                         }
                     } else {
-                        AstID *id = new AstID(name);
-                        output.push(id);
+                        if (isVar(name)) {
+                            AstID *id = new AstID(name);
+                            output.push(id);
+                        } else {
+                            syntax->addError(scanner->getLine(), "Unknown variable.");
+                            return false;
+                        }
                     }
                     
                     scanner->rewind(token);
@@ -546,7 +564,7 @@ void Parser::debugScanner() {
 }
 
 // Checks to see if a string is a constant
-int Parser::isConstant(std::string name) {
+inline int Parser::isConstant(std::string name) {
     if (globalConsts.find(name) != globalConsts.end()) {
         return 1;
     }
@@ -556,4 +574,18 @@ int Parser::isConstant(std::string name) {
     }
     
     return 0;
+}
+
+inline bool Parser::isVar(std::string name) {
+    if (std::find(vars.begin(), vars.end(), name) != vars.end()) {
+        return true;
+    }
+    return false;
+}
+
+inline bool Parser::isFunc(std::string name) {
+    if (std::find(funcs.begin(), funcs.end(), name) != funcs.end()) {
+        return true;
+    }
+    return false;
 }

@@ -59,6 +59,8 @@ protected:
     AstExpression *checkExpression(AstExpression *expr, DataType varType);
     AstExpression *checkCondExpression(AstExpression *toCheck);
     int isConstant(std::string name);
+    bool isVar(std::string name);
+    bool isFunc(std::string name);
 private:
     std::string input = "";
     Scanner *scanner;
@@ -69,5 +71,7 @@ private:
     std::map<std::string, std::pair<DataType,DataType>> typeMap;
     std::map<std::string, std::pair<DataType, AstExpression*>> globalConsts;
     std::map<std::string, std::pair<DataType, AstExpression*>> localConsts;
+    std::vector<std::string> vars;
+    std::vector<std::string> funcs;
 };
 

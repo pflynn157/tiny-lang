@@ -1,5 +1,6 @@
 
 func main is
-    println("Hello!");
-    
+    var x : i32 := 20;
+    var y : i32 := x * 2;
+    println("%d", y);
 end
