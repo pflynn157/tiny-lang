@@ -55,7 +55,7 @@ protected:
     // Expression.cpp
     struct ExprContext {
         std::stack<AstExpression *> output;
-        std::stack<AstExpression *> opStack;
+        std::stack<AstOp *> opStack;
         DataType varType;
     };
     

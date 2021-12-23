@@ -161,77 +161,59 @@ bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType
             
             case Plus: 
             case Minus:
+            case Mul:
+            case Div:
             case And:
             case Or:
-            case Xor: {
-                if (ctx->opStack.size() > 0) {
-                    AstType type = ctx->opStack.top()->getType();
-                    if (type == AstType::Mul || type == AstType::Div) {
-                        if (!applyHigherPred(ctx)) return false;
-                    }
-                }
-                
-                if (token.type == Plus) {
-                    AstAddOp *add = new AstAddOp;
-                    ctx->opStack.push(add);
-                } else if (token.type == And) {
-                    ctx->opStack.push(new AstAndOp);
-                } else if (token.type == Or) {
-                    ctx->opStack.push(new AstOrOp);
-                } else if (token.type == Xor) {
-                    ctx->opStack.push(new AstXorOp);
-                } else {
-                    if (lastWasOp) {
-                        ctx->opStack.push(new AstNegOp);
-                    } else {
-                        AstSubOp *sub = new AstSubOp;
-                        ctx->opStack.push(sub);
-                    }
-                }
-                
-                lastWasOp = true;
-            } break;
-            
-            case Mul: {
-                lastWasOp = true;
-                AstMulOp *mul = new AstMulOp;
-                ctx->opStack.push(mul);
-            } break;
-            
-            case Div: {
-                lastWasOp = true;
-                AstDivOp *div = new AstDivOp;
-                ctx->opStack.push(div);
-            } break;
-            
-            case EQ: ctx->opStack.push(new AstEQOp); lastWasOp = true; break;
-            case NEQ: ctx->opStack.push(new AstNEQOp); lastWasOp = true; break;
-            case GT: ctx->opStack.push(new AstGTOp); lastWasOp = true; break;
-            case LT: ctx->opStack.push(new AstLTOp); lastWasOp = true; break;
-            case GTE: ctx->opStack.push(new AstGTEOp); lastWasOp = true; break;
-            case LTE: ctx->opStack.push(new AstLTEOp); lastWasOp = true; break;
-            
+            case Xor:
+            case EQ:
+            case NEQ:
+            case GT:
+            case LT:
+            case GTE:
+            case LTE:
             case Logical_And:
             case Logical_Or: {
-                if (ctx->opStack.size() > 0) {
-                    AstType type = ctx->opStack.top()->getType();
-                    switch (type) {
-                        case AstType::EQ:
-                        case AstType::NEQ:
-                        case AstType::GT:
-                        case AstType::LT:
-                        case AstType::GTE:
-                        case AstType::LTE: {
+                AstBinaryOp *op = new AstBinaryOp;
+                AstUnaryOp *op1 = new AstUnaryOp;
+                bool useUnary = false;
+                switch (token.type) {
+                    case Plus: op = new AstAddOp; break;
+                    case Mul: op = new AstMulOp; break;
+                    case Div: op = new AstDivOp; break;
+                    case And: op = new AstAndOp; break;
+                    case Or: op = new AstOrOp; break;
+                    case Xor: op = new AstXorOp; break;
+                    case EQ: op = new AstEQOp; break;
+                    case NEQ: op = new AstNEQOp; break;
+                    case GT: op = new AstGTOp; break;
+                    case LT: op = new AstLTOp; break;
+                    case GTE: op = new AstGTEOp; break;
+                    case LTE: op = new AstLTEOp; break;
+                    case Logical_And: op = new AstLogicalAndOp; break;
+                    case Logical_Or: op = new AstLogicalOrOp; break;
+                    case Minus: {
+                        if (lastWasOp) {
+                            op1 = new AstNegOp;
+                            useUnary = true;
+                        } else {
+                            op = new AstSubOp;
+                        }
+                    } break;
+                }
+                
+                if (ctx->opStack.size() > 0 && useUnary == false) {
+                    AstOp *top = ctx->opStack.top();
+                        if (top->isBinaryOp()) {
+                        AstBinaryOp *op2 = static_cast<AstBinaryOp *>(top);
+                        if (op->getPrecedence() > op2->getPrecedence()) {
                             if (!applyHigherPred(ctx)) return false;
-                        } break;
-                        
-                        default: {}
+                        }
                     }
                 }
                 
-                if (token.type == Logical_And) ctx->opStack.push(new AstLogicalAndOp);
-                else if (token.type == Logical_Or) ctx->opStack.push(new AstLogicalOrOp);
-                
+                if (useUnary) ctx->opStack.push(op1);
+                else ctx->opStack.push(op);
                 lastWasOp = true;
             } break;
             

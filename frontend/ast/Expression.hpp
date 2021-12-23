@@ -25,9 +25,22 @@ protected:
     AstType type = AstType::EmptyAst;
 };
 
-// Represents the base of a unary expression
-class AstUnaryOp : public AstExpression {
+class AstOp : public AstExpression {
 public:
+    bool isBinaryOp() { return isBinary; }
+
+    virtual void print() {}
+protected:
+    bool isBinary = true;
+};
+
+// Represents the base of a unary expression
+class AstUnaryOp : public AstOp {
+public:
+    AstUnaryOp() {
+        isBinary = false;
+    }
+
     void setVal(AstExpression *val) { this->val = val; }
     AstExpression *getVal() { return val; }
     
@@ -47,17 +60,20 @@ public:
 };
 
 // Represents the base of a binary expression
-class AstBinaryOp : public AstExpression {
+class AstBinaryOp : public AstOp {
 public:
     void setLVal(AstExpression *lval) { this->lval = lval; }
     void setRVal(AstExpression *rval) { this->rval = rval; }
+    void setPrecedence(int p) { this->precedence = p; }
     
     AstExpression *getLVal() { return lval; }
     AstExpression *getRVal() { return rval; }
+    int getPrecedence() { return precedence; }
     
     virtual void print() {}
 protected:
     AstExpression *lval, *rval;
+    int precedence = 0;
 };
 
 // Represents an add operation
@@ -65,6 +81,7 @@ class AstAddOp : public AstBinaryOp {
 public:
     AstAddOp() {
         this->type = AstType::Add;
+        this->precedence = 4;
     }
     
     void print();
@@ -75,6 +92,7 @@ class AstSubOp : public AstBinaryOp {
 public:
     AstSubOp() {
         this->type = AstType::Sub;
+        this->precedence = 4;
     }
     
     void print();
@@ -85,6 +103,7 @@ class AstMulOp : public AstBinaryOp {
 public:
     AstMulOp() {
         this->type = AstType::Mul;
+        this->precedence = 3;
     }
     
     void print();
@@ -95,6 +114,7 @@ class AstDivOp : public AstBinaryOp {
 public:
     AstDivOp() {
         this->type = AstType::Div;
+        this->precedence = 3;
     }
     
     void print();
@@ -105,6 +125,7 @@ class AstAndOp : public AstBinaryOp {
 public:
     AstAndOp() {
         this->type = AstType::And;
+        this->precedence = 8;
     }
     
     void print();
@@ -115,6 +136,7 @@ class AstOrOp : public AstBinaryOp {
 public:
     AstOrOp() {
         this->type = AstType::Or;
+        this->precedence = 10;
     }
     
     void print();
@@ -125,6 +147,7 @@ class AstXorOp : public AstBinaryOp {
 public:
     AstXorOp() {
         this->type = AstType::Xor;
+        this->precedence = 9;
     }
     
     void print();
@@ -135,6 +158,7 @@ class AstEQOp : public AstBinaryOp {
 public:
     AstEQOp() {
         this->type = AstType::EQ;
+        this->precedence = 6;
     }
     
     void print();
@@ -145,6 +169,7 @@ class AstNEQOp : public AstBinaryOp {
 public:
     AstNEQOp() {
         this->type = AstType::NEQ;
+        this->precedence = 6;
     }
     
     void print();
@@ -155,6 +180,7 @@ class AstGTOp : public AstBinaryOp {
 public:
     AstGTOp() {
         this->type = AstType::GT;
+        this->precedence = 6;
     }
     
     void print();
@@ -165,6 +191,7 @@ class AstLTOp : public AstBinaryOp {
 public:
     AstLTOp() {
         this->type = AstType::LT;
+        this->precedence = 6;
     }
     
     void print();
@@ -175,6 +202,7 @@ class AstGTEOp : public AstBinaryOp {
 public:
     AstGTEOp() {
         this->type = AstType::GTE;
+        this->precedence = 6;
     }
     
     void print();
@@ -185,6 +213,7 @@ class AstLTEOp : public AstBinaryOp {
 public:
     AstLTEOp() {
         this->type = AstType::LTE;
+        this->precedence = 6;
     }
     
     void print();
@@ -195,6 +224,7 @@ class AstLogicalAndOp : public AstBinaryOp {
 public:
     AstLogicalAndOp() {
         this->type = AstType::LogicalAnd;
+        this->precedence = 11;
     }
     
     void print();
@@ -205,6 +235,7 @@ class AstLogicalOrOp : public AstBinaryOp {
 public:
     AstLogicalOrOp() {
         this->type = AstType::LogicalOr;
+        this->precedence = 12;
     }
     
     void print();
