@@ -11,6 +11,7 @@ using namespace llvm;
 using namespace llvm::sys;
 
 #include <iostream>
+#include <exception>
 
 #include <Compiler.hpp>
 #include <llvm-c/Support.h>

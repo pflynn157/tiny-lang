@@ -33,6 +33,13 @@ public:
         return structs;
     }
     
+    bool hasStruct(std::string name) {
+        for (AstStruct *s : structs) {
+            if (s->getName() == name) return true;
+        }
+        return false;
+    }
+    
     void addGlobalStatement(AstGlobalStatement *stmt) {
         global_statements.push_back(stmt);
     }

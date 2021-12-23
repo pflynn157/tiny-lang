@@ -236,8 +236,7 @@ bool Parser::buildFunctionCallStmt(AstBlock *block, Token idToken) {
     
     Token token = scanner->getNext();
     if (token.type != SemiColon) {
-        syntax->addError(scanner->getLine(), "Expected \';\'.");
-        token.print();
+        syntax->addError(scanner->getLine() - 1, "Expected \';\'.");
         return false;
     }
     

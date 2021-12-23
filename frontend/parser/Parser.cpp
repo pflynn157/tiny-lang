@@ -154,6 +154,7 @@ bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType
                              AstExpression **dest, bool isConst) {
     std::stack<AstExpression *> output;
     std::stack<AstExpression *> opStack;
+    int currentLine = scanner->getLine();
     
     DataType varType = currentType;
     
@@ -225,6 +226,10 @@ bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType
                     acc->setIndex(index);
                     output.push(acc);
                 } else if (token.type == LParen) {
+                    if (currentLine != scanner->getLine()) {
+                        syntax->addWarning(scanner->getLine(), "Function call on newline- possible logic error.");
+                    }
+                
                     AstFuncCallExpr *fc = new AstFuncCallExpr(name);
                     AstExpression *fcExpr = fc;
                     buildExpression(nullptr, varType, RParen, Comma, &fcExpr);
@@ -268,9 +273,17 @@ bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType
                 if (opStack.size() > 0) {
                     AstType type = opStack.top()->getType();
                     if (type == AstType::Mul || type == AstType::Div) {
+                        if (output.empty()) {
+                            syntax->addError(scanner->getLine(), "Invalid expression: No RVAL");
+                            return false;
+                        }
                         AstExpression *rval = checkExpression(output.top(), varType);
                         output.pop();
                         
+                        if (output.empty()) {
+                            syntax->addError(scanner->getLine(), "Invalid expression: No LVAL");
+                            return false;
+                        }
                         AstExpression *lval = checkExpression(output.top(), varType);
                         output.pop();
                         
@@ -323,7 +336,12 @@ bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType
             case GTE: opStack.push(new AstGTEOp); lastWasOp = true; break;
             case LTE: opStack.push(new AstLTEOp); lastWasOp = true; break;
             
-            default: {}
+            case Comma: break;
+            
+            default: {
+                syntax->addError(scanner->getLine(), "Invalid token in expression.");
+                return false;
+            }
         }
         
         if (!lastWasOp && opStack.size() > 0) {
@@ -341,11 +359,24 @@ bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType
         token = scanner->getNext();
     }
     
+    if (token.type == Eof) {
+        syntax->addError(scanner->getLine(), "Invalid expression-> missing \';\'.");
+        return false;
+    }
+    
     // Build the expression
     while (opStack.size() > 0) {
+        if (output.empty()) {
+            syntax->addError(scanner->getLine(), "Invalid expression: No RVAL");
+            return false;
+        }
         AstExpression *rval = checkExpression(output.top(), varType);
         output.pop();
         
+        if (output.empty()) {
+            syntax->addError(scanner->getLine(), "Invalid expression: No LVAL");
+            return false;
+        }
         AstExpression *lval = checkExpression(output.top(), varType);
         output.pop();
         

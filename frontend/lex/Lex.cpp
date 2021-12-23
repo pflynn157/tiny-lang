@@ -115,6 +115,8 @@ Token Scanner::getNext() {
         }
         
         if (next == ' ' || next == '\n' || isSymbol(next)) {
+            if (next == '\n') ++currentLine;
+        
             if (buffer.length() == 0) {
                 if (isSymbol(next)) {
                     Token sym;

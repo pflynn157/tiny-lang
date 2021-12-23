@@ -59,7 +59,10 @@ bool Parser::buildVariableDec(AstBlock *block) {
         case U64: dataType = DataType::U64; break;
         case Str: dataType = DataType::String; break;
         
-        default: {}
+        default: {
+            syntax->addError(scanner->getLine(), "Invalid data type.");
+            return false;
+        }
     }
     
     token = scanner->getNext();
