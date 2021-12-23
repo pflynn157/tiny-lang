@@ -1,15 +1,15 @@
 #OUTPUT
-#False
-#False
 #True
 #True
+#False
+#False
 #False
 #END
 
 #RET 0
 
 func test1(x:i32) is
-    if x = 20 or x = 30 then
+    if x > 20 and x < 30 then
         println("True");
     else
         println("False");
