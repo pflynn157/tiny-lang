@@ -50,6 +50,9 @@ enum class AstType {
     GTE,
     LTE,
     
+    LogicalAnd,
+    LogicalOr,
+    
     CharL,
     I8L,
     I16L,

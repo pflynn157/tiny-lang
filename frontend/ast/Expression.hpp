@@ -190,6 +190,26 @@ public:
     void print();
 };
 
+// Represents a logical AND operation
+class AstLogicalAndOp : public AstBinaryOp {
+public:
+    AstLogicalAndOp() {
+        this->type = AstType::LogicalAnd;
+    }
+    
+    void print();
+};
+
+// Represents a logical OR operation
+class AstLogicalOrOp : public AstBinaryOp {
+public:
+    AstLogicalOrOp() {
+        this->type = AstType::LogicalOr;
+    }
+    
+    void print();
+};
+
 // Represents a character literal
 class AstChar : public AstExpression {
 public:

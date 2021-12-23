@@ -361,6 +361,22 @@ void AstLTEOp::print() {
     std::cout << ")";
 }
 
+void AstLogicalAndOp::print() {
+    std::cout << "(";
+    lval->print();
+    std::cout << ") && (";
+    rval->print();
+    std::cout << ")";
+}
+
+void AstLogicalOrOp::print() {
+    std::cout << "(";
+    lval->print();
+    std::cout << ") || (";
+    rval->print();
+    std::cout << ")";
+}
+
 void AstChar::print() {
     std::cout << "CHAR(" << val << ")";
 }

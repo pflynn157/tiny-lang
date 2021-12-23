@@ -384,6 +384,104 @@ bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType
             case GTE: opStack.push(new AstGTEOp); lastWasOp = true; break;
             case LTE: opStack.push(new AstLTEOp); lastWasOp = true; break;
             
+            /*case EQ:
+            case NEQ:
+            case GT:
+            case LT:
+            case GTE:
+            case LTE: {
+                if (opStack.size() > 0) {
+                    AstType type = opStack.top()->getType();
+                    if (type == AstType::LogicalAnd || type == AstType::LogicalOr) {
+                        if (output.empty()) {
+                            syntax->addError(scanner->getLine(), "Invalid expression: No RVAL");
+                            return false;
+                        }
+                        AstExpression *rval = checkExpression(output.top(), varType);
+                        output.pop();
+                        
+                        if (output.empty()) {
+                            syntax->addError(scanner->getLine(), "Invalid expression: No LVAL");
+                            return false;
+                        }
+                        AstExpression *lval = checkExpression(output.top(), varType);
+                        output.pop();
+                        
+                        AstBinaryOp *op = static_cast<AstBinaryOp *>(opStack.top());
+                        opStack.pop();
+                        
+                        op->setLVal(lval);
+                        op->setRVal(rval);
+                        output.push(op);
+                    }
+                }
+                
+                switch (token.type) {
+                    case EQ: opStack.push(new AstEQOp); break;
+                    case NEQ: opStack.push(new AstNEQOp); break;
+                    case GT: opStack.push(new AstGTOp); break;
+                    case LT: opStack.push(new AstLTOp); break;
+                    case GTE: opStack.push(new AstGTEOp); break;
+                    case LTE: opStack.push(new AstLTEOp); break;
+                    default: {}
+                }
+                
+                lastWasOp = true;
+            } break;*/
+            
+            /*case Logical_And: {
+                lastWasOp = true;
+                opStack.push(new AstLogicalAndOp);
+            } break;
+            
+            case Logical_Or: {
+                lastWasOp = true;
+                opStack.push(new AstLogicalOrOp);
+            } break;*/
+            
+            case Logical_And:
+            case Logical_Or: {
+                if (opStack.size() > 0) {
+                    AstType type = opStack.top()->getType();
+                    switch (type) {
+                        case AstType::EQ:
+                        case AstType::NEQ:
+                        case AstType::GT:
+                        case AstType::LT:
+                        case AstType::GTE:
+                        case AstType::LTE: {
+                            if (output.empty()) {
+                                syntax->addError(scanner->getLine(), "Invalid expression: No RVAL");
+                                return false;
+                            }
+                            AstExpression *rval = checkExpression(output.top(), varType);
+                            output.pop();
+                            
+                            if (output.empty()) {
+                                syntax->addError(scanner->getLine(), "Invalid expression: No LVAL");
+                                return false;
+                            }
+                            AstExpression *lval = checkExpression(output.top(), varType);
+                            output.pop();
+                            
+                            AstBinaryOp *op = static_cast<AstBinaryOp *>(opStack.top());
+                            opStack.pop();
+                            
+                            op->setLVal(lval);
+                            op->setRVal(rval);
+                            output.push(op);
+                        } break;
+                        
+                        default: {}
+                    }
+                }
+                
+                if (token.type == Logical_And) opStack.push(new AstLogicalAndOp);
+                else if (token.type == Logical_Or) opStack.push(new AstLogicalOrOp);
+                
+                lastWasOp = true;
+            } break;
+            
             case Comma: break;
             
             default: {

@@ -323,7 +323,9 @@ Value *Compiler::compileValue(AstExpression *expr, DataType dataType) {
         case AstType::GT:
         case AstType::LT:
         case AstType::GTE:
-        case AstType::LTE: {
+        case AstType::LTE:
+        case AstType::LogicalAnd:
+        case AstType::LogicalOr: {
             AstBinaryOp *op = static_cast<AstBinaryOp *>(expr);
             AstExpression *lvalExpr = op->getLVal();
             AstExpression *rvalExpr = op->getRVal();
@@ -405,6 +407,9 @@ Value *Compiler::compileValue(AstExpression *expr, DataType dataType) {
                 case AstType::LT: return builder->CreateICmpSLT(lval, rval);
                 case AstType::GTE: return builder->CreateICmpSGE(lval, rval);
                 case AstType::LTE: return builder->CreateICmpSLE(lval, rval);
+                
+                case AstType::LogicalAnd: return builder->CreateLogicalAnd(lval, rval);
+                case AstType::LogicalOr: return builder->CreateLogicalOr(lval, rval);
                     
                 default: {}
             }

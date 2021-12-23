@@ -72,6 +72,9 @@ enum TokenType {
     Or,
     Xor,
     
+    Logical_And,
+    Logical_Or,
+    
     EQ,
     NEQ,
     GT,

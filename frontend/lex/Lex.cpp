@@ -234,6 +234,8 @@ TokenType Scanner::getKeyword() {
     else if (buffer == "import") return Import;
     else if (buffer == "true") return True;
     else if (buffer == "false") return False;
+    else if (buffer == "and") return Logical_And;
+    else if (buffer == "or") return Logical_Or;
     return EmptyToken;
 }
 

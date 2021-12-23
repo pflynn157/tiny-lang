@@ -36,6 +36,11 @@ conditional_expr:
     | expression '<=' expression
     ;
     
+logical_expr:
+      expression AND expression
+    | expression OR expression
+    ;
+    
 binary_expr:
       expression '+' expression
     | expression '-' expression
@@ -61,6 +66,7 @@ struct_expr: ID '.' ID
 expression:
       primary_expr
     | conditional_expr
+    | logical_expr
     | binary_expr
     | function_expr
     | array_expr
