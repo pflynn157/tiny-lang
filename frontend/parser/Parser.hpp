@@ -57,9 +57,11 @@ protected:
         std::stack<AstExpression *> output;
         std::stack<AstOp *> opStack;
         DataType varType;
+        bool lastWasOp = true;
     };
     
     AstExpression *buildConstExpr(Token token);
+    bool buildOperator(Token token, ExprContext *ctx);
     bool applyHigherPred(ExprContext *ctx);
     bool buildExpression(AstStatement *stmt, DataType currentType,
                         TokenType stopToken = SemiColon, TokenType separateToken = EmptyToken,

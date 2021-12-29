@@ -23,6 +23,72 @@ AstExpression *Parser::buildConstExpr(Token token) {
     return nullptr;
 }
 
+bool Parser::buildOperator(Token token, ExprContext *ctx) {
+    switch (token.type) {
+        case Plus: 
+        case Minus:
+        case Mul:
+        case Div:
+        case And:
+        case Or:
+        case Xor:
+        case EQ:
+        case NEQ:
+        case GT:
+        case LT:
+        case GTE:
+        case LTE:
+        case Logical_And:
+        case Logical_Or: {
+            AstBinaryOp *op = new AstBinaryOp;
+            AstUnaryOp *op1 = new AstUnaryOp;
+            bool useUnary = false;
+            switch (token.type) {
+                case Plus: op = new AstAddOp; break;
+                case Mul: op = new AstMulOp; break;
+                case Div: op = new AstDivOp; break;
+                case And: op = new AstAndOp; break;
+                case Or: op = new AstOrOp; break;
+                case Xor: op = new AstXorOp; break;
+                case EQ: op = new AstEQOp; break;
+                case NEQ: op = new AstNEQOp; break;
+                case GT: op = new AstGTOp; break;
+                case LT: op = new AstLTOp; break;
+                case GTE: op = new AstGTEOp; break;
+                case LTE: op = new AstLTEOp; break;
+                case Logical_And: op = new AstLogicalAndOp; break;
+                case Logical_Or: op = new AstLogicalOrOp; break;
+                case Minus: {
+                    if (ctx->lastWasOp) {
+                        op1 = new AstNegOp;
+                        useUnary = true;
+                    } else {
+                        op = new AstSubOp;
+                    }
+                } break;
+            }
+            
+            if (ctx->opStack.size() > 0 && useUnary == false) {
+                AstOp *top = ctx->opStack.top();
+                    if (top->isBinaryOp()) {
+                    AstBinaryOp *op2 = static_cast<AstBinaryOp *>(top);
+                    if (op->getPrecedence() > op2->getPrecedence()) {
+                        if (!applyHigherPred(ctx)) return false;
+                    }
+                }
+            }
+            
+            if (useUnary) ctx->opStack.push(op1);
+            else ctx->opStack.push(op);
+            ctx->lastWasOp = true;
+        } break;
+        
+        default: {}
+    }   
+    
+    return true;        
+}
+
 // Applies higher precedence for an operator
 bool Parser::applyHigherPred(ExprContext *ctx) {
     if (ctx->output.empty()) {
@@ -52,15 +118,11 @@ bool Parser::applyHigherPred(ExprContext *ctx) {
 // Builds an expression
 bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType stopToken, TokenType separateToken,
                              AstExpression **dest, bool isConst) {
-    //std::stack<AstExpression *> output;
-    //std::stack<AstExpression *> opStack;
     ExprContext *ctx = new ExprContext;
     ctx->varType = currentType;
     int currentLine = scanner->getLine();
     
     DataType varType = currentType;
-    
-    bool lastWasOp = true;
 
     Token token = scanner->getNext();
     while (token.type != Eof && token.type != stopToken) {
@@ -87,13 +149,13 @@ bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType
             case CharL:
             case Int32:
             case String: {
-                lastWasOp = false;
+                ctx->lastWasOp = false;
                 AstExpression *expr = buildConstExpr(token);
                 ctx->output.push(expr);
             } break;
             
             case Id: {
-                lastWasOp = false;
+                ctx->lastWasOp = false;
             
                 std::string name = token.id_val;
                 if (varType == DataType::Void) {
@@ -174,47 +236,9 @@ bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType
             case LTE:
             case Logical_And:
             case Logical_Or: {
-                AstBinaryOp *op = new AstBinaryOp;
-                AstUnaryOp *op1 = new AstUnaryOp;
-                bool useUnary = false;
-                switch (token.type) {
-                    case Plus: op = new AstAddOp; break;
-                    case Mul: op = new AstMulOp; break;
-                    case Div: op = new AstDivOp; break;
-                    case And: op = new AstAndOp; break;
-                    case Or: op = new AstOrOp; break;
-                    case Xor: op = new AstXorOp; break;
-                    case EQ: op = new AstEQOp; break;
-                    case NEQ: op = new AstNEQOp; break;
-                    case GT: op = new AstGTOp; break;
-                    case LT: op = new AstLTOp; break;
-                    case GTE: op = new AstGTEOp; break;
-                    case LTE: op = new AstLTEOp; break;
-                    case Logical_And: op = new AstLogicalAndOp; break;
-                    case Logical_Or: op = new AstLogicalOrOp; break;
-                    case Minus: {
-                        if (lastWasOp) {
-                            op1 = new AstNegOp;
-                            useUnary = true;
-                        } else {
-                            op = new AstSubOp;
-                        }
-                    } break;
+                if (!buildOperator(token, ctx)) {
+                    return false;
                 }
-                
-                if (ctx->opStack.size() > 0 && useUnary == false) {
-                    AstOp *top = ctx->opStack.top();
-                        if (top->isBinaryOp()) {
-                        AstBinaryOp *op2 = static_cast<AstBinaryOp *>(top);
-                        if (op->getPrecedence() > op2->getPrecedence()) {
-                            if (!applyHigherPred(ctx)) return false;
-                        }
-                    }
-                }
-                
-                if (useUnary) ctx->opStack.push(op1);
-                else ctx->opStack.push(op);
-                lastWasOp = true;
             } break;
             
             case Comma: break;
@@ -225,7 +249,7 @@ bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType
             }
         }
         
-        if (!lastWasOp && ctx->opStack.size() > 0) {
+        if (!ctx->lastWasOp && ctx->opStack.size() > 0) {
             if (ctx->opStack.top()->getType() == AstType::Neg) {
                 AstExpression *val = checkExpression(ctx->output.top(), varType);
                 ctx->output.pop();
