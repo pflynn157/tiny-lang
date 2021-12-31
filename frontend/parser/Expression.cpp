@@ -270,6 +270,7 @@ bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType
     }
     
     // Build the expression
+    AstType lastOp = AstType::EmptyAst;
     while (ctx->opStack.size() > 0) {
         if (ctx->output.empty()) {
             syntax->addError(scanner->getLine(), "Invalid expression: No RVAL");
@@ -288,9 +289,21 @@ bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType
         AstBinaryOp *op = static_cast<AstBinaryOp *>(ctx->opStack.top());
         ctx->opStack.pop();
         
+        if (op->getType() == lastOp) {
+            AstBinaryOp *op2 = static_cast<AstBinaryOp *>(rval);
+            
+            rval = op2->getRVal();
+            op2->setRVal(op2->getLVal());
+            op2->setLVal(lval);
+            
+            lval = op2;
+        }
+        
         op->setLVal(lval);
         op->setRVal(rval);
         ctx->output.push(op);
+        
+        lastOp = op->getType();
     }
     
     // Add the expressions back
