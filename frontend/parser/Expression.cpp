@@ -241,6 +241,16 @@ bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType
                 }
             } break;
             
+            case LParen: {
+                AstExpression *subExpr = nullptr;
+                if (!buildExpression(nullptr, varType, RParen, EmptyToken, &subExpr)) {
+                    return false;
+                }
+                if (!subExpr) return false;
+                ctx->output.push(subExpr);
+                ctx->lastWasOp = false;
+            } break;
+            
             case Comma: break;
             
             default: {
