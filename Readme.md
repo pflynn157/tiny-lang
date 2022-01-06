@@ -6,7 +6,7 @@ This project was born out of another one. I started a project to test implementi
 
 The solution: Create a downsided version of Orka that contains the most essential programming elements. This downsized language is meant to be usable for most real-world tasks, but simple enough to where a compiler or interpreter can be implemented quickly.
 
-See here for the specs and more information: [https://patrickflynn.co/tiny-lang/](https://patrickflynn.co/tiny-lang/)
+See here for the specs and more information: [https://patrickflynn.xyz/tiny-lang/](https://patrickflynn.xyz/tiny-lang/)
 
 ### Examples
 
