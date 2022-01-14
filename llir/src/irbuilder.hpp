@@ -27,6 +27,9 @@ public:
     Reg *createLoad(Type *type, Operand *src);
     Reg *createAdd(Type *type, Operand *op1, Operand *op2);
     Reg *createSub(Type *type, Operand *op1, Operand *op2);
+    Reg *createAnd(Type *type, Operand *op1, Operand *op2);
+    Reg *createOr(Type *type, Operand *op1, Operand *op2);
+    Reg *createXor(Type *type, Operand *op1, Operand *op2);
     Instruction *createVoidCall(std::string name, std::vector<Operand *> args);
     Instruction *createRetVoid();
     Instruction *createRet(Type *type, Operand *op);

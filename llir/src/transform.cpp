@@ -72,13 +72,26 @@ void Module::transform() {
                     case InstrType::SMul:
                     case InstrType::UMul:
                     case InstrType::SDiv:
-                    case InstrType::UDiv: {
+                    case InstrType::UDiv:
+                    case InstrType::And:
+                    case InstrType::Or:
+                    case InstrType::Xor: {
                         Reg *reg = static_cast<Reg *>(instr->getDest());
                         regMap[reg->getName()] = regCount;
                         ++regCount;
                         
                         HReg *reg2 = new HReg(regCount - 1);
                         instr->setDest(reg2);
+                    } break;
+                    
+                    case InstrType::Call: {
+                        FunctionCall *fc = static_cast<FunctionCall *>(instr);
+                        std::vector<Operand *> args;
+                        for (Operand *arg : fc->getArgs()) {
+                            Operand *op = checkOperand(arg);
+                            args.push_back(op);
+                        }
+                        fc->setArgs(args);
                     } break;
                 }
                 

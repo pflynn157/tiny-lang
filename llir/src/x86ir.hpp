@@ -17,11 +17,15 @@ enum class X86Type {
     
     Push,
     Mov,
-    Add,
-    Sub,
     Call,
     Leave,
     Ret,
+    
+    Add,
+    Sub,
+    And,
+    Or,
+    Xor,
     
     Reg8,
     Reg8H,
@@ -178,6 +182,39 @@ public:
 class X86Sub : public X86Instr {
 public:
     explicit X86Sub(X86Operand *op1, X86Operand *op2) : X86Instr(X86Type::Sub) {
+        this->op1 = op1;
+        this->op2 = op2;
+    }
+    
+    std::string print();
+};
+
+// An AND instruction
+class X86And : public X86Instr {
+public:
+    explicit X86And(X86Operand *op1, X86Operand *op2) : X86Instr(X86Type::And) {
+        this->op1 = op1;
+        this->op2 = op2;
+    }
+    
+    std::string print();
+};
+
+// An OR instruction
+class X86Or : public X86Instr {
+public:
+    explicit X86Or(X86Operand *op1, X86Operand *op2) : X86Instr(X86Type::Or) {
+        this->op1 = op1;
+        this->op2 = op2;
+    }
+    
+    std::string print();
+};
+
+// A XOR instruction
+class X86Xor : public X86Instr {
+public:
+    explicit X86Xor(X86Operand *op1, X86Operand *op2) : X86Instr(X86Type::Xor) {
         this->op1 = op1;
         this->op2 = op2;
     }

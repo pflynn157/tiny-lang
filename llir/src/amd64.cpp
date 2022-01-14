@@ -72,8 +72,14 @@ void Amd64Writer::compile() {
             }
         }
         
-        if (stackPos < 16) stackImm->setValue(16);
-        else stackImm->setValue(stackPos+4);
+        if (stackPos < 16) {
+            stackImm->setValue(16);
+        } else {
+            int i = 16;
+            for (; i < (stackPos + 4); i += 8) {}
+            i += 8;
+            stackImm->setValue(i);
+        }
         stackPos = 0;
         
         // Clean up the stack and leave
@@ -107,7 +113,10 @@ void Amd64Writer::compileInstruction(Instruction *instr) {
         
         // Math
         case InstrType::Add:
-        case InstrType::Sub: {
+        case InstrType::Sub:
+        case InstrType::And:
+        case InstrType::Or:
+        case InstrType::Xor: {
             X86Operand *op1 = compileOperand(instr->getOperand1(), instr->getDataType());
             X86Operand *op2 = compileOperand(instr->getOperand2(), instr->getDataType());
             X86Operand *fop1, *fop2;
@@ -123,6 +132,9 @@ void Amd64Writer::compileInstruction(Instruction *instr) {
             switch (instr->getType()) {
                 case InstrType::Add: instr2 = new X86Add(fop1, fop2); break;
                 case InstrType::Sub: instr2 = new X86Sub(fop1, fop2); break;
+                case InstrType::And: instr2 = new X86And(fop1, fop2); break;
+                case InstrType::Or: instr2 = new X86Or(fop1, fop2); break;
+                case InstrType::Xor: instr2 = new X86Xor(fop1, fop2); break;
                 
                 default: {}
             }

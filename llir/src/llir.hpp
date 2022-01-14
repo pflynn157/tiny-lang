@@ -40,6 +40,11 @@ enum class InstrType {
     SRem,
     URem,
     
+    // Bitwise operations
+    And,
+    Or,
+    Xor,
+    
     // Jumps
     // We're going to use RISC-V style because these will be the easiest
     // to translate on different architectures
@@ -241,6 +246,8 @@ public:
         this->name = name;
         this->args = args;
     }
+    
+    void setArgs(std::vector<Operand *> args) { this->args = args; }
     
     std::string getName() { return name; }
     std::vector<Operand *> getArgs() { return args; }

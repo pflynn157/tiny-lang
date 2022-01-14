@@ -57,6 +57,18 @@ std::string X86Sub::print() {
     return "sub " + op1->print() + ", " + op2->print();
 }
 
+std::string X86And::print() {
+    return "and " + op1->print() + ", " + op2->print();
+}
+
+std::string X86Or::print() {
+    return "or " + op1->print() + ", " + op2->print();
+}
+
+std::string X86Xor::print() {
+    return "xor " + op1->print() + ", " + op2->print();
+}
+
 std::string X86Imm::print() {
     return std::to_string(value);
 }

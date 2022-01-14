@@ -75,6 +75,10 @@ void Instruction::print() {
         case InstrType::URem: std::cout << "urem "; break;
         case InstrType::SRem: std::cout << "srem "; break;
         
+        case InstrType::And: std::cout << "and "; break;
+        case InstrType::Or: std::cout << "or "; break;
+        case InstrType::Xor: std::cout << "xor "; break;
+        
         case InstrType::Br: std::cout << "br "; break;
         case InstrType::Beq: std::cout << "beq "; break;
         case InstrType::Bne: std::cout << "bne "; break;

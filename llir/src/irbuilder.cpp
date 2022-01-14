@@ -89,6 +89,48 @@ Reg *IRBuilder::createSub(Type *type, Operand *op1, Operand *op2) {
     return dest;
 }
 
+Reg *IRBuilder::createAnd(Type *type, Operand *op1, Operand *op2) {
+    Instruction *op = new Instruction(InstrType::And);
+    op->setDataType(type);
+    op->setOperand1(op1);
+    op->setOperand2(op2);
+    
+    Reg *dest = new Reg(std::to_string(regCounter));
+    ++regCounter;
+    op->setDest(dest);
+    
+    currentBlock->addInstruction(op);
+    return dest;
+}
+
+Reg *IRBuilder::createOr(Type *type, Operand *op1, Operand *op2) {
+    Instruction *op = new Instruction(InstrType::Or);
+    op->setDataType(type);
+    op->setOperand1(op1);
+    op->setOperand2(op2);
+    
+    Reg *dest = new Reg(std::to_string(regCounter));
+    ++regCounter;
+    op->setDest(dest);
+    
+    currentBlock->addInstruction(op);
+    return dest;
+}
+
+Reg *IRBuilder::createXor(Type *type, Operand *op1, Operand *op2) {
+    Instruction *op = new Instruction(InstrType::Xor);
+    op->setDataType(type);
+    op->setOperand1(op1);
+    op->setOperand2(op2);
+    
+    Reg *dest = new Reg(std::to_string(regCounter));
+    ++regCounter;
+    op->setDest(dest);
+    
+    currentBlock->addInstruction(op);
+    return dest;
+}
+
 Instruction *IRBuilder::createVoidCall(std::string name, std::vector<Operand *> args) {
     FunctionCall *fc = new FunctionCall(name, args);
     currentBlock->addInstruction(fc);
