@@ -51,6 +51,9 @@ enum class InstrType {
     Blt,
     Ble,
     
+    // Function calls
+    Call,
+    
     // Memory
     Alloca,
     Load,
@@ -64,6 +67,7 @@ enum class OpType {
     Imm,
     Reg,
     Label,
+    String,
     
     Mem,
     HReg
@@ -74,6 +78,7 @@ class Function;
 class Block;
 class Instruction;
 class Operand;
+class StringPtr;
 
 //
 // The base of all LLIR projects
@@ -85,10 +90,13 @@ public:
     }
     
     void addFunction(Function *func) { functions.push_back(func); }
+    void addStringPtr(StringPtr *ptr) { strings.push_back(ptr); }
     
     std::string getName() { return name; }
     int getFunctionCount() { return functions.size(); }
     Function *getFunction(int pos) { return functions.at(pos); }
+    int getStringCount() { return strings.size(); }
+    StringPtr *getString(int pos) { return strings.at(pos); }
     
     void transform();
     
@@ -96,6 +104,7 @@ public:
 private:
     std::string name = "";
     std::vector<Function *> functions;
+    std::vector<StringPtr *> strings;
 };
 
 //
@@ -215,7 +224,7 @@ public:
     Operand *getOperand2() { return src2; }
     Operand *getOperand3() { return src3; }
     
-    void print();
+    virtual void print();
 protected:
     Type *dataType;
     InstrType type = InstrType::None;
@@ -223,6 +232,23 @@ protected:
     Operand *src1 = nullptr;
     Operand *src2 = nullptr;
     Operand *src3 = nullptr;
+};
+
+// Represents function calls
+class FunctionCall : public Instruction {
+public:
+    explicit FunctionCall(std::string name, std::vector<Operand *> args) : Instruction(InstrType::Call) {
+        this->name = name;
+        this->args = args;
+    }
+    
+    std::string getName() { return name; }
+    std::vector<Operand *> getArgs() { return args; }
+    
+    void print();
+private:
+    std::string name = "";
+    std::vector<Operand *> args;
 };
 
 //
@@ -279,6 +305,23 @@ public:
     void print();
 private:
     std::string name = "";
+};
+
+// Represents a string
+class StringPtr : public Operand {
+public:
+    explicit StringPtr(std::string name, std::string val) : Operand(OpType::String) {
+        this->name = name;
+        this->val = val;
+    }
+    
+    std::string getName() { return name; }
+    std::string getValue() { return val; }
+    
+    void print();
+private:
+    std::string name = "";
+    std::string val = "";
 };
 
 //

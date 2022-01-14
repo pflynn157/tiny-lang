@@ -3,6 +3,10 @@
 
 namespace LLIR {
 
+IRBuilder::IRBuilder(Module *mod) {
+    this->mod = mod;
+}
+
 Block *IRBuilder::createBlock(std::string name) {
     currentBlock = new Block(name);
     currentFunc->addBlock(currentBlock);
@@ -11,6 +15,16 @@ Block *IRBuilder::createBlock(std::string name) {
 
 Operand *IRBuilder::createI32(int val) {
     return new Imm(val);
+}
+
+Operand *IRBuilder::createString(std::string val) {
+    std::string name = "STR" + std::to_string(lblCounter);
+    ++lblCounter;
+    
+    StringPtr *ptr = new StringPtr(name, val);
+    mod->addStringPtr(ptr);
+    
+    return ptr;
 }
 
 Reg *IRBuilder::createAlloca(Type *type) {
@@ -73,6 +87,12 @@ Reg *IRBuilder::createSub(Type *type, Operand *op1, Operand *op2) {
     
     currentBlock->addInstruction(sub);
     return dest;
+}
+
+Instruction *IRBuilder::createVoidCall(std::string name, std::vector<Operand *> args) {
+    FunctionCall *fc = new FunctionCall(name, args);
+    currentBlock->addInstruction(fc);
+    return fc;
 }
 
 Instruction *IRBuilder::createRetVoid() {

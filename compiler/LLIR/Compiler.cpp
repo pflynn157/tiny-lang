@@ -14,7 +14,7 @@ Compiler::Compiler(AstTree *tree, CFlags cflags) {
     this->cflags = cflags;
 
     mod = new LLIR::Module(cflags.name);
-    builder = new LLIR::IRBuilder;
+    builder = new LLIR::IRBuilder(mod);
 }
 
 void Compiler::compile() {
@@ -225,10 +225,10 @@ LLIR::Operand *Compiler::compileValue(AstExpression *expr, DataType dataType) {
             return builder->getInt8(cval->getValue());
         } break;*/
         
-        /*case AstType::StringL: {
+        case AstType::StringL: {
             AstString *str = static_cast<AstString *>(expr);
-            return builder->CreateGlobalStringPtr(str->getValue());
-        } break;*/
+            return builder->createString(str->getValue());
+        } break;
         
         case AstType::ID: {
             AstID *id = static_cast<AstID *>(expr);

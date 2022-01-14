@@ -104,6 +104,22 @@ void Instruction::print() {
     std::cout << ";" << std::endl;
 }
 
+void FunctionCall::print() {
+    if (dest) {
+        dest->print();
+        std::cout << " = ";
+    }
+    
+    std::cout << name << "(";
+    for (int i = 0; i<args.size(); i++) {
+        args.at(i)->print();
+        if (i + 1 < args.size()) {
+            std::cout << ", ";
+        }
+    }
+    std::cout << ");" << std::endl;
+}
+
 void Imm::print() {
     std::cout << imm;
 }
@@ -114,6 +130,10 @@ void Reg::print() {
 
 void Label::print() {
     std::cout << name;
+}
+
+void StringPtr::print() {
+    std::cout << name << "(\"" << val << "\")";
 }
 
 void Mem::print() {

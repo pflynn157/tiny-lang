@@ -112,16 +112,14 @@ void Compiler::compileExternFunction(AstGlobalStatement *global) {
 //
 void Compiler::compileFuncCallStatement(AstStatement *stmt) {
     AstFuncCallStmt *fc = static_cast<AstFuncCallStmt *>(stmt);
-    /*std::vector<Value *> args;
+    std::vector<LLIR::Operand *> args;
     
     for (auto stmt : stmt->getExpressions()) {
-        Value *val = compileValue(stmt);
+        LLIR::Operand *val = compileValue(stmt);
         args.push_back(val);
     }
     
-    Function *callee = mod->getFunction(fc->getName());
-    if (!callee) std::cerr << "Invalid function call statement." << std::endl;
-    builder->CreateCall(callee, args);*/
+    builder->createVoidCall(fc->getName(), args);
 }
 
 //
