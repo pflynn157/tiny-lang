@@ -34,6 +34,20 @@ Instruction *IRBuilder::createStore(Type *type, Operand *op, Operand *dest) {
     return store;
 }
 
+Reg *IRBuilder::createAdd(Type *type, Operand *op1, Operand *op2) {
+    Instruction *add = new Instruction(InstrType::Add);
+    add->setDataType(type);
+    add->setOperand1(op1);
+    add->setOperand2(op2);
+    
+    Reg *dest = new Reg(std::to_string(regCounter));
+    ++regCounter;
+    add->setDest(dest);
+    
+    currentBlock->addInstruction(add);
+    return dest;
+}
+
 Instruction *IRBuilder::createRetVoid() {
     Instruction *ret = new Instruction(InstrType::Ret);
     ret->setDataType(Type::createVoidType());

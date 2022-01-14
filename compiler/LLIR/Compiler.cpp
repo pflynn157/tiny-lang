@@ -197,6 +197,8 @@ void Compiler::compileStatement(AstStatement *stmt) {
 
 // Converts an AST value to an LLVM value
 LLIR::Operand *Compiler::compileValue(AstExpression *expr, DataType dataType) {
+    LLIR::Type *type = translateType(dataType);
+
     switch (expr->getType()) {
         /*case AstType::I8L: {
             AstI8 *i8 = static_cast<AstI8 *>(expr);
@@ -295,7 +297,7 @@ LLIR::Operand *Compiler::compileValue(AstExpression *expr, DataType dataType) {
             return builder->CreateNeg(val);
         } break;*/
         
-        /*case AstType::Add:
+        case AstType::Add:
         case AstType::Sub: 
         case AstType::Mul:
         case AstType::Div:
@@ -314,10 +316,10 @@ LLIR::Operand *Compiler::compileValue(AstExpression *expr, DataType dataType) {
             AstExpression *lvalExpr = op->getLVal();
             AstExpression *rvalExpr = op->getRVal();
             
-            Value *lval = compileValue(lvalExpr, dataType);
-            Value *rval = compileValue(rvalExpr, dataType);
+            LLIR::Operand *lval = compileValue(lvalExpr, dataType);
+            LLIR::Operand *rval = compileValue(rvalExpr, dataType);
             
-            bool strOp = false;
+            /*bool strOp = false;
             bool rvalStr = false;
             
             if (lvalExpr->getType() == AstType::StringL || rvalExpr->getType() == AstType::StringL) {
@@ -372,32 +374,32 @@ LLIR::Operand *Compiler::compileValue(AstExpression *expr, DataType dataType) {
                     // Invalid
                     return nullptr;
                 }
-            }
+            }*/
             
             // Otherwise, build a normal comparison
             switch (expr->getType()) {
-                case AstType::Add: return builder->CreateAdd(lval, rval);
-                case AstType::Sub: return builder->CreateSub(lval, rval);
-                case AstType::Mul: return builder->CreateMul(lval, rval);
-                case AstType::Div: return builder->CreateSDiv(lval, rval);
+                case AstType::Add: return builder->createAdd(type, lval, rval);
+                //case AstType::Sub: return builder->CreateSub(lval, rval);
+                //case AstType::Mul: return builder->CreateMul(lval, rval);
+                //case AstType::Div: return builder->CreateSDiv(lval, rval);
                 
-                case AstType::And: return builder->CreateAnd(lval, rval);
-                case AstType::Or:  return builder->CreateOr(lval, rval);
-                case AstType::Xor: return builder->CreateXor(lval, rval);
+                //case AstType::And: return builder->CreateAnd(lval, rval);
+                //case AstType::Or:  return builder->CreateOr(lval, rval);
+                //case AstType::Xor: return builder->CreateXor(lval, rval);
                     
-                case AstType::EQ: return builder->CreateICmpEQ(lval, rval);
-                case AstType::NEQ: return builder->CreateICmpNE(lval, rval);
-                case AstType::GT: return builder->CreateICmpSGT(lval, rval);
-                case AstType::LT: return builder->CreateICmpSLT(lval, rval);
-                case AstType::GTE: return builder->CreateICmpSGE(lval, rval);
-                case AstType::LTE: return builder->CreateICmpSLE(lval, rval);
+                //case AstType::EQ: return builder->CreateICmpEQ(lval, rval);
+                //case AstType::NEQ: return builder->CreateICmpNE(lval, rval);
+                //case AstType::GT: return builder->CreateICmpSGT(lval, rval);
+                //case AstType::LT: return builder->CreateICmpSLT(lval, rval);
+                //case AstType::GTE: return builder->CreateICmpSGE(lval, rval);
+                //case AstType::LTE: return builder->CreateICmpSLE(lval, rval);
                 
-                case AstType::LogicalAnd: return builder->CreateLogicalAnd(lval, rval);
-                case AstType::LogicalOr: return builder->CreateLogicalOr(lval, rval);
+                //case AstType::LogicalAnd: return builder->CreateLogicalAnd(lval, rval);
+                //case AstType::LogicalOr: return builder->CreateLogicalOr(lval, rval);
                     
                 default: {}
             }
-        } break;*/
+        } break;
         
         default: {}
     }
