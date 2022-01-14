@@ -10,6 +10,12 @@ namespace LLIR {
 Amd64Writer::Amd64Writer(Module *mod) {
     this->mod = mod;
     file = new X86File(mod->getName());
+    
+    // Init the register map
+    regMap[0] = X86Reg::AX;
+    regMap[1] = X86Reg::BX;
+    regMap[2] = X86Reg::CX;
+    regMap[3] = X86Reg::DX;
 }
 
 void Amd64Writer::compile() {
@@ -114,6 +120,10 @@ void Amd64Writer::compileInstruction(Instruction *instr) {
         } break;
         
         case InstrType::Load: {
+            X86Operand *src = compileOperand(instr->getOperand1(), instr->getDataType());
+            X86Operand *dest = compileOperand(instr->getDest(), instr->getDataType());
+            X86Mov *mov = new X86Mov(dest, src);
+            file->addCode(mov);
         } break;
         
         case InstrType::Store: {
@@ -144,7 +154,19 @@ X86Operand *Amd64Writer::compileOperand(Operand *src, Type *type) {
         
         // Return a hardware register
         case OpType::HReg: {
-        
+            HReg *reg = static_cast<HReg *>(src);
+            X86Reg rType = regMap[reg->getNum()];
+            
+            switch (type->getType()) {
+                case DataType::Void: break;
+                case DataType::I8: break;
+                case DataType::I16: break;
+                case DataType::I32: return new X86Reg32(rType);
+                case DataType::Ptr:
+                case DataType::I64: return new X86Reg64(rType);
+                case DataType::F32:
+                case DataType::F64: break;
+            }
         } break;
         
         default: return nullptr;

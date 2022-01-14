@@ -26,7 +26,7 @@ private:
     
     int stackPos = 0;
     std::map<std::string, int> memMap;
-    std::map<std::string, std::string> regMap;
+    std::map<int, X86Reg> regMap;
 };
 
 } // end namespace LLIR
