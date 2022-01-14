@@ -54,6 +54,30 @@ std::string X86Imm::print() {
     return std::to_string(value);
 }
 
+std::string X86Reg32::print() {
+    switch (regType) {
+        case X86Reg::AX: return "eax";
+        case X86Reg::BX: return "ebx";
+        case X86Reg::CX: return "ecx";
+        case X86Reg::DX: return "edx";
+        
+        case X86Reg::SI: return "esi";
+        case X86Reg::DI: return "edi";
+        case X86Reg::SP: return "esp";
+        case X86Reg::BP: return "ebp";
+        
+        case X86Reg::R8: return "r8d";
+        case X86Reg::R9: return "r9d";
+        case X86Reg::R10: return "r10d";
+        case X86Reg::R11: return "r11d";
+        case X86Reg::R12: return "r12d";
+        case X86Reg::R13: return "r13d";
+        case X86Reg::R14: return "r14d";
+        case X86Reg::R15: return "r15d";
+    }
+    return "";
+}
+
 std::string X86Reg64::print() {
     switch (regType) {
         case X86Reg::AX: return "rax";

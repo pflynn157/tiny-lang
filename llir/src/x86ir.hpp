@@ -191,6 +191,19 @@ private:
     uint64_t value = 0;
 };
 
+// Represents a 32-bit register
+class X86Reg32 : public X86Operand {
+public:
+    explicit X86Reg32(X86Reg regType) : X86Operand(X86Type::Reg32) {
+        this->regType = regType;
+    }
+    
+    X86Reg getType() { return regType; }
+    std::string print();
+protected:
+    X86Reg regType;
+};
+
 // Represents a 64-bit register
 class X86Reg64 : public X86Operand {
 public:

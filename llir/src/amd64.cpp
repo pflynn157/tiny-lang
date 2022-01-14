@@ -62,21 +62,20 @@ void Amd64Writer::compileInstruction(Instruction *instr) {
         case InstrType::None: break;
         
         case InstrType::Ret: {
-            Operand *src = instr->getOperand1();
-            switch (src->getType()) {
-                case OpType::Imm: {
-                    Imm *imm = static_cast<Imm *>(src);
-                    X86Mov *mov = new X86Mov(new X86Reg64(X86Reg::AX), new X86Imm(imm->getValue()));
-                    file->addCode(mov);
-                } break;
+            Type *type = instr->getDataType();
+            X86Operand *src = compileOperand(instr->getOperand1(), type);
+            X86Operand *dest;
+            switch (type->getType()) {
+                case DataType::I8: break;
+                case DataType::I16: break;
+                case DataType::I32: dest = new X86Reg32(X86Reg::AX); break;
+                case DataType::I64: dest = new X86Reg64(X86Reg::AX); break;
                 
-                case OpType::Reg: {
-                    Reg *reg = static_cast<Reg *>(src);
-                    if (regMap[reg->getName()] == "eax" || regMap[reg->getName()] == "rax") break;
-                    // TODO: Either load memory or move to the proper register
-                    
-                } break;
+                default: {}
             }
+            
+            X86Mov *mov = new X86Mov(dest, src);
+            file->addCode(mov);
         } break;
         
         case InstrType::RetVoid: break;    // Nothing on x86-64
@@ -144,6 +143,20 @@ void Amd64Writer::compileInstruction(Instruction *instr) {
             }
         } break;
     }
+}
+
+X86Operand *Amd64Writer::compileOperand(Operand *src, Type *type) {
+    switch (src->getType()) {
+        // Return an immediate operand
+        case OpType::Imm: {
+            Imm *imm = static_cast<Imm *>(src);
+            return new X86Imm(imm->getValue());
+        }
+        
+        default: return nullptr;
+    }
+    
+    return nullptr;
 }
 
 void Amd64Writer::dump() {

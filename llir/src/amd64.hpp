@@ -13,6 +13,7 @@ public:
     explicit Amd64Writer(Module *mod);
     void compile();
     void compileInstruction(Instruction *instr);
+    X86Operand *compileOperand(Operand *src, Type *type);
     void dump();
     void writeToFile();
     void writeToFile(std::string path);
