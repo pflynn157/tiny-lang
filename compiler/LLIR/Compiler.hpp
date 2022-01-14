@@ -58,9 +58,9 @@ private:
     //std::map<std::string, std::vector<Type *>> structElementTypeTable;
     
     // Symbol table
-    //std::map<std::string, AllocaInst *> symtable;
-    //std::map<std::string, DataType> typeTable;
-    //std::map<std::string, DataType> ptrTable;
+    std::map<std::string, LLIR::Reg *> symtable;
+    std::map<std::string, DataType> typeTable;
+    std::map<std::string, DataType> ptrTable;
     
     // Block stack
     int blockCount = 0;

@@ -13,6 +13,18 @@ Operand *IRBuilder::createI32(int val) {
     return new Imm(val);
 }
 
+Reg *IRBuilder::createAlloca(Type *type) {
+    Instruction *alloc = new Instruction(InstrType::Alloca);
+    alloc->setDataType(type);
+    
+    Reg *dest = new Reg(std::to_string(regCounter));
+    ++regCounter;
+    alloc->setDest(dest);
+    
+    currentBlock->addInstruction(alloc);
+    return dest;
+}
+
 Instruction *IRBuilder::createRetVoid() {
     Instruction *ret = new Instruction(InstrType::Ret);
     ret->setDataType(Type::createVoidType());

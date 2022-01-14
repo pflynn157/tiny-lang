@@ -19,11 +19,13 @@ public:
     //
     // Instruction builders
     //
+    Reg *createAlloca(Type *type);
     Instruction *createRetVoid();
     Instruction *createRet(Type *type, Operand *op);
 private:
     Function *currentFunc;
     Block *currentBlock;
+    int regCounter = 0;
 };
 
 }

@@ -65,12 +65,12 @@ void Compiler::compileStatement(AstStatement *stmt) {
         // A variable declaration (alloca) statement
         case AstType::VarDec: {
             AstVarDec *vd = static_cast<AstVarDec *>(stmt);
-            /*Type *type = translateType(vd->getDataType(), vd->getPtrType());
+            LLIR::Type *type = translateType(vd->getDataType(), vd->getPtrType());
             
-            AllocaInst *var = builder->CreateAlloca(type);
+            LLIR::Reg *var = builder->createAlloca(type);
             symtable[vd->getName()] = var;
             typeTable[vd->getName()] = vd->getDataType();
-            ptrTable[vd->getName()] = vd->getPtrType();*/
+            ptrTable[vd->getName()] = vd->getPtrType();
         } break;
         
         // A structure declaration
