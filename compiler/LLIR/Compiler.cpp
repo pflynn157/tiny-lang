@@ -110,11 +110,12 @@ void Compiler::compileStatement(AstStatement *stmt) {
         // A variable assignment
         case AstType::VarAssign: {
             AstVarAssign *va = static_cast<AstVarAssign *>(stmt);
-            /*AllocaInst *ptr = symtable[va->getName()];
+            LLIR::Reg *ptr = symtable[va->getName()];
             DataType ptrType = typeTable[va->getName()];
-            Value *val = compileValue(stmt->getExpressions().at(0), ptrType);
+            LLIR::Operand *val = compileValue(stmt->getExpressions().at(0), ptrType);
+            LLIR::Type *type = translateType(ptrType);
             
-            builder->CreateStore(val, ptr);*/
+            builder->createStore(type, val, ptr);
         } break;
         
         // An array assignment

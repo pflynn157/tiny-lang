@@ -20,6 +20,7 @@ public:
     // Instruction builders
     //
     Reg *createAlloca(Type *type);
+    Instruction *createStore(Type *type, Operand *op, Operand *dest);
     Instruction *createRetVoid();
     Instruction *createRet(Type *type, Operand *op);
 private:

@@ -25,6 +25,15 @@ Reg *IRBuilder::createAlloca(Type *type) {
     return dest;
 }
 
+Instruction *IRBuilder::createStore(Type *type, Operand *op, Operand *dest) {
+    Instruction *store = new Instruction(InstrType::Store);
+    store->setDataType(type);
+    store->setOperand1(op);
+    store->setOperand2(dest);
+    currentBlock->addInstruction(store);
+    return store;
+}
+
 Instruction *IRBuilder::createRetVoid() {
     Instruction *ret = new Instruction(InstrType::Ret);
     ret->setDataType(Type::createVoidType());
