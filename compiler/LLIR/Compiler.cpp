@@ -13,9 +13,8 @@ Compiler::Compiler(AstTree *tree, CFlags cflags) {
     this->tree = tree;
     this->cflags = cflags;
 
-    /*context = std::make_unique<LLVMContext>();
-    mod = std::make_unique<Module>(cflags.name, *context);
-    builder = std::make_unique<IRBuilder<>>(*context);*/
+    mod = new LLIR::Module(cflags.name);
+    builder = new LLIR::IRBuilder;
 }
 
 void Compiler::compile() {
@@ -36,12 +35,12 @@ void Compiler::compile() {
     }*/
 
     // Build all other functions
-    /*for (auto global : tree->getGlobalStatements()) {
+    for (auto global : tree->getGlobalStatements()) {
         switch (global->getType()) {
             case AstType::Func: {
-                symtable.clear();
-                typeTable.clear();
-                ptrTable.clear();
+                //symtable.clear();
+                //typeTable.clear();
+                //ptrTable.clear();
                 
                 compileFunction(global);
             } break;
@@ -52,11 +51,12 @@ void Compiler::compile() {
 
             default: {}
         }
-    }*/
+    }
 }
 
 void Compiler::debug() {
     //mod->print(errs(), nullptr);
+    mod->print();
 }
 
 // Compiles an individual statement
@@ -195,48 +195,48 @@ void Compiler::compileStatement(AstStatement *stmt) {
 }
 
 // Converts an AST value to an LLVM value
-/*Value *Compiler::compileValue(AstExpression *expr, DataType dataType) {
+LLIR::Operand *Compiler::compileValue(AstExpression *expr, DataType dataType) {
     switch (expr->getType()) {
-        case AstType::I8L: {
+        /*case AstType::I8L: {
             AstI8 *i8 = static_cast<AstI8 *>(expr);
             return builder->getInt8(i8->getValue());
-        } break;
+        } break;*/
         
-        case AstType::I16L: {
+        /*case AstType::I16L: {
             AstI16 *i16 = static_cast<AstI16 *>(expr);
             return builder->getInt16(i16->getValue());
-        } break;
+        } break;*/
         
         case AstType::I32L: {
             AstI32 *ival = static_cast<AstI32 *>(expr);
-            return builder->getInt32(ival->getValue());
+            return builder->createI32(ival->getValue());
         } break;
         
-        case AstType::I64L: {
+        /*case AstType::I64L: {
             AstI64 *i64 = static_cast<AstI64 *>(expr);
             return builder->getInt64(i64->getValue());
-        } break;
+        } break;*/
         
-        case AstType::CharL: {
+        /*case AstType::CharL: {
             AstChar *cval = static_cast<AstChar *>(expr);
             return builder->getInt8(cval->getValue());
-        } break;
+        } break;*/
         
-        case AstType::StringL: {
+        /*case AstType::StringL: {
             AstString *str = static_cast<AstString *>(expr);
             return builder->CreateGlobalStringPtr(str->getValue());
-        } break;
+        } break;*/
         
-        case AstType::ID: {
+        /*case AstType::ID: {
             AstID *id = static_cast<AstID *>(expr);
             AllocaInst *ptr = symtable[id->getValue()];
             Type *type = translateType(typeTable[id->getValue()], ptrTable[id->getValue()]);
             
             if (typeTable[id->getValue()] == DataType::Struct) return ptr;
             return builder->CreateLoad(type, ptr);
-        } break;
+        } break;*/
         
-        case AstType::ArrayAccess: {
+        /*case AstType::ArrayAccess: {
             AstArrayAccess *acc = static_cast<AstArrayAccess *>(expr);
             AllocaInst *ptr = symtable[acc->getValue()];
             DataType ptrType = typeTable[acc->getValue()];
@@ -258,9 +258,9 @@ void Compiler::compileStatement(AstStatement *stmt) {
                 Value *ep = builder->CreateGEP(arrayElementType, ptrLd, index);
                 return builder->CreateLoad(arrayElementType, ep);
             }
-        } break;
+        } break;*/
 
-        case AstType::StructAccess: {
+        /*case AstType::StructAccess: {
             AstStructAccess *sa = static_cast<AstStructAccess *>(expr);
             AllocaInst *ptr = symtable[sa->getName()];
             int pos = getStructIndex(sa->getName(), sa->getMember());
@@ -271,9 +271,9 @@ void Compiler::compileStatement(AstStatement *stmt) {
 
             Value *ep = builder->CreateStructGEP(strType, ptr, pos);
             return builder->CreateLoad(elementType, ep);
-        } break;
+        } break;*/
         
-        case AstType::FuncCallExpr: {
+        /*case AstType::FuncCallExpr: {
             AstFuncCallExpr *fc = static_cast<AstFuncCallExpr *>(expr);
             std::vector<Value *> args;
             
@@ -285,16 +285,16 @@ void Compiler::compileStatement(AstStatement *stmt) {
             Function *callee = mod->getFunction(fc->getName());
             if (!callee) std::cerr << "Invalid function call statement." << std::endl;
             return builder->CreateCall(callee, args);
-        } break;
+        } break;*/
         
-        case AstType::Neg: {
+        /*case AstType::Neg: {
             AstNegOp *op = static_cast<AstNegOp *>(expr);
             Value *val = compileValue(op->getVal(), dataType);
             
             return builder->CreateNeg(val);
-        } break;
+        } break;*/
         
-        case AstType::Add:
+        /*case AstType::Add:
         case AstType::Sub: 
         case AstType::Mul:
         case AstType::Div:
@@ -396,35 +396,35 @@ void Compiler::compileStatement(AstStatement *stmt) {
                     
                 default: {}
             }
-        } break;
+        } break;*/
         
         default: {}
     }
     
     return nullptr;
-}*/
+}
 
-/*Type *Compiler::translateType(DataType dataType, DataType subType, std::string typeName) {
-    Type *type;
+LLIR::Type *Compiler::translateType(DataType dataType, DataType subType, std::string typeName) {
+    LLIR::Type *type;
             
     switch (dataType) {
         case DataType::Char:
         case DataType::I8:
-        case DataType::U8: type = Type::getInt8Ty(*context); break;
+        case DataType::U8: type = LLIR::Type::createI8Type(); break;
         
         case DataType::I16:
-        case DataType::U16: type = Type::getInt16Ty(*context); break;
+        case DataType::U16: type = LLIR::Type::createI16Type(); break;
         
         case DataType::Bool:
         case DataType::I32:
-        case DataType::U32: type = Type::getInt32Ty(*context); break;
+        case DataType::U32: type = LLIR::Type::createI32Type(); break;
         
         case DataType::I64:
-        case DataType::U64: type = Type::getInt64Ty(*context); break;
+        case DataType::U64: type = LLIR::Type::createI64Type(); break;
         
-        case DataType::String: type = Type::getInt8PtrTy(*context); break;
+        //case DataType::String: type = Type::getInt8PtrTy(*context); break;
         
-        case DataType::Ptr: {
+        /*case DataType::Ptr: {
             switch (subType) {
                 case DataType::Char:
                 case DataType::I8:
@@ -443,17 +443,17 @@ void Compiler::compileStatement(AstStatement *stmt) {
                 
                 default: {}
             }
-        } break;
+        } break;*/
         
-        case DataType::Struct: {
+        /*case DataType::Struct: {
             return structTable[typeName];
-        } break;
+        } break;*/
         
-        default: type = Type::getVoidTy(*context);
+        default: type = LLIR::Type::createVoidType();
     }
     
     return type;
-}*/
+}
 
 int Compiler::getStructIndex(std::string name, std::string member) {
     /*std::string name2 = structVarTable[name];

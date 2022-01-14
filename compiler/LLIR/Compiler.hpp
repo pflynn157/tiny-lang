@@ -9,6 +9,9 @@
 #include <map>
 #include <stack>
 
+#include <llir.hpp>
+#include <irbuilder.hpp>
+
 #include <ast.hpp>
 
 struct CFlags {
@@ -25,8 +28,8 @@ public:
     void link();
 protected:
     void compileStatement(AstStatement *stmt);
-    //Value *compileValue(AstExpression *expr, DataType dataType = DataType::Void);
-    //Type *translateType(DataType dataType, DataType subType = DataType::Void, std::string typeName = "");
+    LLIR::Operand *compileValue(AstExpression *expr, DataType dataType = DataType::Void);
+    LLIR::Type *translateType(DataType dataType, DataType subType = DataType::Void, std::string typeName = "");
     int getStructIndex(std::string name, std::string member);
 
     // Function.cpp
@@ -42,12 +45,11 @@ private:
     AstTree *tree;
     CFlags cflags;
 
-    // LLVM stuff
-    //std::unique_ptr<LLVMContext> context;
-    //std::unique_ptr<Module> mod;
-    //std::unique_ptr<IRBuilder<>> builder;
-    //Function *currentFunc;
-    //DataType currentFuncType = DataType::Void;
+    // LLIR stuff
+    LLIR::Module *mod;
+    LLIR::IRBuilder *builder;
+    LLIR::Function *currentFunc;
+    DataType currentFuncType = DataType::Void;
     //std::string funcTypeStruct = "";
     
     // The user-defined structure table

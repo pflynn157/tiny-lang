@@ -102,6 +102,13 @@ public:
         this->type = type;
     }
     
+    // Convience creators for types
+    static Type *createVoidType() { return new Type(DataType::Void); }
+    static Type *createI8Type() { return new Type(DataType::I8); }
+    static Type *createI16Type() { return new Type(DataType::I16); }
+    static Type *createI32Type() { return new Type(DataType::I32); }
+    static Type *createI64Type() { return new Type(DataType::I64); }
+    
     DataType getType() { return type; }
     
     void print();
@@ -118,6 +125,12 @@ public:
         this->name = name;
         this->linkage = linkage;
         dataType = new Type(DataType::Void);
+    }
+    
+    static Function *Create(std::string name, Linkage linkage, Type *dataType) {
+        Function *func = new Function(name, linkage);
+        func->setDataType(dataType);
+        return func;
     }
     
     void setDataType(Type *d) {

@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include <LLIR/Compiler.hpp>
+#include <llir.hpp>
 
 //
 // Compiles a function and its body
@@ -19,16 +20,12 @@ void Compiler::compileFunction(AstGlobalStatement *global) {
     AstFunction *astFunc = static_cast<AstFunction *>(global);
 
     std::vector<Var> astVarArgs = astFunc->getArguments();
-    /*FunctionType *FT;
-    Type *funcType = translateType(astFunc->getDataType(), astFunc->getPtrType(), astFunc->getDataTypeName());
-    //if (astFunc->getDataType() == DataType::Struct) {
-    //    funcType = PointerType::getUnqual(funcType);
-    //}
+    LLIR::Type *funcType = translateType(astFunc->getDataType(), astFunc->getPtrType(), astFunc->getDataTypeName());
     currentFuncType = astFunc->getDataType();
-    if (currentFuncType == DataType::Struct)
-        funcTypeStruct = astFunc->getDataTypeName();
+    //if (currentFuncType == DataType::Struct)
+        //funcTypeStruct = astFunc->getDataTypeName();
     
-    if (astVarArgs.size() == 0) {
+    /*if (astVarArgs.size() == 0) {
         FT = FunctionType::get(funcType, false);
     } else {
         std::vector<Type *> args;
@@ -41,16 +38,17 @@ void Compiler::compileFunction(AstGlobalStatement *global) {
         }
         
         FT = FunctionType::get(funcType, args, false);
-    }
+    }*/
     
-    Function *func = Function::Create(FT, Function::ExternalLinkage, astFunc->getName(), mod.get());
+    LLIR::Function *func = LLIR::Function::Create(astFunc->getName(), LLIR::Linkage::Global, funcType);
     currentFunc = func;
-
-    BasicBlock *mainBlock = BasicBlock::Create(*context, "entry", func);
-    builder->SetInsertPoint(mainBlock);
+    mod->addFunction(func);
+    
+    builder->setCurrentFunction(func);
+    builder->createBlock("entry");
     
     // Load and store any arguments
-    if (astVarArgs.size() > 0) {
+    /*if (astVarArgs.size() > 0) {
         for (int i = 0; i<astVarArgs.size(); i++) {
             Var var = astVarArgs.at(i);
             
@@ -73,11 +71,11 @@ void Compiler::compileFunction(AstGlobalStatement *global) {
             Value *param = func->getArg(i);
             builder->CreateStore(param, alloca);
         }
-    }
+    }*/
 
     for (auto stmt : astFunc->getBlock()->getBlock()) {
         compileStatement(stmt);
-    }*/
+    }
 }
 
 //
@@ -131,19 +129,18 @@ void Compiler::compileFuncCallStatement(AstStatement *stmt) {
 // TODO: We may want to rethink this some
 //
 void Compiler::compileReturnStatement(AstStatement *stmt) {
-    /*if (stmt->getExpressionCount() == 0) {
-        builder->CreateRetVoid();
-    } else if (stmt->getExpressionCount() == 1) {
-        Value *val = compileValue(stmt->getExpressions().at(0), currentFuncType);
-        if (currentFuncType == DataType::Struct) {
+    if (stmt->getExpressionCount() == 1) {
+        LLIR::Operand *op = compileValue(stmt->getExpressions().at(0), currentFuncType);
+        LLIR::Type *type = translateType(currentFuncType);
+        /*if (currentFuncType == DataType::Struct) {
             StructType *type = structTable[funcTypeStruct];
             Value *ld = builder->CreateLoad(type, val);
             builder->CreateRet(ld);
-        } else {
-            builder->CreateRet(val);
-        }
+        } else {*/
+            builder->createRet(type, op);
+        //}
     } else {
-        builder->CreateRetVoid();
-    }*/
+        builder->createRetVoid();
+    }
 }
 

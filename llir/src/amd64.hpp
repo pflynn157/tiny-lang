@@ -15,6 +15,7 @@ public:
     void compileInstruction(Instruction *instr);
     void dump();
     void writeToFile();
+    void writeToFile(std::string path);
     void build();
 protected:
     std::string getSizeForType(Type *type);

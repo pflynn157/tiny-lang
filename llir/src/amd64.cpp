@@ -64,7 +64,11 @@ void Amd64Writer::compileInstruction(Instruction *instr) {
         case InstrType::Ret: {
             Operand *src = instr->getOperand1();
             switch (src->getType()) {
-                case OpType::Imm: break;
+                case OpType::Imm: {
+                    Imm *imm = static_cast<Imm *>(src);
+                    X86Mov *mov = new X86Mov(new X86Reg64(X86Reg::AX), new X86Imm(imm->getValue()));
+                    file->addCode(mov);
+                } break;
                 
                 case OpType::Reg: {
                     Reg *reg = static_cast<Reg *>(src);
@@ -148,6 +152,12 @@ void Amd64Writer::dump() {
 
 void Amd64Writer::writeToFile() {
     std::string path = "/tmp/" + mod->getName() + ".s";
+    std::ofstream writer(path);
+    writer << file->print() << std::endl;
+    writer.close();
+}
+
+void Amd64Writer::writeToFile(std::string path) {
     std::ofstream writer(path);
     writer << file->print() << std::endl;
     writer.close();
