@@ -3,24 +3,13 @@
 // This file is part of the Tiny Lang compiler.
 // Tiny Lang is licensed under the BSD-3 license. See the COPYING file for more information.
 //
-#include "llvm/Support/FileSystem.h"
-#include "llvm/Support/Host.h"
-#include "llvm/Support/raw_ostream.h"
-#include "llvm/Support/TargetRegistry.h"
-#include "llvm/Support/TargetSelect.h"
-#include "llvm/Target/TargetMachine.h"
-#include "llvm/Target/TargetOptions.h"
-#include "llvm/IR/LegacyPassManager.h"
 
-using namespace llvm;
-using namespace llvm::sys;
-
-#include <Compiler.hpp>
+#include <LLIR/Compiler.hpp>
 
 void Compiler::writeAssembly() {
     std::string triple = "";
 
-    LLVMInitializeX86TargetInfo();
+    /*LLVMInitializeX86TargetInfo();
     LLVMInitializeX86Target();
     LLVMInitializeX86TargetMC();
     LLVMInitializeX86AsmParser();
@@ -67,7 +56,7 @@ void Compiler::writeAssembly() {
     }
     
     pass.run(*mod);
-    writer.flush();
+    writer.flush();*/
 }
 
 // Assemble the file

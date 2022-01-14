@@ -13,7 +13,7 @@ using namespace llvm::sys;
 #include <iostream>
 #include <exception>
 
-#include <Compiler.hpp>
+#include <LLVM/Compiler.hpp>
 #include <llvm-c/Support.h>
 
 Compiler::Compiler(AstTree *tree, CFlags cflags) {
