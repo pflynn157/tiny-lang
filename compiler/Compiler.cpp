@@ -408,8 +408,11 @@ Value *Compiler::compileValue(AstExpression *expr, DataType dataType) {
                 case AstType::GTE: return builder->CreateICmpSGE(lval, rval);
                 case AstType::LTE: return builder->CreateICmpSLE(lval, rval);
                 
+/*
+TODO: We need to find a way to detect this
                 case AstType::LogicalAnd: return builder->CreateLogicalAnd(lval, rval);
                 case AstType::LogicalOr: return builder->CreateLogicalOr(lval, rval);
+*/
                     
                 default: {}
             }
