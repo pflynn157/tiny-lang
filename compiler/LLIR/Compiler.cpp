@@ -230,14 +230,14 @@ LLIR::Operand *Compiler::compileValue(AstExpression *expr, DataType dataType) {
             return builder->CreateGlobalStringPtr(str->getValue());
         } break;*/
         
-        /*case AstType::ID: {
+        case AstType::ID: {
             AstID *id = static_cast<AstID *>(expr);
-            AllocaInst *ptr = symtable[id->getValue()];
-            Type *type = translateType(typeTable[id->getValue()], ptrTable[id->getValue()]);
+            LLIR::Reg *ptr = symtable[id->getValue()];
+            LLIR::Type *type = translateType(typeTable[id->getValue()], ptrTable[id->getValue()]);
             
             if (typeTable[id->getValue()] == DataType::Struct) return ptr;
-            return builder->CreateLoad(type, ptr);
-        } break;*/
+            return builder->createLoad(type, ptr);
+        } break;
         
         /*case AstType::ArrayAccess: {
             AstArrayAccess *acc = static_cast<AstArrayAccess *>(expr);

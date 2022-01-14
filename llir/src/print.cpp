@@ -120,4 +120,8 @@ void Mem::print() {
     std::cout << "[" << name << "]";
 }
 
+void HReg::print() {
+    std::cout << "r" << num;
+}
+
 } // end namespace LLIR

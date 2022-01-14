@@ -12,6 +12,7 @@ void Compiler::writeAssembly(bool printTransform) {
     mod->transform();
     if (printTransform) {
         mod->print();
+        return;
     }
 
     // Write it out

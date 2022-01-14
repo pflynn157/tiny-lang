@@ -23,6 +23,11 @@ Operand *checkOperand(Operand *input) {
         return mem;
     }
     
+    if (regMap.find(reg->getName()) != regMap.end()) {
+        HReg *reg2 = new HReg(regMap[reg->getName()]);
+        return reg2;
+    }
+    
     return input;
 }
 
@@ -54,6 +59,27 @@ void Module::transform() {
                         instr->setDest(mem);
                         continue;
                     }
+                    
+                    // In order to keep from too many registers being used, we should always
+                    // go back to earlier registers once we hit a store instruction
+                    case InstrType::Store: {
+                        regCount = 0;
+                    } break;
+                    
+                    case InstrType::Load:
+                    case InstrType::Add:
+                    case InstrType::Sub:
+                    case InstrType::SMul:
+                    case InstrType::UMul:
+                    case InstrType::SDiv:
+                    case InstrType::UDiv: {
+                        Reg *reg = static_cast<Reg *>(instr->getDest());
+                        regMap[reg->getName()] = regCount;
+                        ++regCount;
+                        
+                        HReg *reg2 = new HReg(regCount - 1);
+                        instr->setDest(reg2);
+                    } break;
                 }
                 
                 // Otherwise, check and switch the operands

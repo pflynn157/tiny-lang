@@ -65,7 +65,8 @@ enum class OpType {
     Reg,
     Label,
     
-    Mem
+    Mem,
+    HReg
 };
 
 // Forward declarations
@@ -297,6 +298,20 @@ public:
     void print();
 private:
     std::string name = "";
+};
+
+// Represents a hardware register
+class HReg : public Operand {
+public:
+    explicit HReg(int num) : Operand(OpType::HReg) {
+        this->num = num;
+    }
+    
+    int getNum() { return num; }
+    
+    void print();
+private:
+    int num = 0;
 };
 
 } // end namespace LLIR

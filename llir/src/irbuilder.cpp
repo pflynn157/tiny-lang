@@ -34,6 +34,19 @@ Instruction *IRBuilder::createStore(Type *type, Operand *op, Operand *dest) {
     return store;
 }
 
+Reg *IRBuilder::createLoad(Type *type, Operand *src) {
+    Instruction *load = new Instruction(InstrType::Load);
+    load->setDataType(type);
+    load->setOperand1(src);
+    
+    Reg *dest = new Reg(std::to_string(regCounter));
+    ++regCounter;
+    load->setDest(dest);
+    
+    currentBlock->addInstruction(load);
+    return dest;
+}
+
 Reg *IRBuilder::createAdd(Type *type, Operand *op1, Operand *op2) {
     Instruction *add = new Instruction(InstrType::Add);
     add->setDataType(type);

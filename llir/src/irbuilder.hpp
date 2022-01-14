@@ -21,6 +21,7 @@ public:
     //
     Reg *createAlloca(Type *type);
     Instruction *createStore(Type *type, Operand *op, Operand *dest);
+    Reg *createLoad(Type *type, Operand *src);
     Reg *createAdd(Type *type, Operand *op1, Operand *op2);
     Instruction *createRetVoid();
     Instruction *createRet(Type *type, Operand *op);
