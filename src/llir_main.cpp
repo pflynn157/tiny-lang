@@ -46,7 +46,7 @@ AstTree *getAstTree(std::string input, bool testLex, bool printAst) {
     return tree;
 }
 
-int compileLLIR(AstTree *tree, CFlags flags, bool printLLVM) {
+int compileLLIR(AstTree *tree, CFlags flags, bool printLLVM, bool printLLIR2) {
     Compiler *compiler = new Compiler(tree, flags);
     compiler->compile();
         
@@ -55,7 +55,7 @@ int compileLLIR(AstTree *tree, CFlags flags, bool printLLVM) {
         return 0;
     }
         
-    compiler->writeAssembly();
+    compiler->writeAssembly(printLLIR2);
     compiler->assemble();
     compiler->link();
     
@@ -78,6 +78,7 @@ int main(int argc, char **argv) {
     bool testLex = false;
     bool printAst = false;
     bool printLLVM = false;
+    bool printLLIR2 = false;
     
     for (int i = 1; i<argc; i++) {
         std::string arg = argv[i];
@@ -90,6 +91,8 @@ int main(int argc, char **argv) {
             printAst = true;
         } else if (arg == "--llir") {
             printLLVM = true;
+        } else if (arg == "--llir2") {
+            printLLIR2 = true;
         } else if (arg == "-o") {
             flags.name = argv[i+1];
             i += 1;
@@ -113,6 +116,6 @@ int main(int argc, char **argv) {
     }
 
     // Compile
-    return compileLLIR(tree, flags, printLLVM);
+    return compileLLIR(tree, flags, printLLVM, printLLIR2);
 }
 

@@ -7,7 +7,13 @@
 #include <LLIR/Compiler.hpp>
 #include <amd64.hpp>
 
-void Compiler::writeAssembly() {
+void Compiler::writeAssembly(bool printTransform) {
+    // Run the transform pass so it can be printed
+    mod->transform();
+    if (printTransform) {
+        mod->print();
+    }
+
     // Write it out
     std::string outputPath = "/tmp/" + cflags.name + ".asm";
     

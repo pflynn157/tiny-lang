@@ -116,4 +116,8 @@ void Label::print() {
     std::cout << name;
 }
 
+void Mem::print() {
+    std::cout << "[" << name << "]";
+}
+
 } // end namespace LLIR

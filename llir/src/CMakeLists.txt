@@ -5,6 +5,7 @@ set(SRC
     amd64.cpp
     irbuilder.cpp
     print.cpp
+    transform.cpp
     x86ir.cpp
 )
 

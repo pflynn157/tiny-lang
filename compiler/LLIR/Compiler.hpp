@@ -23,7 +23,7 @@ public:
     explicit Compiler(AstTree *tree, CFlags flags);
     void compile();
     void debug();
-    void writeAssembly();
+    void writeAssembly(bool printTransform = false);
     void assemble();
     void link();
 protected:

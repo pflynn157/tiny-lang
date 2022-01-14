@@ -63,7 +63,9 @@ enum class OpType {
     
     Imm,
     Reg,
-    Label
+    Label,
+    
+    Mem
 };
 
 // Forward declarations
@@ -86,6 +88,8 @@ public:
     std::string getName() { return name; }
     int getFunctionCount() { return functions.size(); }
     Function *getFunction(int pos) { return functions.at(pos); }
+    
+    void transform();
     
     void print();
 private:
@@ -270,6 +274,25 @@ public:
     explicit Label(std::string name) : Operand(OpType::Label) {
         this->name = name;
     }
+    
+    void print();
+private:
+    std::string name = "";
+};
+
+//
+// NOTE: These are more hardware-specific operands, and should only be used by
+// the transform layer and the assembly writers
+//
+
+// Represents a memory location
+class Mem : public Operand {
+public:
+    explicit Mem(std::string name) : Operand(OpType::Mem) {
+        this->name = name;
+    }
+    
+    std::string getName() { return name; }
     
     void print();
 private:
