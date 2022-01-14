@@ -61,6 +61,20 @@ Reg *IRBuilder::createAdd(Type *type, Operand *op1, Operand *op2) {
     return dest;
 }
 
+Reg *IRBuilder::createSub(Type *type, Operand *op1, Operand *op2) {
+    Instruction *sub = new Instruction(InstrType::Sub);
+    sub->setDataType(type);
+    sub->setOperand1(op1);
+    sub->setOperand2(op2);
+    
+    Reg *dest = new Reg(std::to_string(regCounter));
+    ++regCounter;
+    sub->setDest(dest);
+    
+    currentBlock->addInstruction(sub);
+    return dest;
+}
+
 Instruction *IRBuilder::createRetVoid() {
     Instruction *ret = new Instruction(InstrType::Ret);
     ret->setDataType(Type::createVoidType());

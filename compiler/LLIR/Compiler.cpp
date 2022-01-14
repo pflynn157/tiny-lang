@@ -379,7 +379,7 @@ LLIR::Operand *Compiler::compileValue(AstExpression *expr, DataType dataType) {
             // Otherwise, build a normal comparison
             switch (expr->getType()) {
                 case AstType::Add: return builder->createAdd(type, lval, rval);
-                //case AstType::Sub: return builder->CreateSub(lval, rval);
+                case AstType::Sub: return builder->createSub(type, lval, rval);
                 //case AstType::Mul: return builder->CreateMul(lval, rval);
                 //case AstType::Div: return builder->CreateSDiv(lval, rval);
                 

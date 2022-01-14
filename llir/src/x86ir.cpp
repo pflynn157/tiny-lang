@@ -46,6 +46,10 @@ std::string X86Mov::print() {
     return "mov " + op1->print() + ", " + op2->print();
 }
 
+std::string X86Add::print() {
+    return "add " + op1->print() + ", " + op2->print();
+}
+
 std::string X86Sub::print() {
     return "sub " + op1->print() + ", " + op2->print();
 }

@@ -39,11 +39,13 @@ void Amd64Writer::compile() {
         }
         
         // Setup the stack
+        X86Imm *stackImm = new X86Imm(0);
+        
         X86Push *p = new X86Push(new X86Reg64(X86Reg::BP));
         file->addCode(p);
         X86Mov *mov = new X86Mov(new X86Reg64(X86Reg::BP), new X86Reg64(X86Reg::SP));
         file->addCode(mov);
-        X86Sub *sub = new X86Sub(new X86Reg64(X86Reg::SP), new X86Imm(func->getStackSize()));
+        X86Sub *sub = new X86Sub(new X86Reg64(X86Reg::SP), stackImm);
         file->addCode(sub);
         
         // Blocks
@@ -56,6 +58,9 @@ void Amd64Writer::compile() {
                 compileInstruction(block->getInstruction(k));
             }
         }
+        
+        stackImm->setValue(stackPos+4);
+        stackPos = 0;
         
         // Clean up the stack and leave
         file->addCode(new X86Leave);
@@ -86,8 +91,37 @@ void Amd64Writer::compileInstruction(Instruction *instr) {
         
         case InstrType::RetVoid: break;    // Nothing on x86-64
         
-        case InstrType::Add: break;
-        case InstrType::Sub: break;
+        // Math
+        case InstrType::Add:
+        case InstrType::Sub: {
+            X86Operand *op1 = compileOperand(instr->getOperand1(), instr->getDataType());
+            X86Operand *op2 = compileOperand(instr->getOperand2(), instr->getDataType());
+            X86Operand *fop1, *fop2;
+            if (op1->getType() == X86Type::Imm) {
+                fop2 = op1;
+                fop1 = op2;
+            } else {
+                fop1 = op1;
+                fop2 = op2;
+            }
+            
+            X86Instr *instr2;
+            switch (instr->getType()) {
+                case InstrType::Add: instr2 = new X86Add(fop1, fop2); break;
+                case InstrType::Sub: instr2 = new X86Sub(fop1, fop2); break;
+                
+                default: {}
+            }
+            
+            file->addCode(instr2);
+            
+            // Now, we need a move so we're in the right register
+            // I love x86
+            X86Operand *dest = compileOperand(instr->getDest(), instr->getDataType());
+            X86Mov *mov = new X86Mov(dest, fop1);
+            file->addCode(mov);
+        } break;
+        
         case InstrType::UMul: break;
         case InstrType::SMul: break;
         case InstrType::UDiv: break;

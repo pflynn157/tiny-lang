@@ -17,6 +17,7 @@ enum class X86Type {
     
     Push,
     Mov,
+    Add,
     Sub,
     Leave,
     Ret,
@@ -139,6 +140,17 @@ public:
     std::string print();
 };
 
+// An ADD instruction
+class X86Add : public X86Instr {
+public:
+    explicit X86Add(X86Operand *op1, X86Operand *op2) : X86Instr(X86Type::Add) {
+        this->op1 = op1;
+        this->op2 = op2;
+    }
+    
+    std::string print();
+};
+
 // A SUB instruction
 class X86Sub : public X86Instr {
 public:
@@ -186,6 +198,8 @@ public:
     explicit X86Imm(uint64_t imm) : X86Operand(X86Type::Imm) {
         this->value = imm;
     }
+    
+    void setValue(int64_t imm) { value = imm; }
     
     std::string print();
 private:
