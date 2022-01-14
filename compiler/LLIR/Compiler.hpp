@@ -28,7 +28,7 @@ public:
     void link();
 protected:
     void compileStatement(AstStatement *stmt);
-    LLIR::Operand *compileValue(AstExpression *expr, DataType dataType = DataType::Void);
+    LLIR::Operand *compileValue(AstExpression *expr, DataType dataType = DataType::Void, LLIR::Block *destBlock = nullptr);
     LLIR::Type *translateType(DataType dataType, DataType subType = DataType::Void, std::string typeName = "");
     int getStructIndex(std::string name, std::string member);
 

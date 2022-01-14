@@ -45,19 +45,11 @@ enum class InstrType {
     Or,
     Xor,
     
-    // Comparisons
-    ICmpEQ,
-    ICmpNE,
-    ICmpSGT,
-    ICmpSLT,
-    ICmpSGE,
-    ICmpSLE,
-    
     // Jumps
     // We're going to use RISC-V style because these will be the easiest
     // to translate on different architectures
     Br,
-    Bc,
+    Beq,
     
     // Function calls
     Call,

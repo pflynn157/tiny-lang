@@ -147,11 +147,12 @@ Reg *IRBuilder::createXor(Type *type, Operand *op1, Operand *op2) {
     return dest;
 }
 
-Reg *IRBuilder::createICmpEQ(Type *type, Operand *op1, Operand *op2) {
-    Instruction *op = new Instruction(InstrType::ICmpEQ);
+Reg *IRBuilder::createBeq(Type *type, Operand *op1, Operand *op2, Block *destBlock) {
+    Instruction *op = new Instruction(InstrType::Beq);
     op->setDataType(type);
     op->setOperand1(op1);
     op->setOperand2(op2);
+    op->setOperand3(new Label(destBlock->getName()));
     
     Reg *dest = new Reg(std::to_string(regCounter));
     ++regCounter;
@@ -159,19 +160,6 @@ Reg *IRBuilder::createICmpEQ(Type *type, Operand *op1, Operand *op2) {
     
     currentBlock->addInstruction(op);
     return dest;
-}
-
-Instruction *IRBuilder::createCondBr(Operand *cond, Block *trueBlock, Block *falseBlock) {
-    Label *trueLbl = new Label(trueBlock->getName());
-    Label *falseLbl = new Label(falseBlock->getName());
-    
-    Instruction *op = new Instruction(InstrType::Bc);
-    op->setOperand1(cond);
-    op->setOperand2(trueLbl);
-    op->setOperand3(falseLbl);
-    
-    currentBlock->addInstruction(op);
-    return op;
 }
 
 Instruction *IRBuilder::createBr(Block *block) {

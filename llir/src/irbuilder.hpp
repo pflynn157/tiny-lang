@@ -34,8 +34,7 @@ public:
     Reg *createAnd(Type *type, Operand *op1, Operand *op2);
     Reg *createOr(Type *type, Operand *op1, Operand *op2);
     Reg *createXor(Type *type, Operand *op1, Operand *op2);
-    Reg *createICmpEQ(Type *type, Operand *op1, Operand *op2);
-    Instruction *createCondBr(Operand *cond, Block *trueBlock, Block *falseBlock);
+    Reg *createBeq(Type *type, Operand *op1, Operand *op2, Block *destBlock);
     Instruction *createBr(Block *block);
     Instruction *createVoidCall(std::string name, std::vector<Operand *> args);
     Instruction *createRetVoid();

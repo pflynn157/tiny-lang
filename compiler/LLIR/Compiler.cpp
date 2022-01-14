@@ -196,7 +196,7 @@ void Compiler::compileStatement(AstStatement *stmt) {
 }
 
 // Converts an AST value to an LLVM value
-LLIR::Operand *Compiler::compileValue(AstExpression *expr, DataType dataType) {
+LLIR::Operand *Compiler::compileValue(AstExpression *expr, DataType dataType, LLIR::Block *destBlock) {
     LLIR::Type *type = translateType(dataType);
 
     switch (expr->getType()) {
@@ -387,7 +387,7 @@ LLIR::Operand *Compiler::compileValue(AstExpression *expr, DataType dataType) {
                 case AstType::Or:  return builder->createOr(type, lval, rval);
                 case AstType::Xor: return builder->createXor(type, lval, rval);
                     
-                case AstType::EQ: return builder->createICmpEQ(type, lval, rval);
+                case AstType::EQ: return builder->createBeq(type, lval, rval, destBlock);
                 //case AstType::NEQ: return builder->CreateICmpNE(lval, rval);
                 //case AstType::GT: return builder->CreateICmpSGT(lval, rval);
                 //case AstType::LT: return builder->CreateICmpSLT(lval, rval);

@@ -16,9 +16,9 @@ void Compiler::compileIfStatement(AstStatement *stmt) {
     if (hasBranches) falseBlock = new LLIR::Block("false" + std::to_string(blockCount));
     ++blockCount;
 
-    LLIR::Operand *cond = compileValue(stmt->getExpressions().at(0));
-    if (hasBranches) builder->createCondBr(cond, trueBlock, falseBlock);
-    else builder->createCondBr(cond, trueBlock, endBlock);
+    LLIR::Operand *cond = compileValue(stmt->getExpressions().at(0), DataType::Void, trueBlock);
+    if (hasBranches) builder->createBr(falseBlock);
+    else builder->createBr(endBlock);
 
     // Align the blocks
     builder->addBlock(trueBlock);
@@ -56,8 +56,8 @@ void Compiler::compileIfStatement(AstStatement *stmt) {
             builder->addBlockAfter(current, trueBlock2);
             builder->addBlockAfter(trueBlock2, falseBlock2);
             
-            LLIR::Operand *cond = compileValue(stmt->getExpressions().at(0));
-            builder->createCondBr(cond, trueBlock2, falseBlock2);
+            LLIR::Operand *cond = compileValue(stmt->getExpressions().at(0), DataType::Void, trueBlock2);
+            builder->createBr(falseBlock2);
             
             builder->setInsertPoint(trueBlock2);
             bool hasBreak = false;
