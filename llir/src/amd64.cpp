@@ -16,10 +16,23 @@ Amd64Writer::Amd64Writer(Module *mod) {
     regMap[1] = X86Reg::BX;
     regMap[2] = X86Reg::CX;
     regMap[3] = X86Reg::DX;
+    
+    // Init the arguments register map
+    argRegMap[0] = X86Reg::DI;
+    argRegMap[1] = X86Reg::SI;
+    argRegMap[2] = X86Reg::DX;
+    argRegMap[3] = X86Reg::CX;
+    argRegMap[4] = X86Reg::R8;
+    argRegMap[5] = X86Reg::R9;
 }
 
 void Amd64Writer::compile() {
     // Data section
+    for (int i = 0; i<mod->getStringCount(); i++) {
+        StringPtr *str = mod->getString(i);
+        X86Data *d = new X86Data(str->getName(), str->getValue());
+        file->addData(d);
+    }
     
     // Text section
     for (int i = 0; i<mod->getFunctionCount(); i++) {
@@ -59,7 +72,8 @@ void Amd64Writer::compile() {
             }
         }
         
-        stackImm->setValue(stackPos+4);
+        if (stackPos < 16) stackImm->setValue(16);
+        else stackImm->setValue(stackPos+4);
         stackPos = 0;
         
         // Clean up the stack and leave
@@ -137,6 +151,29 @@ void Amd64Writer::compileInstruction(Instruction *instr) {
         case InstrType::Blt: break;
         case InstrType::Ble: break;
         
+        case InstrType::Call: {
+            FunctionCall *fc = static_cast<FunctionCall *>(instr);
+            
+            int pos = 0;
+            for (Operand *arg : fc->getArgs()) {
+                // TODO: Some better argument detection for the registers would be ideal
+                X86Operand *op = compileOperand(arg, Type::createI32Type());
+                
+                X86Reg regType = argRegMap[pos];
+                ++pos;
+                
+                X86Operand *dest = new X86Reg32(regType);
+                if (op->getType() == X86Type::String)
+                    dest = new X86Reg64(regType);
+                    
+                X86Mov *mov = new X86Mov(dest, op);
+                file->addCode(mov);
+            }
+            
+            X86Call *call = new X86Call(fc->getName());
+            file->addCode(call);
+        } break;
+        
         case InstrType::Alloca: {
             switch (instr->getDataType()->getType()) {
                 case DataType::Void: break;
@@ -201,6 +238,12 @@ X86Operand *Amd64Writer::compileOperand(Operand *src, Type *type) {
                 case DataType::F32:
                 case DataType::F64: break;
             }
+        } break;
+        
+        // A string operand
+        case OpType::String: {
+            StringPtr *ptr = static_cast<StringPtr *>(src);
+            return new X86String(ptr->getName());
         } break;
         
         default: return nullptr;

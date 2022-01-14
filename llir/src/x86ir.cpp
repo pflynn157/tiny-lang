@@ -7,9 +7,12 @@ std::string X86File::print(AsmType type) {
     if (type == AsmType::GAS) {
         file += ".intel_syntax noprefix\n";
         
-        // TODO: Data
+        // Data
         file += "\n";
         file += ".data\n";
+        for (X86Data *ln : data) {
+            file += ln->print() + "\n";
+        }
         
         // Code
         file += "\n";
@@ -112,6 +115,10 @@ std::string X86Mem::print() {
     dest += offset->print();
     dest += "]";
     return dest;
+}
+
+std::string X86String::print() {
+    return "OFFSET FLAT:" + value;
 }
 
 } // end namespace LLIR

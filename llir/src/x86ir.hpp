@@ -19,6 +19,7 @@ enum class X86Type {
     Mov,
     Add,
     Sub,
+    Call,
     Leave,
     Ret,
     
@@ -29,7 +30,8 @@ enum class X86Type {
     Reg64,
     
     Imm,
-    Mem
+    Mem,
+    String
 };
 
 enum class X86Reg {
@@ -50,6 +52,7 @@ enum class AsmType {
 };
 
 // Forward declarations
+class X86Data;
 class X86Instr;
 class X86Operand;
 
@@ -60,12 +63,32 @@ public:
         this->name = name;
     }
     
+    void addData(X86Data *d) { data.push_back(d); }
     void addCode(X86Instr *c) { code.push_back(c); }
     
     std::string print(AsmType type = AsmType::GAS);
 private:
     std::string name = "";
+    std::vector<X86Data *> data;
     std::vector<X86Instr *> code;
+};
+
+//
+// Represents an x86 data item
+//
+class X86Data {
+public:
+    explicit X86Data(std::string name, std::string val) {
+        this->name = name;
+        this->val = val;
+    }
+    
+    std::string print() {
+        return name + ": .string \"" + val + "\"";
+    }
+private:
+    std::string name = "";
+    std::string val = "";
 };
 
 //
@@ -162,6 +185,18 @@ public:
     std::string print();
 };
 
+// a CALL instruction
+class X86Call : public X86Instr {
+public:
+    explicit X86Call(std::string name) : X86Instr(X86Type::Call) {
+        this->name = name;
+    }
+    
+    std::string print() { return "call " + name; }
+private:
+    std::string name = "";
+};
+
 // a LEAVE instruction
 class X86Leave : public X86Instr {
 public:
@@ -251,6 +286,18 @@ public:
 private:
     X86Operand *base, *offset;
     std::string sizeAttr = "";
+};
+
+// Represents a string value
+class X86String : public X86Operand {
+public:
+    explicit X86String(std::string val) : X86Operand(X86Type::String) {
+        this->value = val;
+    }
+    
+    std::string print();
+private:
+    std::string value = "";
 };
 
 } // end namespace llir
