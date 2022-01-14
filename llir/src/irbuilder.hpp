@@ -12,6 +12,10 @@ public:
     
     // Creates a new block and sets the insert point
     Block *createBlock(std::string name);
+    void addBlock(Block *block);
+    void addBlockAfter(Block *block, Block *newBlock);
+    void setInsertPoint(Block *block);
+    Block *getInsertPoint();
     
     //
     // Operand builders
@@ -30,6 +34,9 @@ public:
     Reg *createAnd(Type *type, Operand *op1, Operand *op2);
     Reg *createOr(Type *type, Operand *op1, Operand *op2);
     Reg *createXor(Type *type, Operand *op1, Operand *op2);
+    Reg *createICmpEQ(Type *type, Operand *op1, Operand *op2);
+    Instruction *createCondBr(Operand *cond, Block *trueBlock, Block *falseBlock);
+    Instruction *createBr(Block *block);
     Instruction *createVoidCall(std::string name, std::vector<Operand *> args);
     Instruction *createRetVoid();
     Instruction *createRet(Type *type, Operand *op);

@@ -387,7 +387,7 @@ LLIR::Operand *Compiler::compileValue(AstExpression *expr, DataType dataType) {
                 case AstType::Or:  return builder->createOr(type, lval, rval);
                 case AstType::Xor: return builder->createXor(type, lval, rval);
                     
-                //case AstType::EQ: return builder->CreateICmpEQ(lval, rval);
+                case AstType::EQ: return builder->createICmpEQ(type, lval, rval);
                 //case AstType::NEQ: return builder->CreateICmpNE(lval, rval);
                 //case AstType::GT: return builder->CreateICmpSGT(lval, rval);
                 //case AstType::LT: return builder->CreateICmpSLT(lval, rval);

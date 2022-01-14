@@ -79,13 +79,15 @@ void Instruction::print() {
         case InstrType::Or: std::cout << "or "; break;
         case InstrType::Xor: std::cout << "xor "; break;
         
+        case InstrType::ICmpEQ: std::cout << "icmp.eq "; break;
+        case InstrType::ICmpNE: std::cout << "icmp.ne "; break;
+        case InstrType::ICmpSGT: std::cout << "icmp.sgt "; break;
+        case InstrType::ICmpSLT: std::cout << "icmp.slt "; break;
+        case InstrType::ICmpSGE: std::cout << "icmp.sge "; break;
+        case InstrType::ICmpSLE: std::cout << "icmp.sle "; break;
+        
         case InstrType::Br: std::cout << "br "; break;
-        case InstrType::Beq: std::cout << "beq "; break;
-        case InstrType::Bne: std::cout << "bne "; break;
-        case InstrType::Bgt: std::cout << "bgt "; break;
-        case InstrType::Bge: std::cout << "bge "; break;
-        case InstrType::Blt: std::cout << "blt "; break;
-        case InstrType::Ble: std::cout << "ble "; break;
+        case InstrType::Bc: std::cout << "bc "; break;
         
         case InstrType::Alloca: std::cout << "alloca "; break;
         case InstrType::Load: std::cout << "load "; break;

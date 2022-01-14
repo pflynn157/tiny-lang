@@ -45,16 +45,19 @@ enum class InstrType {
     Or,
     Xor,
     
+    // Comparisons
+    ICmpEQ,
+    ICmpNE,
+    ICmpSGT,
+    ICmpSLT,
+    ICmpSGE,
+    ICmpSLE,
+    
     // Jumps
     // We're going to use RISC-V style because these will be the easiest
     // to translate on different architectures
     Br,
-    Beq,
-    Bne,
-    Bgt,
-    Bge,
-    Blt,
-    Ble,
+    Bc,
     
     // Function calls
     Call,
@@ -136,6 +139,31 @@ protected:
 };
 
 //
+// Represents a basic block
+//
+class Block {
+public:
+    explicit Block(std::string name) {
+        this->name = name;
+    }
+    
+    void addInstruction(Instruction *i) { instrs.push_back(i); }
+    void setPosition(int pos) { this->pos = pos; }
+    
+    std::string getName() { return name; }
+    int getPosition() { return pos; }
+    
+    int getInstrCount() { return instrs.size(); }
+    Instruction *getInstruction(int pos) { return instrs.at(pos); }
+    
+    void print();
+private:
+    std::string name = "";
+    std::vector<Instruction *> instrs;
+    int pos = 0;
+};
+
+//
 // Represents a function
 //
 class Function {
@@ -157,7 +185,17 @@ public:
         dataType = d;
     }
     
-    void addBlock(Block *block) { blocks.push_back(block); }
+    void addBlock(Block *block) {
+        blocks.push_back(block);
+        block->setPosition(blocks.size() - 1);
+    }
+    
+    void addBlockAfter(Block *block, Block *newBlock) {
+        int pos = block->getPosition();
+        blocks.insert(blocks.begin() + pos + 1, newBlock);
+        newBlock->setPosition(pos + 1);
+    }
+    
     void setStackSize(int size) { stackSize = size; }
     
     std::string getName() { return name; }
@@ -174,32 +212,6 @@ private:
     Linkage linkage = Linkage::Local;
     std::vector<Block *> blocks;
     int stackSize = 0;
-};
-
-//
-// Represents a global string value
-//
-
-//
-// Represents a basic block
-//
-class Block {
-public:
-    explicit Block(std::string name) {
-        this->name = name;
-    }
-    
-    void addInstruction(Instruction *i) { instrs.push_back(i); }
-    
-    std::string getName() { return name; }
-    
-    int getInstrCount() { return instrs.size(); }
-    Instruction *getInstruction(int pos) { return instrs.at(pos); }
-    
-    void print();
-private:
-    std::string name = "";
-    std::vector<Instruction *> instrs;
 };
 
 //

@@ -13,6 +13,22 @@ Block *IRBuilder::createBlock(std::string name) {
     return currentBlock;
 }
 
+void IRBuilder::addBlock(Block *block) {
+    currentFunc->addBlock(block);
+}
+
+void IRBuilder::addBlockAfter(Block *block, Block *newBlock) {
+    currentFunc->addBlockAfter(block, newBlock);
+}
+
+void IRBuilder::setInsertPoint(Block *block) {
+    currentBlock = block;
+}
+
+Block *IRBuilder::getInsertPoint() {
+    return currentBlock;
+}
+
 Operand *IRBuilder::createI32(int val) {
     return new Imm(val);
 }
@@ -129,6 +145,41 @@ Reg *IRBuilder::createXor(Type *type, Operand *op1, Operand *op2) {
     
     currentBlock->addInstruction(op);
     return dest;
+}
+
+Reg *IRBuilder::createICmpEQ(Type *type, Operand *op1, Operand *op2) {
+    Instruction *op = new Instruction(InstrType::ICmpEQ);
+    op->setDataType(type);
+    op->setOperand1(op1);
+    op->setOperand2(op2);
+    
+    Reg *dest = new Reg(std::to_string(regCounter));
+    ++regCounter;
+    op->setDest(dest);
+    
+    currentBlock->addInstruction(op);
+    return dest;
+}
+
+Instruction *IRBuilder::createCondBr(Operand *cond, Block *trueBlock, Block *falseBlock) {
+    Label *trueLbl = new Label(trueBlock->getName());
+    Label *falseLbl = new Label(falseBlock->getName());
+    
+    Instruction *op = new Instruction(InstrType::Bc);
+    op->setOperand1(cond);
+    op->setOperand2(trueLbl);
+    op->setOperand3(falseLbl);
+    
+    currentBlock->addInstruction(op);
+    return op;
+}
+
+Instruction *IRBuilder::createBr(Block *block) {
+    Label *lbl = new Label(block->getName());
+    Instruction *op = new Instruction(InstrType::Br);
+    op->setOperand1(lbl);
+    currentBlock->addInstruction(op);
+    return op;
 }
 
 Instruction *IRBuilder::createVoidCall(std::string name, std::vector<Operand *> args) {

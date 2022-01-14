@@ -156,12 +156,7 @@ void Amd64Writer::compileInstruction(Instruction *instr) {
         case InstrType::SRem: break;
         
         case InstrType::Br: break;
-        case InstrType::Beq: break;
-        case InstrType::Bne: break;
-        case InstrType::Bgt: break;
-        case InstrType::Bge: break;
-        case InstrType::Blt: break;
-        case InstrType::Ble: break;
+        case InstrType::Bc: break;
         
         case InstrType::Call: {
             FunctionCall *fc = static_cast<FunctionCall *>(instr);
