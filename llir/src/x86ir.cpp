@@ -102,4 +102,12 @@ std::string X86Reg64::print() {
     return "";
 }
 
+std::string X86Mem::print() {
+    std::string dest =  sizeAttr + " [";
+    dest += base->print();
+    dest += offset->print();
+    dest += "]";
+    return dest;
+}
+
 } // end namespace LLIR

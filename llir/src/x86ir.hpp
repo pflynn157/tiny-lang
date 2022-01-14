@@ -27,7 +27,8 @@ enum class X86Type {
     Reg32,
     Reg64,
     
-    Imm
+    Imm,
+    Mem
 };
 
 enum class X86Reg {
@@ -188,7 +189,7 @@ public:
     
     std::string print();
 private:
-    uint64_t value = 0;
+    int64_t value = 0;
 };
 
 // Represents a 32-bit register
@@ -215,6 +216,27 @@ public:
     std::string print();
 protected:
     X86Reg regType;
+};
+
+// Represents a memory location
+class X86Mem : public X86Operand {
+public:
+    explicit X86Mem(X86Operand *base, X86Operand *offset) : X86Operand(X86Type::Mem) {
+        this->base = base;
+        this->offset = offset;
+    }
+    
+    explicit X86Mem(X86Operand *offset) : X86Operand(X86Type::Mem) {
+        this->offset = offset;
+        this->base = new X86Reg64(X86Reg::BP);
+    }
+    
+    void setSizeAttr(std::string sizeAttr) { this->sizeAttr = sizeAttr; }
+    
+    std::string print();
+private:
+    X86Operand *base, *offset;
+    std::string sizeAttr = "";
 };
 
 } // end namespace llir

@@ -109,38 +109,18 @@ void Amd64Writer::compileInstruction(Instruction *instr) {
                 case DataType::Ptr: stackPos += 8; break;
             }
             
-            Reg *reg = static_cast<Reg *>(instr->getDest());
-            memMap[reg->getName()] = stackPos;
+            Mem *mem = static_cast<Mem *>(instr->getDest());
+            memMap[mem->getName()] = stackPos;
         } break;
         
         case InstrType::Load: {
-            Reg *destReg = static_cast<Reg *>(instr->getDest());
-            regMap[destReg->getName()] = "eax";
-            
-            Reg *srcReg = static_cast<Reg *>(instr->getOperand1());
-            int pos = memMap[srcReg->getName()];
-            
-            /*assembly += "  mov eax, ";
-            assembly += getSizeForType(instr->getDataType());
-            assembly += " [rbp-" + std::to_string(pos) + "]\n";*/
         } break;
         
         case InstrType::Store: {
-            Reg *dest = static_cast<Reg *>(instr->getOperand2());
-            int pos = memMap[dest->getName()];
-            
-            Operand *src = instr->getOperand1();
-            switch (src->getType()) {
-                case OpType::Imm: {
-                    Imm *imm = static_cast<Imm *>(src);
-                    
-                    /*assembly += "  mov " + getSizeForType(instr->getDataType());
-                    assembly += " [rbp-" + std::to_string(pos) + "]";
-                    assembly += ", " + std::to_string(imm->getValue()) + "\n";*/
-                } break;
-                
-                case OpType::Reg: break;
-            }
+            X86Operand *src = compileOperand(instr->getOperand1(), instr->getDataType());
+            X86Operand *dest = compileOperand(instr->getOperand2(), instr->getDataType());
+            X86Mov *mov = new X86Mov(dest, src);
+            file->addCode(mov);
         } break;
     }
 }
@@ -152,6 +132,20 @@ X86Operand *Amd64Writer::compileOperand(Operand *src, Type *type) {
             Imm *imm = static_cast<Imm *>(src);
             return new X86Imm(imm->getValue());
         }
+        
+        // Return a memory operand
+        case OpType::Mem: {
+            Mem *mem = static_cast<Mem *>(src);
+            int pos = memMap[mem->getName()];
+            X86Mem *mem2 = new X86Mem(new X86Imm(0 - pos));
+            mem2->setSizeAttr(getSizeForType(type));
+            return mem2;
+        }
+        
+        // Return a hardware register
+        case OpType::HReg: {
+        
+        } break;
         
         default: return nullptr;
     }
