@@ -42,13 +42,15 @@ void Compiler::compileIfStatement(AstStatement *stmt) {
     // Branches
     bool hadElif = false;
     bool hadElse = false;
+    int subCount = 0;
 
     for (auto stmt : condStmt->getBranches()) {
         if (stmt->getType() == AstType::Elif) {
             AstElifStmt *elifStmt = static_cast<AstElifStmt *>(stmt);
             
-            LLIR::Block *trueBlock2 = new LLIR::Block("true" + std::to_string(blockCount));
-            LLIR::Block *falseBlock2 = new LLIR::Block("false" + std::to_string(blockCount));
+            LLIR::Block *trueBlock2 = new LLIR::Block(std::to_string(subCount) + "true" + std::to_string(blockCount));
+            LLIR::Block *falseBlock2 = new LLIR::Block(std::to_string(subCount) + "false" + std::to_string(blockCount));
+            ++subCount;
             
             // Align
             if (!hadElif) builder->setInsertPoint(falseBlock);

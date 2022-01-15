@@ -64,15 +64,17 @@ void Amd64Writer::compile() {
         file->addCode(sub);
         
         // Blocks
+        std::string prefix = "F" + std::to_string(i) + "_";
+        
         for (int j = 0; j<func->getBlockCount(); j++) {
             Block *block = func->getBlock(j);
             if (j != 0) {
-                file->addCode(new X86Label(block->getName()));
+                file->addCode(new X86Label(prefix + block->getName()));
             }
             
             // Instructions
             for (int k = 0; k<block->getInstrCount(); k++) {
-                compileInstruction(block->getInstruction(k));
+                compileInstruction(block->getInstruction(k), prefix);
             }
         }
         
@@ -92,7 +94,7 @@ void Amd64Writer::compile() {
     }
 }
 
-void Amd64Writer::compileInstruction(Instruction *instr) {
+void Amd64Writer::compileInstruction(Instruction *instr, std::string prefix) {
     switch (instr->getType()) {
         case InstrType::None: break;
         
@@ -104,7 +106,7 @@ void Amd64Writer::compileInstruction(Instruction *instr) {
             }
         
             Type *type = instr->getDataType();
-            X86Operand *src = compileOperand(instr->getOperand1(), type);
+            X86Operand *src = compileOperand(instr->getOperand1(), type, prefix);
             X86Operand *dest;
             switch (type->getType()) {
                 case DataType::I8: dest = new X86Reg8(X86Reg::AX); break;
@@ -130,8 +132,8 @@ void Amd64Writer::compileInstruction(Instruction *instr) {
         case InstrType::And:
         case InstrType::Or:
         case InstrType::Xor: {
-            X86Operand *op1 = compileOperand(instr->getOperand1(), instr->getDataType());
-            X86Operand *op2 = compileOperand(instr->getOperand2(), instr->getDataType());
+            X86Operand *op1 = compileOperand(instr->getOperand1(), instr->getDataType(), prefix);
+            X86Operand *op2 = compileOperand(instr->getOperand2(), instr->getDataType(), prefix);
             X86Operand *fop1, *fop2;
             if (op1->getType() == X86Type::Imm) {
                 fop2 = op1;
@@ -156,7 +158,7 @@ void Amd64Writer::compileInstruction(Instruction *instr) {
             
             // Now, we need a move so we're in the right register
             // I love x86
-            X86Operand *dest = compileOperand(instr->getDest(), instr->getDataType());
+            X86Operand *dest = compileOperand(instr->getDest(), instr->getDataType(), prefix);
             X86Mov *mov = new X86Mov(dest, fop1);
             file->addCode(mov);
         } break;
@@ -165,9 +167,9 @@ void Amd64Writer::compileInstruction(Instruction *instr) {
         // This is like the only instruction that makes sense with the three operands
         case InstrType::UMul:
         case InstrType::SMul: {
-            X86Operand *op1 = compileOperand(instr->getOperand1(), instr->getDataType());
-            X86Operand *op2 = compileOperand(instr->getOperand2(), instr->getDataType());
-            X86Operand *dest = compileOperand(instr->getDest(), instr->getDataType());
+            X86Operand *op1 = compileOperand(instr->getOperand1(), instr->getDataType(), prefix);
+            X86Operand *op2 = compileOperand(instr->getOperand2(), instr->getDataType(), prefix);
+            X86Operand *dest = compileOperand(instr->getDest(), instr->getDataType(), prefix);
             X86Operand *fop1, *fop2;
             if (op1->getType() == X86Type::Imm) {
                 fop2 = op1;
@@ -187,15 +189,15 @@ void Amd64Writer::compileInstruction(Instruction *instr) {
         case InstrType::SDiv:
         case InstrType::URem:
         case InstrType::SRem: {
-            X86Operand *op1 = compileOperand(instr->getOperand1(), instr->getDataType());
-            X86Operand *op2 = compileOperand(instr->getOperand2(), instr->getDataType());
-            X86Operand *dest = compileOperand(instr->getDest(), instr->getDataType());
-            X86Operand *rax = compileOperand(new HReg(0), instr->getDataType());
+            X86Operand *op1 = compileOperand(instr->getOperand1(), instr->getDataType(), prefix);
+            X86Operand *op2 = compileOperand(instr->getOperand2(), instr->getDataType(), prefix);
+            X86Operand *dest = compileOperand(instr->getDest(), instr->getDataType(), prefix);
+            X86Operand *rax = compileOperand(new HReg(0), instr->getDataType(), prefix);
             X86Operand *fop2;
             bool pop = false;
             if (op2->getType() == X86Type::Imm) {
-                X86Operand *fop2_long = compileOperand(new HReg(-1), Type::createI64Type());
-                fop2 = compileOperand(new HReg(-1), instr->getDataType());
+                X86Operand *fop2_long = compileOperand(new HReg(-1), Type::createI64Type(), prefix);
+                fop2 = compileOperand(new HReg(-1), instr->getDataType(), prefix);
                 X86Mov *mov1 = new X86Mov(fop2, op2);
                 file->addCode(mov1);
                 pop = true;
@@ -217,7 +219,7 @@ void Amd64Writer::compileInstruction(Instruction *instr) {
         } break;
         
         case InstrType::Br: {
-            X86Operand *label = compileOperand(instr->getOperand1(), nullptr);
+            X86Operand *label = compileOperand(instr->getOperand1(), nullptr, prefix);
             X86Jmp *jmp = new X86Jmp(label, X86Type::Jmp);
             file->addCode(jmp);
         } break;
@@ -229,12 +231,12 @@ void Amd64Writer::compileInstruction(Instruction *instr) {
         case InstrType::Blt:
         case InstrType::Bge:
         case InstrType::Ble: {
-            X86Operand *op1 = compileOperand(instr->getOperand1(), Type::createI32Type());
-            X86Operand *op2 = compileOperand(instr->getOperand2(), Type::createI32Type());
+            X86Operand *op1 = compileOperand(instr->getOperand1(), Type::createI32Type(), prefix);
+            X86Operand *op2 = compileOperand(instr->getOperand2(), Type::createI32Type(), prefix);
             X86Cmp *cmp = new X86Cmp(op1, op2);
             file->addCode(cmp);
             
-            X86Operand *label = compileOperand(instr->getOperand3(), nullptr);
+            X86Operand *label = compileOperand(instr->getOperand3(), nullptr, prefix);
             X86Instr *jmp;
             switch (instr->getType()) {
                 case InstrType::Beq: jmp = new X86Jmp(label, X86Type::Je); break;
@@ -256,7 +258,7 @@ void Amd64Writer::compileInstruction(Instruction *instr) {
             int pos = 0;
             for (Operand *arg : fc->getArgs()) {
                 // TODO: Some better argument detection for the registers would be ideal
-                X86Operand *op = compileOperand(arg, Type::createI32Type());
+                X86Operand *op = compileOperand(arg, Type::createI32Type(), prefix);
                 
                 X86Reg regType = argRegMap[pos];
                 ++pos;
@@ -290,22 +292,22 @@ void Amd64Writer::compileInstruction(Instruction *instr) {
         } break;
         
         case InstrType::Load: {
-            X86Operand *src = compileOperand(instr->getOperand1(), instr->getDataType());
-            X86Operand *dest = compileOperand(instr->getDest(), instr->getDataType());
+            X86Operand *src = compileOperand(instr->getOperand1(), instr->getDataType(), prefix);
+            X86Operand *dest = compileOperand(instr->getDest(), instr->getDataType(), prefix);
             X86Mov *mov = new X86Mov(dest, src);
             file->addCode(mov);
         } break;
         
         case InstrType::Store: {
-            X86Operand *src = compileOperand(instr->getOperand1(), instr->getDataType());
-            X86Operand *dest = compileOperand(instr->getOperand2(), instr->getDataType());
+            X86Operand *src = compileOperand(instr->getOperand1(), instr->getDataType(), prefix);
+            X86Operand *dest = compileOperand(instr->getOperand2(), instr->getDataType(), prefix);
             X86Mov *mov = new X86Mov(dest, src);
             file->addCode(mov);
         } break;
     }
 }
 
-X86Operand *Amd64Writer::compileOperand(Operand *src, Type *type) {
+X86Operand *Amd64Writer::compileOperand(Operand *src, Type *type, std::string prefix) {
     switch (src->getType()) {
         // Return an immediate operand
         case OpType::Imm: {
@@ -365,7 +367,7 @@ X86Operand *Amd64Writer::compileOperand(Operand *src, Type *type) {
         // A label reference
         case OpType::Label: {
             Label *lbl = static_cast<Label *>(src);
-            return new X86LabelRef(lbl->getName());
+            return new X86LabelRef(prefix + lbl->getName());
         }
         
         default: return nullptr;

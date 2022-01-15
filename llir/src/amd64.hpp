@@ -12,8 +12,8 @@ class Amd64Writer {
 public:
     explicit Amd64Writer(Module *mod);
     void compile();
-    void compileInstruction(Instruction *instr);
-    X86Operand *compileOperand(Operand *src, Type *type);
+    void compileInstruction(Instruction *instr, std::string prefix);
+    X86Operand *compileOperand(Operand *src, Type *type, std::string prefix);
     void dump();
     void writeToFile();
     void writeToFile(std::string path);
