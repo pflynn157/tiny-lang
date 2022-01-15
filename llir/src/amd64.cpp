@@ -155,7 +155,29 @@ void Amd64Writer::compileInstruction(Instruction *instr) {
         case InstrType::URem: break;
         case InstrType::SRem: break;
         
-        case InstrType::Br: break;
+        case InstrType::Br: {
+            X86Operand *label = compileOperand(instr->getOperand1(), nullptr);
+            X86Jmp *jmp = new X86Jmp(label, X86Type::Jmp);
+            file->addCode(jmp);
+        } break;
+        
+        // All conditional branches
+        case InstrType::Beq: {
+            X86Operand *op1 = compileOperand(instr->getOperand1(), Type::createI32Type());
+            X86Operand *op2 = compileOperand(instr->getOperand2(), Type::createI32Type());
+            X86Cmp *cmp = new X86Cmp(op1, op2);
+            file->addCode(cmp);
+            
+            X86Operand *label = compileOperand(instr->getOperand3(), nullptr);
+            X86Instr *jmp;
+            switch (instr->getType()) {
+                case InstrType::Beq: jmp = new X86Jmp(label, X86Type::Je); break;
+                
+                default: {}
+            }
+            
+            file->addCode(jmp);
+        } break;
         
         case InstrType::Call: {
             FunctionCall *fc = static_cast<FunctionCall *>(instr);
@@ -250,7 +272,13 @@ X86Operand *Amd64Writer::compileOperand(Operand *src, Type *type) {
         case OpType::String: {
             StringPtr *ptr = static_cast<StringPtr *>(src);
             return new X86String(ptr->getName());
-        } break;
+        }
+        
+        // A label reference
+        case OpType::Label: {
+            Label *lbl = static_cast<Label *>(src);
+            return new X86LabelRef(lbl->getName());
+        }
         
         default: return nullptr;
     }

@@ -12,6 +12,7 @@ enum class X86Type {
     None,        // Always translates to NOP
     
     Label,
+    LabelRef,
     Global,
     Extern,
     
@@ -26,6 +27,10 @@ enum class X86Type {
     And,
     Or,
     Xor,
+    Cmp,
+    
+    Jmp,
+    Je,
     
     Reg8,
     Reg8H,
@@ -222,6 +227,26 @@ public:
     std::string print();
 };
 
+// A CMP instruction
+class X86Cmp : public X86Instr {
+public:
+    explicit X86Cmp(X86Operand *op1, X86Operand *op2) : X86Instr(X86Type::Cmp) {
+        this->op1 = op1;
+        this->op2 = op2;
+    }
+    
+    std::string print();
+};
+
+class X86Jmp : public X86Instr {
+public:
+    explicit X86Jmp(X86Operand *lbl, X86Type jType) : X86Instr(jType) {
+        this->op1 = lbl;
+    }
+    
+    std::string print();
+};
+
 // a CALL instruction
 class X86Call : public X86Instr {
 public:
@@ -262,6 +287,18 @@ public:
     virtual std::string print() { return ""; }
 protected:
     X86Type type = X86Type::None;
+};
+
+// Represents a reference to a label
+class X86LabelRef : public X86Operand {
+public:
+    explicit X86LabelRef(std::string name) : X86Operand(X86Type::LabelRef) {
+        this->name = name;
+    }
+    
+    std::string print();
+protected:
+    std::string name = "";
 };
 
 // Represents an immediate value

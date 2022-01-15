@@ -13,7 +13,6 @@ func main -> i32 is
     var x : bool := true;
     
     if x then println("True");
-    elif x = 10 then println("FALSE");
     else println("False");
     end
     

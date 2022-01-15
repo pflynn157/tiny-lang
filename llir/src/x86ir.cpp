@@ -69,6 +69,26 @@ std::string X86Xor::print() {
     return "xor " + op1->print() + ", " + op2->print();
 }
 
+std::string X86Cmp::print() {
+    return "cmp " + op1->print() + ", " + op2->print();
+}
+
+std::string X86Jmp::print() {
+    std::string ret = "";
+    switch (type) {
+        case X86Type::Je: ret = "je "; break;
+        
+        default: ret = "jmp ";
+    }
+    
+    ret += op1->print();
+    return ret;
+}
+
+std::string X86LabelRef::print() {
+    return name;
+}
+
 std::string X86Imm::print() {
     return std::to_string(value);
 }

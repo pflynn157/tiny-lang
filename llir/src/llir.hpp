@@ -313,6 +313,8 @@ public:
         this->name = name;
     }
     
+    std::string getName() { return name; }
+    
     void print();
 private:
     std::string name = "";
