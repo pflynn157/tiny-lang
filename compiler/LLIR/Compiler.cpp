@@ -205,20 +205,20 @@ LLIR::Operand *Compiler::compileValue(AstExpression *expr, DataType dataType, LL
             return builder->createI8(i8->getValue());
         } break;
         
-        /*case AstType::I16L: {
+        case AstType::I16L: {
             AstI16 *i16 = static_cast<AstI16 *>(expr);
-            return builder->getInt16(i16->getValue());
-        } break;*/
+            return builder->createI16(i16->getValue());
+        } break;
         
         case AstType::I32L: {
             AstI32 *ival = static_cast<AstI32 *>(expr);
             return builder->createI32(ival->getValue());
         } break;
         
-        /*case AstType::I64L: {
+        case AstType::I64L: {
             AstI64 *i64 = static_cast<AstI64 *>(expr);
-            return builder->getInt64(i64->getValue());
-        } break;*/
+            return builder->createI64(i64->getValue());
+        } break;
         
         case AstType::CharL: {
             AstChar *cval = static_cast<AstChar *>(expr);
@@ -380,8 +380,8 @@ LLIR::Operand *Compiler::compileValue(AstExpression *expr, DataType dataType, LL
             switch (expr->getType()) {
                 case AstType::Add: return builder->createAdd(type, lval, rval);
                 case AstType::Sub: return builder->createSub(type, lval, rval);
-                //case AstType::Mul: return builder->CreateMul(lval, rval);
-                //case AstType::Div: return builder->CreateSDiv(lval, rval);
+                case AstType::Mul: return builder->createSMul(type, lval, rval);
+                case AstType::Div: return builder->createSDiv(type, lval, rval);
                 
                 case AstType::And: return builder->createAnd(type, lval, rval);
                 case AstType::Or:  return builder->createOr(type, lval, rval);

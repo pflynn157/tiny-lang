@@ -33,7 +33,15 @@ Operand *IRBuilder::createI8(int8_t val) {
     return new Imm(val);
 }
 
+Operand *IRBuilder::createI16(int16_t val) {
+    return new Imm(val);
+}
+
 Operand *IRBuilder::createI32(int val) {
+    return new Imm(val);
+}
+
+Operand *IRBuilder::createI64(int64_t val) {
     return new Imm(val);
 }
 
@@ -106,6 +114,34 @@ Reg *IRBuilder::createSub(Type *type, Operand *op1, Operand *op2) {
     sub->setDest(dest);
     
     currentBlock->addInstruction(sub);
+    return dest;
+}
+
+Reg *IRBuilder::createSMul(Type *type, Operand *op1, Operand *op2) {
+    Instruction *op = new Instruction(InstrType::SMul);
+    op->setDataType(type);
+    op->setOperand1(op1);
+    op->setOperand2(op2);
+    
+    Reg *dest = new Reg(std::to_string(regCounter));
+    ++regCounter;
+    op->setDest(dest);
+    
+    currentBlock->addInstruction(op);
+    return dest;
+}
+
+Reg *IRBuilder::createSDiv(Type *type, Operand *op1, Operand *op2) {
+    Instruction *op = new Instruction(InstrType::SDiv);
+    op->setDataType(type);
+    op->setOperand1(op1);
+    op->setOperand2(op2);
+    
+    Reg *dest = new Reg(std::to_string(regCounter));
+    ++regCounter;
+    op->setDest(dest);
+    
+    currentBlock->addInstruction(op);
     return dest;
 }
 

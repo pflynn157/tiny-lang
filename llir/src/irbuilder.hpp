@@ -21,7 +21,9 @@ public:
     // Operand builders
     //
     Operand *createI8(int8_t val);
+    Operand *createI16(int16_t val);
     Operand *createI32(int val);
+    Operand *createI64(int64_t val);
     Operand *createString(std::string val);
     
     //
@@ -32,6 +34,8 @@ public:
     Reg *createLoad(Type *type, Operand *src);
     Reg *createAdd(Type *type, Operand *op1, Operand *op2);
     Reg *createSub(Type *type, Operand *op1, Operand *op2);
+    Reg *createSMul(Type *type, Operand *op1, Operand *op2);
+    Reg *createSDiv(Type *type, Operand *op1, Operand *op2);
     Reg *createAnd(Type *type, Operand *op1, Operand *op2);
     Reg *createOr(Type *type, Operand *op1, Operand *op2);
     Reg *createXor(Type *type, Operand *op1, Operand *op2);

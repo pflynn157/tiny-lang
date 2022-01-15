@@ -148,12 +148,62 @@ void Amd64Writer::compileInstruction(Instruction *instr) {
             file->addCode(mov);
         } break;
         
-        case InstrType::UMul: break;
-        case InstrType::SMul: break;
-        case InstrType::UDiv: break;
-        case InstrType::SDiv: break;
-        case InstrType::URem: break;
-        case InstrType::SRem: break;
+        // Multiplication
+        // This is like the only instruction that makes sense with the three operands
+        case InstrType::UMul:
+        case InstrType::SMul: {
+            X86Operand *op1 = compileOperand(instr->getOperand1(), instr->getDataType());
+            X86Operand *op2 = compileOperand(instr->getOperand2(), instr->getDataType());
+            X86Operand *dest = compileOperand(instr->getDest(), instr->getDataType());
+            X86Operand *fop1, *fop2;
+            if (op1->getType() == X86Type::Imm) {
+                fop2 = op1;
+                fop1 = op2;
+            } else {
+                fop1 = op1;
+                fop2 = op2;
+            }
+            
+            X86IMul *imul = new X86IMul(dest, op1, op2);
+            file->addCode(imul);
+        } break;
+        
+        // Division
+        // This operand is even more interesting!
+        case InstrType::UDiv:
+        case InstrType::SDiv:
+        case InstrType::URem:
+        case InstrType::SRem: {
+            X86Operand *op1 = compileOperand(instr->getOperand1(), instr->getDataType());
+            X86Operand *op2 = compileOperand(instr->getOperand2(), instr->getDataType());
+            X86Operand *dest = compileOperand(instr->getDest(), instr->getDataType());
+            X86Operand *rax = compileOperand(new HReg(0), instr->getDataType());
+            X86Operand *fop2;
+            bool pop = false;
+            if (op2->getType() == X86Type::Imm) {
+                X86Operand *fop2_long = compileOperand(new HReg(1), Type::createI64Type());
+                fop2 = compileOperand(new HReg(1), instr->getDataType());
+                X86Push *push = new X86Push(fop2_long);
+                //file->addCode(push);
+                X86Mov *mov1 = new X86Mov(fop2, op2);
+                file->addCode(mov1);
+                pop = true;
+            } else {
+                fop2 = op2;
+            }
+            
+            X86Mov *mov = new X86Mov(op1, rax);
+            file->addCode(mov);
+            
+            X86Cdq *cdq = new X86Cdq;
+            file->addCode(cdq);
+            
+            X86IDiv *idiv = new X86IDiv(fop2);
+            file->addCode(idiv);
+            
+            X86Mov *mov2 = new X86Mov(dest, rax);
+            file->addCode(mov2);
+        } break;
         
         case InstrType::Br: {
             X86Operand *label = compileOperand(instr->getOperand1(), nullptr);

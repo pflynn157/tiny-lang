@@ -77,6 +77,14 @@ std::string X86Cmp::print() {
     return "cmp " + op1->print() + ", " + op2->print();
 }
 
+std::string X86IMul::print() {
+    return "imul " + dest->print() + ", " + op1->print() + ", " + op2->print();
+}
+
+std::string X86IDiv::print() {
+    return "idiv " + op1->print();
+}
+
 std::string X86Jmp::print() {
     std::string ret = "";
     switch (type) {

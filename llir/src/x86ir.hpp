@@ -20,6 +20,7 @@ enum class X86Type {
     Mov,
     Movsx,
     Call,
+    Cdq,
     Leave,
     Ret,
     
@@ -29,6 +30,8 @@ enum class X86Type {
     Or,
     Xor,
     Cmp,
+    IMul,
+    IDiv,
     
     Jmp,
     Je,
@@ -250,6 +253,30 @@ public:
     std::string print();
 };
 
+// An IMUL instruction
+class X86IMul : public X86Instr {
+public:
+    explicit X86IMul(X86Operand *dest, X86Operand *op1, X86Operand *op2) : X86Instr(X86Type::IMul) {
+        this->dest = dest;
+        this->op1 = op1;
+        this->op2 = op2;
+    }
+    
+    std::string print();
+private:
+    X86Operand *dest;
+};
+
+// An IDIV instruction
+class X86IDiv : public X86Instr {
+public:
+    explicit X86IDiv(X86Operand *op1) : X86Instr(X86Type::IDiv) {
+        this->op1 = op1;
+    }
+    
+    std::string print();
+};
+
 class X86Jmp : public X86Instr {
 public:
     explicit X86Jmp(X86Operand *lbl, X86Type jType) : X86Instr(jType) {
@@ -269,6 +296,13 @@ public:
     std::string print() { return "call " + name; }
 private:
     std::string name = "";
+};
+
+// a CDQ instruction
+class X86Cdq : public X86Instr {
+public:
+    X86Cdq() : X86Instr(X86Type::Cdq) {}
+    std::string print() { return "cdq"; }
 };
 
 // a LEAVE instruction
