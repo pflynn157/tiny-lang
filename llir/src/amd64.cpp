@@ -66,7 +66,9 @@ void Amd64Writer::compile() {
         // Blocks
         for (int j = 0; j<func->getBlockCount(); j++) {
             Block *block = func->getBlock(j);
-            file->addCode(new X86Label(block->getName()));
+            if (j != 0) {
+                file->addCode(new X86Label(block->getName()));
+            }
             
             // Instructions
             for (int k = 0; k<block->getInstrCount(); k++) {
@@ -95,6 +97,9 @@ void Amd64Writer::compileInstruction(Instruction *instr) {
         case InstrType::None: break;
         
         case InstrType::Ret: {
+            if (instr->getDataType()->getType() == DataType::Void)
+                break;
+        
             Type *type = instr->getDataType();
             X86Operand *src = compileOperand(instr->getOperand1(), type);
             X86Operand *dest;
@@ -305,6 +310,23 @@ X86Operand *Amd64Writer::compileOperand(Operand *src, Type *type) {
         case OpType::HReg: {
             HReg *reg = static_cast<HReg *>(src);
             X86Reg rType = regMap[reg->getNum()];
+            
+            switch (type->getType()) {
+                case DataType::Void: break;
+                case DataType::I8: return new X86Reg8(rType);
+                case DataType::I16: return new X86Reg16(rType);
+                case DataType::I32: return new X86Reg32(rType);
+                case DataType::Ptr:
+                case DataType::I64: return new X86Reg64(rType);
+                case DataType::F32:
+                case DataType::F64: break;
+            }
+        } break;
+        
+        // Return an argument register
+        case OpType::AReg: {
+            AReg *reg = static_cast<AReg *>(src);
+            X86Reg rType = argRegMap[reg->getNum()];
             
             switch (type->getType()) {
                 case DataType::Void: break;

@@ -33,8 +33,14 @@ void Function::print() {
     }
     std::cout << name;
     
-    // TODO: args
-    std::cout << "()";
+    std::cout << "(";
+    for (int i = 0; i<args.size(); i++) {
+        varRegs.at(i)->print();
+        std::cout << ":";
+        args.at(i)->print();
+        if (i + 1 < args.size()) std::cout << ", ";
+    }
+    std::cout << ")";
     
     if (blocks.size() == 0) {
         std::cout << ";";
@@ -142,6 +148,10 @@ void Mem::print() {
 
 void HReg::print() {
     std::cout << "r" << num;
+}
+
+void AReg::print() {
+    std::cout << "a" << num;
 }
 
 } // end namespace LLIR

@@ -34,7 +34,7 @@ std::string X86File::print(AsmType type) {
 }
 
 std::string X86GlobalFunc::print() {
-    std::string ret = "";
+    std::string ret = "\n";
     ret += ".globl " + name + "\n";
     ret += ".type " + name + ",@function\n";
     ret += name + ":";

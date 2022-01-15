@@ -3,6 +3,8 @@
 #include <string>
 #include <vector>
 
+#include <llir_operand.hpp>
+
 namespace LLIR {
 
 // Enumerations
@@ -61,24 +63,12 @@ enum class InstrType {
     Store
 };
 
-// Represents operand types
-enum class OpType {
-    None,
-    
-    Imm,
-    Reg,
-    Label,
-    String,
-    
-    Mem,
-    HReg
-};
-
 // Forward declarations
 class Function;
 class Block;
 class Instruction;
 class Operand;
+class Reg;
 class StringPtr;
 
 //
@@ -159,6 +149,7 @@ private:
 //
 // Represents a function
 //
+// TODO: We can probably get rid of stack
 class Function {
 public:
     explicit Function(std::string name, Linkage linkage) {
@@ -176,6 +167,14 @@ public:
     void setDataType(Type *d) {
         if (dataType) delete dataType;
         dataType = d;
+    }
+    
+    void setArgs(std::vector<Type *> args) {
+        this->args = args;
+        for (int i = 0; i<args.size(); i++) {
+            Reg *reg = new Reg(std::to_string(i));
+            varRegs.push_back(reg);
+        }
     }
     
     void addBlock(Block *block) {
@@ -198,12 +197,18 @@ public:
     int getBlockCount() { return blocks.size(); }
     Block *getBlock(int pos) { return blocks.at(pos); }
     
+    int getArgCount() { return args.size(); }
+    Type *getArgType(int pos) { return args.at(pos); }
+    Reg *getArg(int pos) { return varRegs.at(pos); }
+    
     void print();
 private:
     Type *dataType;
     std::string name = "";
     Linkage linkage = Linkage::Local;
     std::vector<Block *> blocks;
+    std::vector<Type *> args;
+    std::vector<Reg *> varRegs;
     int stackSize = 0;
 };
 
@@ -261,115 +266,6 @@ public:
 private:
     std::string name = "";
     std::vector<Operand *> args;
-};
-
-//
-// The base class for operands
-//
-class Operand {
-public:
-    explicit Operand(OpType type) {
-        this->type = type;
-    }
-    
-    OpType getType() { return type; }
-    
-    virtual void print() {}
-protected:
-    OpType type = OpType::None;
-};
-
-// Represents an immediate value
-class Imm : public Operand {
-public:
-    explicit Imm(int64_t imm) : Operand(OpType::Imm) {
-        this->imm = imm;
-    }
-    
-    int64_t getValue() { return imm; }
-    void setValue(int64_t imm) { this->imm = imm; }
-    
-    void print();
-private:
-    int64_t imm = 0;
-};
-
-// Represents a register
-class Reg : public Operand {
-public:
-    explicit Reg(std::string name) : Operand(OpType::Reg) {
-        this->name = name;
-    }
-    
-    std::string getName() { return name; }
-    
-    void print();
-private:
-    std::string name = "";
-};
-
-// Represents a label
-class Label : public Operand {
-public:
-    explicit Label(std::string name) : Operand(OpType::Label) {
-        this->name = name;
-    }
-    
-    std::string getName() { return name; }
-    
-    void print();
-private:
-    std::string name = "";
-};
-
-// Represents a string
-class StringPtr : public Operand {
-public:
-    explicit StringPtr(std::string name, std::string val) : Operand(OpType::String) {
-        this->name = name;
-        this->val = val;
-    }
-    
-    std::string getName() { return name; }
-    std::string getValue() { return val; }
-    
-    void print();
-private:
-    std::string name = "";
-    std::string val = "";
-};
-
-//
-// NOTE: These are more hardware-specific operands, and should only be used by
-// the transform layer and the assembly writers
-//
-
-// Represents a memory location
-class Mem : public Operand {
-public:
-    explicit Mem(std::string name) : Operand(OpType::Mem) {
-        this->name = name;
-    }
-    
-    std::string getName() { return name; }
-    
-    void print();
-private:
-    std::string name = "";
-};
-
-// Represents a hardware register
-class HReg : public Operand {
-public:
-    explicit HReg(int num) : Operand(OpType::HReg) {
-        this->num = num;
-    }
-    
-    int getNum() { return num; }
-    
-    void print();
-private:
-    int num = 0;
 };
 
 } // end namespace LLIR

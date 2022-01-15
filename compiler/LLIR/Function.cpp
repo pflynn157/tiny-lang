@@ -12,10 +12,10 @@
 // Compiles a function and its body
 //
 void Compiler::compileFunction(AstGlobalStatement *global) {
-    /*symtable.clear();
+    symtable.clear();
     typeTable.clear();
     ptrTable.clear();
-    structVarTable.clear();*/
+    //structVarTable.clear();
     
     AstFunction *astFunc = static_cast<AstFunction *>(global);
 
@@ -25,22 +25,19 @@ void Compiler::compileFunction(AstGlobalStatement *global) {
     //if (currentFuncType == DataType::Struct)
         //funcTypeStruct = astFunc->getDataTypeName();
     
-    /*if (astVarArgs.size() == 0) {
-        FT = FunctionType::get(funcType, false);
-    } else {
-        std::vector<Type *> args;
+    std::vector<LLIR::Type *> args;
+    if (astVarArgs.size() > 0) {
         for (auto var : astVarArgs) {
-            Type *type = translateType(var.type, var.subType, var.typeName);
-            if (var.type == DataType::Struct) {
-                type = PointerType::getUnqual(type);
-            }
+            LLIR::Type *type = translateType(var.type, var.subType, var.typeName);
+            //if (var.type == DataType::Struct) {
+            //    type = PointerType::getUnqual(type);
+            //}
             args.push_back(type);
         }
-        
-        FT = FunctionType::get(funcType, args, false);
-    }*/
+    }
     
     LLIR::Function *func = LLIR::Function::Create(astFunc->getName(), LLIR::Linkage::Global, funcType);
+    func->setArgs(args);
     currentFunc = func;
     mod->addFunction(func);
     
@@ -48,30 +45,30 @@ void Compiler::compileFunction(AstGlobalStatement *global) {
     builder->createBlock("entry");
     
     // Load and store any arguments
-    /*if (astVarArgs.size() > 0) {
+    if (astVarArgs.size() > 0) {
         for (int i = 0; i<astVarArgs.size(); i++) {
             Var var = astVarArgs.at(i);
             
             // Build the alloca for the local var
-            Type *type = translateType(var.type, var.subType, var.typeName);
-            if (var.type == DataType::Struct) {
+            LLIR::Type *type = translateType(var.type, var.subType, var.typeName);
+            /*if (var.type == DataType::Struct) {
                 symtable[var.name] = (AllocaInst *)func->getArg(i);
                 typeTable[var.name] = var.type;
                 ptrTable[var.name] = var.subType;
                 structVarTable[var.name] = var.typeName;
                 continue;
-            }
+            }*/
             
-            AllocaInst *alloca = builder->CreateAlloca(type);
+            LLIR::Reg *alloca = builder->createAlloca(type);
             symtable[var.name] = alloca;
             typeTable[var.name] = var.type;
             ptrTable[var.name] = var.subType;
             
             // Store the variable
-            Value *param = func->getArg(i);
-            builder->CreateStore(param, alloca);
+            LLIR::Operand *param = func->getArg(i);
+            builder->createStore(type, param, alloca);
         }
-    }*/
+    }
 
     for (auto stmt : astFunc->getBlock()->getBlock()) {
         compileStatement(stmt);

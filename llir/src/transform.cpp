@@ -10,7 +10,9 @@ namespace LLIR {
 // The maps
 std::vector<std::string> memList;
 std::map<std::string, int> regMap;
+std::map<std::string, int> argMap;
 int regCount = 0;
+int argCount = 0;
 
 Operand *checkOperand(Operand *input) {
     if (input->getType() != OpType::Reg) {
@@ -21,6 +23,11 @@ Operand *checkOperand(Operand *input) {
     if (std::find(memList.begin(), memList.end(), reg->getName()) != memList.end()) {
         Mem *mem = new Mem(reg->getName());
         return mem;
+    }
+    
+    if (argMap.find(reg->getName()) != argMap.end()) {
+        AReg *reg2 = new AReg(argMap[reg->getName()]);
+        return reg2;
     }
     
     if (regMap.find(reg->getName()) != regMap.end()) {
@@ -45,9 +52,20 @@ void Module::transform() {
         memList.clear();
         regMap.clear();
         regCount = 0;
+        argMap.clear();
+        argCount = 0;
         
         for (int i = 0; i<func->getBlockCount(); i++) {
             Block *block = func->getBlock(i);
+            
+            // Assign argument registers
+            for (int j = 0; j<func->getArgCount(); j++) {
+                Reg *reg = func->getArg(j);
+                argMap[reg->getName()] = argCount;
+                ++argCount;
+            }
+            
+            // Now, take care of the rest of the instructions
             for (int j = 0; j<block->getInstrCount(); j++) {
                 Instruction *instr = block->getInstruction(j);
                 switch (instr->getType()) {

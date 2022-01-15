@@ -8,7 +8,10 @@ class IRBuilder {
 public:
     explicit IRBuilder(Module *mod);
 
-    void setCurrentFunction(Function *func) { currentFunc = func; };
+    void setCurrentFunction(Function *func) {
+        currentFunc = func;
+        regCounter = currentFunc->getArgCount();
+    };
     
     // Creates a new block and sets the insert point
     Block *createBlock(std::string name);
