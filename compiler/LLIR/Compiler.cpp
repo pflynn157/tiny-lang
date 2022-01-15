@@ -200,10 +200,10 @@ LLIR::Operand *Compiler::compileValue(AstExpression *expr, DataType dataType, LL
     LLIR::Type *type = translateType(dataType);
 
     switch (expr->getType()) {
-        /*case AstType::I8L: {
+        case AstType::I8L: {
             AstI8 *i8 = static_cast<AstI8 *>(expr);
-            return builder->getInt8(i8->getValue());
-        } break;*/
+            return builder->createI8(i8->getValue());
+        } break;
         
         /*case AstType::I16L: {
             AstI16 *i16 = static_cast<AstI16 *>(expr);
@@ -220,10 +220,10 @@ LLIR::Operand *Compiler::compileValue(AstExpression *expr, DataType dataType, LL
             return builder->getInt64(i64->getValue());
         } break;*/
         
-        /*case AstType::CharL: {
+        case AstType::CharL: {
             AstChar *cval = static_cast<AstChar *>(expr);
-            return builder->getInt8(cval->getValue());
-        } break;*/
+            return builder->createI8(cval->getValue());
+        } break;
         
         case AstType::StringL: {
             AstString *str = static_cast<AstString *>(expr);

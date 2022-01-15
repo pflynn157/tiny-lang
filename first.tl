@@ -1,20 +1,16 @@
 
 #OUTPUT
-#True
+#12345678
+#305419896
 #END
 
 #RET 0
 
-#import std.io;
-
-extern println(ln:string);
-
 func main -> i32 is
-    var x : bool := true;
-    
-    if x then println("True");
-    else println("False");
-    end
+    var x : i64 := 0x12345678;
+    println("%x", x);
+    println("%d", x);
     
     return 0;
 end
+

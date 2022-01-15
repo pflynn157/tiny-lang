@@ -258,8 +258,8 @@ X86Operand *Amd64Writer::compileOperand(Operand *src, Type *type) {
             
             switch (type->getType()) {
                 case DataType::Void: break;
-                case DataType::I8: break;
-                case DataType::I16: break;
+                case DataType::I8: return new X86Reg8(rType);
+                case DataType::I16: return new X86Reg16(rType);
                 case DataType::I32: return new X86Reg32(rType);
                 case DataType::Ptr:
                 case DataType::I64: return new X86Reg64(rType);

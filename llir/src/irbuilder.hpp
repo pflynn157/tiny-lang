@@ -20,6 +20,7 @@ public:
     //
     // Operand builders
     //
+    Operand *createI8(int8_t val);
     Operand *createI32(int val);
     Operand *createString(std::string val);
     

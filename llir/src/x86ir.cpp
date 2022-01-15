@@ -49,6 +49,10 @@ std::string X86Mov::print() {
     return "mov " + op1->print() + ", " + op2->print();
 }
 
+std::string X86Movsx::print() {
+    return "movsx " + op1->print() + ", " + op2->print();
+}
+
 std::string X86Add::print() {
     return "add " + op1->print() + ", " + op2->print();
 }
@@ -91,6 +95,54 @@ std::string X86LabelRef::print() {
 
 std::string X86Imm::print() {
     return std::to_string(value);
+}
+
+std::string X86Reg8::print() {
+    switch (regType) {
+        case X86Reg::AX: return "al";
+        case X86Reg::BX: return "bl";
+        case X86Reg::CX: return "cl";
+        case X86Reg::DX: return "dl";
+        
+        case X86Reg::SI: return "sil";
+        case X86Reg::DI: return "dil";
+        case X86Reg::SP: return "spl";
+        case X86Reg::BP: return "bpl";
+        
+        case X86Reg::R8: return "r8b";
+        case X86Reg::R9: return "r9b";
+        case X86Reg::R10: return "r10b";
+        case X86Reg::R11: return "r11b";
+        case X86Reg::R12: return "r12b";
+        case X86Reg::R13: return "r13b";
+        case X86Reg::R14: return "r14b";
+        case X86Reg::R15: return "r15b";
+    }
+    return "";
+}
+
+std::string X86Reg16::print() {
+    switch (regType) {
+        case X86Reg::AX: return "ax";
+        case X86Reg::BX: return "bx";
+        case X86Reg::CX: return "cx";
+        case X86Reg::DX: return "dx";
+        
+        case X86Reg::SI: return "si";
+        case X86Reg::DI: return "di";
+        case X86Reg::SP: return "sp";
+        case X86Reg::BP: return "bp";
+        
+        case X86Reg::R8: return "r8w";
+        case X86Reg::R9: return "r9w";
+        case X86Reg::R10: return "r10w";
+        case X86Reg::R11: return "r11w";
+        case X86Reg::R12: return "r12w";
+        case X86Reg::R13: return "r13w";
+        case X86Reg::R14: return "r14w";
+        case X86Reg::R15: return "r15w";
+    }
+    return "";
 }
 
 std::string X86Reg32::print() {

@@ -14,4 +14,3 @@ func main -> i32 is
     println("%c", c2);
     return 0;
 end
-

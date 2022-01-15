@@ -29,6 +29,10 @@ Block *IRBuilder::getInsertPoint() {
     return currentBlock;
 }
 
+Operand *IRBuilder::createI8(int8_t val) {
+    return new Imm(val);
+}
+
 Operand *IRBuilder::createI32(int val) {
     return new Imm(val);
 }

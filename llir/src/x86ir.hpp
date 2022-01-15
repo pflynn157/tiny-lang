@@ -18,6 +18,7 @@ enum class X86Type {
     
     Push,
     Mov,
+    Movsx,
     Call,
     Leave,
     Ret,
@@ -172,6 +173,17 @@ public:
     std::string print();
 };
 
+// An MOVSX instruction
+class X86Movsx : public X86Instr {
+public:
+    explicit X86Movsx(X86Operand *op1, X86Operand *op2) : X86Instr(X86Type::Movsx) {
+        this->op1 = op1;
+        this->op2 = op2;
+    }
+    
+    std::string print();
+};
+
 // An ADD instruction
 class X86Add : public X86Instr {
 public:
@@ -313,6 +325,32 @@ public:
     std::string print();
 private:
     int64_t value = 0;
+};
+
+// Represents a 8-bit register
+class X86Reg8 : public X86Operand {
+public:
+    explicit X86Reg8(X86Reg regType) : X86Operand(X86Type::Reg8) {
+        this->regType = regType;
+    }
+    
+    X86Reg getType() { return regType; }
+    std::string print();
+protected:
+    X86Reg regType;
+};
+
+// Represents a 16-bit register
+class X86Reg16 : public X86Operand {
+public:
+    explicit X86Reg16(X86Reg regType) : X86Operand(X86Type::Reg16) {
+        this->regType = regType;
+    }
+    
+    X86Reg getType() { return regType; }
+    std::string print();
+protected:
+    X86Reg regType;
 };
 
 // Represents a 32-bit register

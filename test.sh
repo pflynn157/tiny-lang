@@ -53,6 +53,10 @@ flags=""
 echo "Running all tests..."
 echo ""
 
+if [[ $1 == "llir" ]] ; then
+    OCC="build/src/tlc2"
+fi
+
 run_test 'test/basic/*.tl' 'sys' $flags
 run_test 'test/syntax/*.tl' 'sys' $flags
 run_test 'test/cond/*.tl' 'sys' $flags
