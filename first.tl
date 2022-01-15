@@ -1,14 +1,17 @@
 
 #OUTPUT
-#32
+#Hello!
+#l
 #END
 
 #RET 0
 
 func main -> i32 is
-    var x : i32 := 1 + 20 * 2 - 3 * 3;
+    var str : string := "Hello!";
+    var c : char := str[3];
     
-    println("%d", x);
+    println(str);
+    println("%c", c);
     
     return 0;
 end
