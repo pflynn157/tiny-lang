@@ -33,12 +33,12 @@ public:
     Instruction *createStore(Type *type, Operand *op, Operand *dest);
     Reg *createLoad(Type *type, Operand *src);
     Operand *createAdd(Type *type, Operand *op1, Operand *op2);
-    Reg *createSub(Type *type, Operand *op1, Operand *op2);
-    Reg *createSMul(Type *type, Operand *op1, Operand *op2);
-    Reg *createSDiv(Type *type, Operand *op1, Operand *op2);
-    Reg *createAnd(Type *type, Operand *op1, Operand *op2);
-    Reg *createOr(Type *type, Operand *op1, Operand *op2);
-    Reg *createXor(Type *type, Operand *op1, Operand *op2);
+    Operand *createSub(Type *type, Operand *op1, Operand *op2);
+    Operand *createSMul(Type *type, Operand *op1, Operand *op2);
+    Operand *createSDiv(Type *type, Operand *op1, Operand *op2);
+    Operand *createAnd(Type *type, Operand *op1, Operand *op2);
+    Operand *createOr(Type *type, Operand *op1, Operand *op2);
+    Operand *createXor(Type *type, Operand *op1, Operand *op2);
     Operand *createNeg(Type *type, Operand *op1);
     Reg *createBeq(Type *type, Operand *op1, Operand *op2, Block *destBlock);
     Instruction *createBr(Block *block);

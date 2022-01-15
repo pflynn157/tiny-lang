@@ -96,6 +96,12 @@ Operand *IRBuilder::createBinaryOp(Type *type, Operand *op1, Operand *op2, Instr
         
         switch (iType) {
             case InstrType::Add: return new Imm(imm1->getValue() + imm2->getValue());
+            case InstrType::Sub: return new Imm(imm1->getValue() - imm2->getValue());
+            case InstrType::SMul: return new Imm(imm1->getValue() * imm2->getValue());
+            case InstrType::SDiv: return new Imm(imm1->getValue() / imm2->getValue());
+            case InstrType::And: return new Imm(imm1->getValue() & imm2->getValue());
+            case InstrType::Or: return new Imm(imm1->getValue() | imm2->getValue());
+            case InstrType::Xor: return new Imm(imm1->getValue() ^ imm2->getValue());
             
             default: {}
         }
@@ -118,88 +124,28 @@ Operand *IRBuilder::createAdd(Type *type, Operand *op1, Operand *op2) {
     return createBinaryOp(type, op1, op2, InstrType::Add);
 }
 
-Reg *IRBuilder::createSub(Type *type, Operand *op1, Operand *op2) {
-    Instruction *sub = new Instruction(InstrType::Sub);
-    sub->setDataType(type);
-    sub->setOperand1(op1);
-    sub->setOperand2(op2);
-    
-    Reg *dest = new Reg(std::to_string(regCounter));
-    ++regCounter;
-    sub->setDest(dest);
-    
-    currentBlock->addInstruction(sub);
-    return dest;
+Operand *IRBuilder::createSub(Type *type, Operand *op1, Operand *op2) {
+    return createBinaryOp(type, op1, op2, InstrType::Sub);
 }
 
-Reg *IRBuilder::createSMul(Type *type, Operand *op1, Operand *op2) {
-    Instruction *op = new Instruction(InstrType::SMul);
-    op->setDataType(type);
-    op->setOperand1(op1);
-    op->setOperand2(op2);
-    
-    Reg *dest = new Reg(std::to_string(regCounter));
-    ++regCounter;
-    op->setDest(dest);
-    
-    currentBlock->addInstruction(op);
-    return dest;
+Operand *IRBuilder::createSMul(Type *type, Operand *op1, Operand *op2) {
+    return createBinaryOp(type, op1, op2, InstrType::SMul);
 }
 
-Reg *IRBuilder::createSDiv(Type *type, Operand *op1, Operand *op2) {
-    Instruction *op = new Instruction(InstrType::SDiv);
-    op->setDataType(type);
-    op->setOperand1(op1);
-    op->setOperand2(op2);
-    
-    Reg *dest = new Reg(std::to_string(regCounter));
-    ++regCounter;
-    op->setDest(dest);
-    
-    currentBlock->addInstruction(op);
-    return dest;
+Operand *IRBuilder::createSDiv(Type *type, Operand *op1, Operand *op2) {
+    return createBinaryOp(type, op1, op2, InstrType::SDiv);
 }
 
-Reg *IRBuilder::createAnd(Type *type, Operand *op1, Operand *op2) {
-    Instruction *op = new Instruction(InstrType::And);
-    op->setDataType(type);
-    op->setOperand1(op1);
-    op->setOperand2(op2);
-    
-    Reg *dest = new Reg(std::to_string(regCounter));
-    ++regCounter;
-    op->setDest(dest);
-    
-    currentBlock->addInstruction(op);
-    return dest;
+Operand *IRBuilder::createAnd(Type *type, Operand *op1, Operand *op2) {
+    return createBinaryOp(type, op1, op2, InstrType::And);
 }
 
-Reg *IRBuilder::createOr(Type *type, Operand *op1, Operand *op2) {
-    Instruction *op = new Instruction(InstrType::Or);
-    op->setDataType(type);
-    op->setOperand1(op1);
-    op->setOperand2(op2);
-    
-    Reg *dest = new Reg(std::to_string(regCounter));
-    ++regCounter;
-    op->setDest(dest);
-    
-    currentBlock->addInstruction(op);
-    return dest;
+Operand *IRBuilder::createOr(Type *type, Operand *op1, Operand *op2) {
+    return createBinaryOp(type, op1, op2, InstrType::Or);
 }
 
-Reg *IRBuilder::createXor(Type *type, Operand *op1, Operand *op2) {
-    Instruction *op = new Instruction(InstrType::Xor);
-    op->setDataType(type);
-    op->setOperand1(op1);
-    op->setOperand2(op2);
-    
-    Reg *dest = new Reg(std::to_string(regCounter));
-    ++regCounter;
-    op->setDest(dest);
-    
-    currentBlock->addInstruction(op);
-    return dest;
+Operand *IRBuilder::createXor(Type *type, Operand *op1, Operand *op2) {
+    return createBinaryOp(type, op1, op2, InstrType::Xor);
 }
 
 Operand *IRBuilder::createNeg(Type *type, Operand *op1) {
