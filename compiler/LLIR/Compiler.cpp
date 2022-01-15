@@ -388,11 +388,11 @@ LLIR::Operand *Compiler::compileValue(AstExpression *expr, DataType dataType, LL
                 case AstType::Xor: return builder->createXor(type, lval, rval);
                     
                 case AstType::EQ: return builder->createBeq(type, lval, rval, destBlock);
-                //case AstType::NEQ: return builder->CreateICmpNE(lval, rval);
-                //case AstType::GT: return builder->CreateICmpSGT(lval, rval);
-                //case AstType::LT: return builder->CreateICmpSLT(lval, rval);
-                //case AstType::GTE: return builder->CreateICmpSGE(lval, rval);
-                //case AstType::LTE: return builder->CreateICmpSLE(lval, rval);
+                case AstType::NEQ: return builder->createBne(type, lval, rval, destBlock);
+                case AstType::GT: return builder->createBgt(type, lval, rval, destBlock);
+                case AstType::LT: return builder->createBlt(type, lval, rval, destBlock);
+                case AstType::GTE: return builder->createBge(type, lval, rval, destBlock);
+                case AstType::LTE: return builder->createBle(type, lval, rval, destBlock);
                 
                 //case AstType::LogicalAnd: return builder->CreateLogicalAnd(lval, rval);
                 //case AstType::LogicalOr: return builder->CreateLogicalOr(lval, rval);

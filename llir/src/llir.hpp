@@ -53,6 +53,11 @@ enum class InstrType {
     // to translate on different architectures
     Br,
     Beq,
+    Bne,
+    Bgt,
+    Blt,
+    Bge,
+    Ble,
     
     // Function calls
     Call,

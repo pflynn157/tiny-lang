@@ -97,15 +97,18 @@ void Amd64Writer::compileInstruction(Instruction *instr) {
         case InstrType::None: break;
         
         case InstrType::Ret: {
-            if (instr->getDataType()->getType() == DataType::Void)
+            if (instr->getDataType()->getType() == DataType::Void) {
+                file->addCode(new X86Leave);
+                file->addCode(new X86Ret);
                 break;
+            }
         
             Type *type = instr->getDataType();
             X86Operand *src = compileOperand(instr->getOperand1(), type);
             X86Operand *dest;
             switch (type->getType()) {
-                case DataType::I8: break;
-                case DataType::I16: break;
+                case DataType::I8: dest = new X86Reg8(X86Reg::AX); break;
+                case DataType::I16: dest = new X86Reg16(X86Reg::AX); break;
                 case DataType::I32: dest = new X86Reg32(X86Reg::AX); break;
                 case DataType::I64: dest = new X86Reg64(X86Reg::AX); break;
                 
@@ -116,7 +119,10 @@ void Amd64Writer::compileInstruction(Instruction *instr) {
             file->addCode(mov);
         } break;
         
-        case InstrType::RetVoid: break;    // Nothing on x86-64
+        case InstrType::RetVoid: {
+            file->addCode(new X86Leave);
+            file->addCode(new X86Ret);
+        } break;
         
         // Math
         case InstrType::Add:
@@ -217,7 +223,12 @@ void Amd64Writer::compileInstruction(Instruction *instr) {
         } break;
         
         // All conditional branches
-        case InstrType::Beq: {
+        case InstrType::Beq:
+        case InstrType::Bne:
+        case InstrType::Bgt:
+        case InstrType::Blt:
+        case InstrType::Bge:
+        case InstrType::Ble: {
             X86Operand *op1 = compileOperand(instr->getOperand1(), Type::createI32Type());
             X86Operand *op2 = compileOperand(instr->getOperand2(), Type::createI32Type());
             X86Cmp *cmp = new X86Cmp(op1, op2);
@@ -227,6 +238,11 @@ void Amd64Writer::compileInstruction(Instruction *instr) {
             X86Instr *jmp;
             switch (instr->getType()) {
                 case InstrType::Beq: jmp = new X86Jmp(label, X86Type::Je); break;
+                case InstrType::Bne: jmp = new X86Jmp(label, X86Type::Jne); break;
+                case InstrType::Bgt: jmp = new X86Jmp(label, X86Type::Jg); break;
+                case InstrType::Blt: jmp = new X86Jmp(label, X86Type::Jl); break;
+                case InstrType::Bge: jmp = new X86Jmp(label, X86Type::Jge); break;
+                case InstrType::Ble: jmp = new X86Jmp(label, X86Type::Jle); break;
                 
                 default: {}
             }

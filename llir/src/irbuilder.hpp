@@ -43,13 +43,18 @@ public:
     Operand *createOr(Type *type, Operand *op1, Operand *op2);
     Operand *createXor(Type *type, Operand *op1, Operand *op2);
     Operand *createNeg(Type *type, Operand *op1);
-    Reg *createBeq(Type *type, Operand *op1, Operand *op2, Block *destBlock);
+    Operand *createBeq(Type *type, Operand *op1, Operand *op2, Block *destBlock);
+    Operand *createBne(Type *type, Operand *op1, Operand *op2, Block *destBlock);
+    Operand *createBgt(Type *type, Operand *op1, Operand *op2, Block *destBlock);
+    Operand *createBlt(Type *type, Operand *op1, Operand *op2, Block *destBlock);
+    Operand *createBge(Type *type, Operand *op1, Operand *op2, Block *destBlock);
+    Operand *createBle(Type *type, Operand *op1, Operand *op2, Block *destBlock);
     Instruction *createBr(Block *block);
     Instruction *createVoidCall(std::string name, std::vector<Operand *> args);
     Instruction *createRetVoid();
     Instruction *createRet(Type *type, Operand *op);
 protected:
-    Operand *createBinaryOp(Type *type, Operand *op1, Operand *op2, InstrType iType);
+    Operand *createBinaryOp(Type *type, Operand *op1, Operand *op2, InstrType iType, Block *destBlock = nullptr);
 private:
     Module *mod;
     Function *currentFunc;

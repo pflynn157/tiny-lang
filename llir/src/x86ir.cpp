@@ -89,6 +89,11 @@ std::string X86Jmp::print() {
     std::string ret = "";
     switch (type) {
         case X86Type::Je: ret = "je "; break;
+        case X86Type::Jne: ret = "jne "; break;
+        case X86Type::Jg: ret = "jg "; break;
+        case X86Type::Jl: ret = "jl "; break;
+        case X86Type::Jge: ret = "jge "; break;
+        case X86Type::Jle: ret = "jle "; break;
         
         default: ret = "jmp ";
     }

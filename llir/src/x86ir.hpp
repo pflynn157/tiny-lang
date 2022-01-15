@@ -35,6 +35,11 @@ enum class X86Type {
     
     Jmp,
     Je,
+    Jne,
+    Jg,
+    Jl,
+    Jge,
+    Jle,
     
     Reg8,
     Reg8H,

@@ -89,7 +89,7 @@ Reg *IRBuilder::createLoad(Type *type, Operand *src) {
     return dest;
 }
 
-Operand *IRBuilder::createBinaryOp(Type *type, Operand *op1, Operand *op2, InstrType iType) {
+Operand *IRBuilder::createBinaryOp(Type *type, Operand *op1, Operand *op2, InstrType iType, Block *destBlock) {
     if (op1->getType() == OpType::Imm && op2->getType() == OpType::Imm) {
         Imm *imm1 = static_cast<Imm *>(op1);
         Imm *imm2 = static_cast<Imm *>(op2);
@@ -111,6 +111,8 @@ Operand *IRBuilder::createBinaryOp(Type *type, Operand *op1, Operand *op2, Instr
     op->setDataType(type);
     op->setOperand1(op1);
     op->setOperand2(op2);
+    
+    if (destBlock != nullptr) op->setOperand3(new Label(destBlock->getName()));
     
     Reg *dest = new Reg(std::to_string(regCounter));
     ++regCounter;
@@ -168,19 +170,28 @@ Operand *IRBuilder::createNeg(Type *type, Operand *op1) {
     return dest;
 }
 
-Reg *IRBuilder::createBeq(Type *type, Operand *op1, Operand *op2, Block *destBlock) {
-    Instruction *op = new Instruction(InstrType::Beq);
-    op->setDataType(type);
-    op->setOperand1(op1);
-    op->setOperand2(op2);
-    op->setOperand3(new Label(destBlock->getName()));
-    
-    Reg *dest = new Reg(std::to_string(regCounter));
-    ++regCounter;
-    op->setDest(dest);
-    
-    currentBlock->addInstruction(op);
-    return dest;
+Operand *IRBuilder::createBeq(Type *type, Operand *op1, Operand *op2, Block *destBlock) {
+    return createBinaryOp(type, op1, op2, InstrType::Beq, destBlock);
+}
+
+Operand *IRBuilder::createBne(Type *type, Operand *op1, Operand *op2, Block *destBlock) {
+    return createBinaryOp(type, op1, op2, InstrType::Bne, destBlock);
+}
+
+Operand *IRBuilder::createBgt(Type *type, Operand *op1, Operand *op2, Block *destBlock) {
+    return createBinaryOp(type, op1, op2, InstrType::Bgt, destBlock);
+}
+
+Operand *IRBuilder::createBlt(Type *type, Operand *op1, Operand *op2, Block *destBlock) {
+    return createBinaryOp(type, op1, op2, InstrType::Blt, destBlock);
+}
+
+Operand *IRBuilder::createBge(Type *type, Operand *op1, Operand *op2, Block *destBlock) {
+    return createBinaryOp(type, op1, op2, InstrType::Bge, destBlock);
+}
+
+Operand *IRBuilder::createBle(Type *type, Operand *op1, Operand *op2, Block *destBlock) {
+    return createBinaryOp(type, op1, op2, InstrType::Ble, destBlock);
 }
 
 Instruction *IRBuilder::createBr(Block *block) {
