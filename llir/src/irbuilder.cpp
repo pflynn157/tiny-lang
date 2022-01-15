@@ -89,18 +89,33 @@ Reg *IRBuilder::createLoad(Type *type, Operand *src) {
     return dest;
 }
 
-Reg *IRBuilder::createAdd(Type *type, Operand *op1, Operand *op2) {
-    Instruction *add = new Instruction(InstrType::Add);
-    add->setDataType(type);
-    add->setOperand1(op1);
-    add->setOperand2(op2);
+Operand *IRBuilder::createBinaryOp(Type *type, Operand *op1, Operand *op2, InstrType iType) {
+    if (op1->getType() == OpType::Imm && op2->getType() == OpType::Imm) {
+        Imm *imm1 = static_cast<Imm *>(op1);
+        Imm *imm2 = static_cast<Imm *>(op2);
+        
+        switch (iType) {
+            case InstrType::Add: return new Imm(imm1->getValue() + imm2->getValue());
+            
+            default: {}
+        }
+    }
+    
+    Instruction *op = new Instruction(iType);
+    op->setDataType(type);
+    op->setOperand1(op1);
+    op->setOperand2(op2);
     
     Reg *dest = new Reg(std::to_string(regCounter));
     ++regCounter;
-    add->setDest(dest);
+    op->setDest(dest);
     
-    currentBlock->addInstruction(add);
+    currentBlock->addInstruction(op);
     return dest;
+}
+
+Operand *IRBuilder::createAdd(Type *type, Operand *op1, Operand *op2) {
+    return createBinaryOp(type, op1, op2, InstrType::Add);
 }
 
 Reg *IRBuilder::createSub(Type *type, Operand *op1, Operand *op2) {
@@ -178,6 +193,26 @@ Reg *IRBuilder::createXor(Type *type, Operand *op1, Operand *op2) {
     op->setDataType(type);
     op->setOperand1(op1);
     op->setOperand2(op2);
+    
+    Reg *dest = new Reg(std::to_string(regCounter));
+    ++regCounter;
+    op->setDest(dest);
+    
+    currentBlock->addInstruction(op);
+    return dest;
+}
+
+Operand *IRBuilder::createNeg(Type *type, Operand *op1) {
+    if (op1->getType() == OpType::Imm) {
+        Imm *imm = static_cast<Imm *>(op1);
+        int val = imm->getValue() * -1;
+        imm->setValue(val);
+        return imm;    
+    }
+    
+    Instruction *op = new Instruction(InstrType::Not);
+    op->setDataType(type);
+    op->setOperand1(op1);
     
     Reg *dest = new Reg(std::to_string(regCounter));
     ++regCounter;

@@ -290,12 +290,12 @@ LLIR::Operand *Compiler::compileValue(AstExpression *expr, DataType dataType, LL
             return builder->CreateCall(callee, args);
         } break;*/
         
-        /*case AstType::Neg: {
+        case AstType::Neg: {
             AstNegOp *op = static_cast<AstNegOp *>(expr);
-            Value *val = compileValue(op->getVal(), dataType);
+            LLIR::Operand *val = compileValue(op->getVal(), dataType);
             
-            return builder->CreateNeg(val);
-        } break;*/
+            return builder->createNeg(type, val);
+        } break;
         
         case AstType::Add:
         case AstType::Sub: 

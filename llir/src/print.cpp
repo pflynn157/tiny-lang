@@ -78,6 +78,7 @@ void Instruction::print() {
         case InstrType::And: std::cout << "and "; break;
         case InstrType::Or: std::cout << "or "; break;
         case InstrType::Xor: std::cout << "xor "; break;
+        case InstrType::Not: std::cout << "not "; break;
         
         case InstrType::Br: std::cout << "br "; break;
         case InstrType::Beq: std::cout << "beq "; break;

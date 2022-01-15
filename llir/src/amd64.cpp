@@ -12,6 +12,8 @@ Amd64Writer::Amd64Writer(Module *mod) {
     file = new X86File(mod->getName());
     
     // Init the register map
+    regMap[-1] = X86Reg::R15;
+    regMap[-2] = X86Reg::R14;
     regMap[0] = X86Reg::AX;
     regMap[1] = X86Reg::BX;
     regMap[2] = X86Reg::CX;
@@ -181,10 +183,8 @@ void Amd64Writer::compileInstruction(Instruction *instr) {
             X86Operand *fop2;
             bool pop = false;
             if (op2->getType() == X86Type::Imm) {
-                X86Operand *fop2_long = compileOperand(new HReg(1), Type::createI64Type());
-                fop2 = compileOperand(new HReg(1), instr->getDataType());
-                X86Push *push = new X86Push(fop2_long);
-                //file->addCode(push);
+                X86Operand *fop2_long = compileOperand(new HReg(-1), Type::createI64Type());
+                fop2 = compileOperand(new HReg(-1), instr->getDataType());
                 X86Mov *mov1 = new X86Mov(fop2, op2);
                 file->addCode(mov1);
                 pop = true;

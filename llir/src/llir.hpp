@@ -44,6 +44,7 @@ enum class InstrType {
     And,
     Or,
     Xor,
+    Not,
     
     // Jumps
     // We're going to use RISC-V style because these will be the easiest
@@ -281,15 +282,16 @@ protected:
 // Represents an immediate value
 class Imm : public Operand {
 public:
-    explicit Imm(uint64_t imm) : Operand(OpType::Imm) {
+    explicit Imm(int64_t imm) : Operand(OpType::Imm) {
         this->imm = imm;
     }
     
-    uint64_t getValue() { return imm; }
+    int64_t getValue() { return imm; }
+    void setValue(int64_t imm) { this->imm = imm; }
     
     void print();
 private:
-    uint64_t imm = 0;
+    int64_t imm = 0;
 };
 
 // Represents a register
