@@ -121,9 +121,33 @@ public:
     
     DataType getType() { return type; }
     
-    void print();
+    virtual void print();
 protected:
+    explicit Type() {}
     DataType type = DataType::Void;
+};
+
+class PointerType : public Type {
+public:
+    explicit PointerType(Type *baseType) {
+        this->type = DataType::Ptr;
+        this->baseType = baseType;
+    }
+    
+    explicit PointerType(DataType type) {
+        this->type = DataType::Ptr;
+        this->baseType = new Type(type);
+    }
+    
+    static PointerType *createVoidPtrType() { return new PointerType(DataType::Void); }
+    static PointerType *createI8PtrType() { return new PointerType(DataType::I8); }
+    static PointerType *createI16PtrType() { return new PointerType(DataType::I16); }
+    static PointerType *createI32PtrType() { return new PointerType(DataType::I32); }
+    static PointerType *createI64PtrType() { return new PointerType(DataType::I64); }
+    
+    void print();
+private:
+    Type *baseType = nullptr;
 };
 
 //

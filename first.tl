@@ -6,13 +6,8 @@
 
 #RET 0
 
-func get_num -> i32 is
-    return 10;
-end
-
 func main -> i32 is
-    var x : i32 := get_num();
-    println("%d", x);
+    var numbers : i32[10];
     
     return 0;
 end

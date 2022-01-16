@@ -277,17 +277,6 @@ LLIR::Operand *Compiler::compileValue(AstExpression *expr, DataType dataType, LL
         } break;*/
         
         case AstType::FuncCallExpr: {
-            /*AstFuncCallExpr *fc = static_cast<AstFuncCallExpr *>(expr);
-            std::vector<Value *> args;
-            
-            for (auto stmt : fc->getArguments()) {
-                Value *val = compileValue(stmt);
-                args.push_back(val);
-            }
-            
-            Function *callee = mod->getFunction(fc->getName());
-            if (!callee) std::cerr << "Invalid function call statement." << std::endl;
-            return builder->CreateCall(callee, args);*/
             AstFuncCallExpr *fc = static_cast<AstFuncCallExpr *>(expr);
             std::vector<LLIR::Operand *> args;
             
@@ -434,28 +423,30 @@ LLIR::Type *Compiler::translateType(DataType dataType, DataType subType, std::st
         case DataType::I64:
         case DataType::U64: type = LLIR::Type::createI64Type(); break;
         
-        //case DataType::String: type = Type::getInt8PtrTy(*context); break;
+        case DataType::String: type = LLIR::PointerType::createI8PtrType(); break;
         
-        /*case DataType::Ptr: {
+        case DataType::Ptr: {
             switch (subType) {
+                case DataType::Void: type = LLIR::PointerType::createVoidPtrType(); break;
+            
                 case DataType::Char:
                 case DataType::I8:
-                case DataType::U8: type = Type::getInt8PtrTy(*context); break;
+                case DataType::U8: type = LLIR::PointerType::createI8PtrType(); break;
                 
                 case DataType::I16:
-                case DataType::U16: type = Type::getInt16PtrTy(*context); break;
+                case DataType::U16: type = LLIR::PointerType::createI16PtrType(); break;
                 
                 case DataType::I32:
-                case DataType::U32: type = Type::getInt32PtrTy(*context); break;
+                case DataType::U32: type = LLIR::PointerType::createI32PtrType(); break;
                 
                 case DataType::I64:
-                case DataType::U64: type = Type::getInt64PtrTy(*context); break;
+                case DataType::U64: type = LLIR::PointerType::createI64PtrType(); break;
                 
-                case DataType::String: type = PointerType::getUnqual(Type::getInt8PtrTy(*context)); break;
+                //case DataType::String: type = PointerType::getUnqual(Type::getInt8PtrTy(*context)); break;
                 
                 default: {}
             }
-        } break;*/
+        } break;
         
         /*case DataType::Struct: {
             return structTable[typeName];

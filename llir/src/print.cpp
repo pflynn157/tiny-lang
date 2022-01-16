@@ -23,6 +23,11 @@ void Type::print() {
     }
 }
 
+void PointerType::print() {
+    std::cout << "*";
+    baseType->print();
+}
+
 void Function::print() {
     dataType->print();
     std::cout << " ";
@@ -120,8 +125,10 @@ void FunctionCall::print() {
         dest->print();
         std::cout << " = ";
     }
+    if (dataType) {
     dataType->print();
     std::cout << " ";
+    }
     
     std::cout << name << "(";
     for (int i = 0; i<args.size(); i++) {
