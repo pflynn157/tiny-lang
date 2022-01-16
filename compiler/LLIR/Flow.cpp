@@ -102,42 +102,20 @@ void Compiler::compileIfStatement(AstStatement *stmt) {
 // Translates a while statement to LLVM
 void Compiler::compileWhileStatement(AstStatement *stmt) {
     AstWhileStmt *loop = static_cast<AstWhileStmt *>(stmt);
-
-    /*BasicBlock *loopBlock = BasicBlock::Create(*context, "loop_body" + std::to_string(blockCount), currentFunc);
-    BasicBlock *loopCmp = BasicBlock::Create(*context, "loop_cmp" + std::to_string(blockCount), currentFunc);
-    BasicBlock *loopEnd = BasicBlock::Create(*context, "loop_end" + std::to_string(blockCount), currentFunc);
-    ++blockCount;*/
+    
     LLIR::Block *loopBlock = new LLIR::Block("loop_body" + std::to_string(blockCount));
     LLIR::Block *loopCmp = new LLIR::Block("loop_cmp" + std::to_string(blockCount));
     LLIR::Block *loopEnd = new LLIR::Block("loop_end" + std::to_string(blockCount));
     ++blockCount;
-
-    /*BasicBlock *current = builder->GetInsertBlock();
-    loopBlock->moveAfter(current);
-    loopCmp->moveAfter(loopBlock);
-    loopEnd->moveAfter(loopCmp);*/
-    builder->addBlock(loopBlock);
-    builder->addBlock(loopCmp);
-    builder->addBlock(loopEnd);
+    
+    LLIR::Block *current = builder->getInsertPoint();
+    builder->addBlockAfter(current, loopBlock);
+    builder->addBlockAfter(loopBlock, loopCmp);
+    builder->addBlockAfter(loopCmp, loopEnd);
     
     breakStack.push(loopEnd);
     continueStack.push(loopCmp);
-
-    /*builder->CreateBr(loopCmp);
-    builder->SetInsertPoint(loopCmp);
-    Value *cond = compileValue(stmt->getExpressions().at(0));
-    builder->CreateCondBr(cond, loopBlock, loopEnd);
-
-    builder->SetInsertPoint(loopBlock);
-    for (auto stmt : loop->getBlock()) {
-        compileStatement(stmt);
-    }
-    builder->CreateBr(loopCmp);
     
-    builder->SetInsertPoint(loopEnd);
-    
-    breakStack.pop();
-    continueStack.pop();*/
     builder->createBr(loopCmp);
     builder->setInsertPoint(loopCmp);
     LLIR::Operand *cond = compileValue(stmt->getExpressions().at(0), DataType::Void, loopBlock);

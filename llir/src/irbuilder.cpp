@@ -49,7 +49,13 @@ Operand *IRBuilder::createString(std::string val) {
     std::string name = "STR" + std::to_string(lblCounter);
     ++lblCounter;
     
-    StringPtr *ptr = new StringPtr(name, val);
+    std::string val2 = "";
+    for (char c : val) {
+        if (c == '\n') val2 += "\\n";
+        else val2 += c;
+    }
+    
+    StringPtr *ptr = new StringPtr(name, val2);
     mod->addStringPtr(ptr);
     
     return ptr;
