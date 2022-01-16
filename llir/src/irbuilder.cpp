@@ -214,6 +214,18 @@ Instruction *IRBuilder::createVoidCall(std::string name, std::vector<Operand *> 
     return fc;
 }
 
+Reg *IRBuilder::createCall(Type *type, std::string name, std::vector<Operand *> args) {
+    FunctionCall *fc = new FunctionCall(name, args);
+    fc->setDataType(type);
+    
+    Reg *dest = new Reg(std::to_string(regCounter));
+    ++regCounter;
+    fc->setDest(dest);
+    
+    currentBlock->addInstruction(fc);
+    return dest;
+}
+
 Instruction *IRBuilder::createRetVoid() {
     Instruction *ret = new Instruction(InstrType::Ret);
     ret->setDataType(Type::createVoidType());

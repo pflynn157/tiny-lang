@@ -51,6 +51,7 @@ public:
     Operand *createBle(Type *type, Operand *op1, Operand *op2, Block *destBlock);
     Instruction *createBr(Block *block);
     Instruction *createVoidCall(std::string name, std::vector<Operand *> args);
+    Reg *createCall(Type *type, std::string name, std::vector<Operand *> args);
     Instruction *createRetVoid();
     Instruction *createRet(Type *type, Operand *op);
 protected:

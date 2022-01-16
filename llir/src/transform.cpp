@@ -110,6 +110,15 @@ void Module::transform() {
                             args.push_back(op);
                         }
                         fc->setArgs(args);
+                        
+                        if (instr->getDest()) {
+                            Reg *reg = static_cast<Reg *>(instr->getDest());
+                            regMap[reg->getName()] = regCount;
+                            ++regCount;
+                            
+                            HReg *reg2 = new HReg(regCount - 1);
+                            instr->setDest(reg2);
+                        }
                     } break;
                 }
                 

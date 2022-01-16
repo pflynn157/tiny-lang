@@ -6,14 +6,13 @@
 
 #RET 0
 
+func get_num -> i32 is
+    return 10;
+end
+
 func main -> i32 is
-    var i : i32 := 0;
-    while i < 10 do
-        print("%d|", i);
-        i := i + 1;
-    end
-    
-    println("\nDone");
+    var x : i32 := get_num();
+    println("%d", x);
     
     return 0;
 end

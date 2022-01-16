@@ -276,8 +276,8 @@ LLIR::Operand *Compiler::compileValue(AstExpression *expr, DataType dataType, LL
             return builder->CreateLoad(elementType, ep);
         } break;*/
         
-        /*case AstType::FuncCallExpr: {
-            AstFuncCallExpr *fc = static_cast<AstFuncCallExpr *>(expr);
+        case AstType::FuncCallExpr: {
+            /*AstFuncCallExpr *fc = static_cast<AstFuncCallExpr *>(expr);
             std::vector<Value *> args;
             
             for (auto stmt : fc->getArguments()) {
@@ -287,8 +287,17 @@ LLIR::Operand *Compiler::compileValue(AstExpression *expr, DataType dataType, LL
             
             Function *callee = mod->getFunction(fc->getName());
             if (!callee) std::cerr << "Invalid function call statement." << std::endl;
-            return builder->CreateCall(callee, args);
-        } break;*/
+            return builder->CreateCall(callee, args);*/
+            AstFuncCallExpr *fc = static_cast<AstFuncCallExpr *>(expr);
+            std::vector<LLIR::Operand *> args;
+            
+            for (auto stmt : fc->getArguments()) {
+                LLIR::Operand *val = compileValue(stmt);
+                args.push_back(val);
+            }
+            
+            return builder->createCall(type, fc->getName(), args);
+        } break;
         
         case AstType::Neg: {
             AstNegOp *op = static_cast<AstNegOp *>(expr);

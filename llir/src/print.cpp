@@ -120,6 +120,8 @@ void FunctionCall::print() {
         dest->print();
         std::cout << " = ";
     }
+    dataType->print();
+    std::cout << " ";
     
     std::cout << name << "(";
     for (int i = 0; i<args.size(); i++) {
