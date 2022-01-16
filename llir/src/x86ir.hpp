@@ -46,6 +46,7 @@ enum class X86Type {
     Reg16,
     Reg32,
     Reg64,
+    RegPtr,
     
     Imm,
     Mem,
@@ -359,6 +360,7 @@ public:
         this->value = imm;
     }
     
+    int64_t getValue() { return value; }
     void setValue(int64_t imm) { value = imm; }
     
     std::string print();
@@ -416,6 +418,22 @@ public:
     std::string print();
 protected:
     X86Reg regType;
+};
+
+// Represents a  pointer
+class X86RegPtr : public X86Operand {
+public:
+    explicit X86RegPtr(X86Reg regType) : X86Operand(X86Type::RegPtr) {
+        this->regType = regType;
+    }
+    
+    void setSizeAttr(std::string sizeAttr) { this->sizeAttr = sizeAttr; }
+    
+    X86Reg getType() { return regType; }
+    std::string print();
+protected:
+    X86Reg regType;
+    std::string sizeAttr = "";
 };
 
 // Represents a memory location

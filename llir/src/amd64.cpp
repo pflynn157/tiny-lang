@@ -298,6 +298,36 @@ void Amd64Writer::compileInstruction(Instruction *instr, std::string prefix) {
             file->addCode(mov);
         } break;
         
+        case InstrType::GEP: {
+            X86Operand *src = compileOperand(instr->getOperand1(), instr->getDataType(), prefix);
+            X86Operand *index = compileOperand(instr->getOperand2(), instr->getDataType(), prefix);
+            
+            // Check the index, and calculate the proper offset
+            int offset = 1;
+            switch (instr->getDataType()->getType()) {
+                case DataType::Void: break;
+                case DataType::I8: break;
+                case DataType::I16: offset = 2; break;
+                case DataType::F32:
+                case DataType::I32: offset = 4; break;
+                case DataType::I64:
+                case DataType::F64:
+                case DataType::Ptr: offset = 8; break;
+            }
+                
+            if (index->getType() == X86Type::Imm) {
+                X86Imm *indexImm = static_cast<X86Imm *>(index);
+                int val = indexImm->getValue();
+                indexImm->setValue(val * offset);
+                index = indexImm;
+            } else {
+                // TODO
+            }
+            
+            X86Add *add = new X86Add(src, index);
+            file->addCode(add);
+        } break;
+        
         case InstrType::Store: {
             X86Operand *src = compileOperand(instr->getOperand1(), instr->getDataType(), prefix);
             X86Operand *dest = compileOperand(instr->getOperand2(), instr->getDataType(), prefix);
@@ -356,6 +386,15 @@ X86Operand *Amd64Writer::compileOperand(Operand *src, Type *type, std::string pr
                 case DataType::F32:
                 case DataType::F64: break;
             }
+        } break;
+        
+        // Return a pointer register
+        case OpType::PReg: {
+            PReg *reg = static_cast<PReg *>(src);
+            X86Reg rType = regMap[reg->getNum()];
+            X86RegPtr *reg2 = new X86RegPtr(rType);
+            reg2->setSizeAttr(getSizeForType(type));
+            return reg2;
         } break;
         
         // A string operand

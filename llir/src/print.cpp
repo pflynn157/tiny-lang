@@ -101,6 +101,7 @@ void Instruction::print() {
         
         case InstrType::Alloca: std::cout << "alloca "; break;
         case InstrType::Load: std::cout << "load "; break;
+        case InstrType::GEP: std::cout << "getelementptr "; break;
         case InstrType::Store: std::cout << "store "; break;
     }
     dataType->print();
@@ -166,6 +167,10 @@ void HReg::print() {
 
 void AReg::print() {
     std::cout << "a" << num;
+}
+
+void PReg::print() {
+    std::cout << "p" << num;
 }
 
 } // end namespace LLIR

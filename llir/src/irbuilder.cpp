@@ -128,6 +128,10 @@ Operand *IRBuilder::createBinaryOp(Type *type, Operand *op1, Operand *op2, Instr
     return dest;
 }
 
+Operand *IRBuilder::createGEP(Type *type, Operand *ptr, Operand *index) {
+    return createBinaryOp(type, ptr, index, InstrType::GEP);
+}
+
 Operand *IRBuilder::createAdd(Type *type, Operand *op1, Operand *op2) {
     return createBinaryOp(type, op1, op2, InstrType::Add);
 }

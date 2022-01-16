@@ -35,6 +35,7 @@ public:
     Reg *createAlloca(Type *type);
     Instruction *createStore(Type *type, Operand *op, Operand *dest);
     Reg *createLoad(Type *type, Operand *src);
+    Operand *createGEP(Type *type, Operand *ptr, Operand *index);
     Operand *createAdd(Type *type, Operand *op1, Operand *op2);
     Operand *createSub(Type *type, Operand *op1, Operand *op2);
     Operand *createSMul(Type *type, Operand *op1, Operand *op2);

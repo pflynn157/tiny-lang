@@ -13,7 +13,8 @@ enum class OpType {
     
     Mem,
     HReg,        // Hardware register
-    AReg         // Argument register
+    AReg,        // Argument register
+    PReg         // Pointer register
 };
 
 //
@@ -129,6 +130,20 @@ private:
 class AReg : public Operand {
 public:
     explicit AReg(int num) : Operand(OpType::AReg) {
+        this->num = num;
+    }
+    
+    int getNum() { return num; }
+    
+    void print();
+private:
+    int num = 0;
+};
+
+// Represents a hardware pointer register
+class PReg : public Operand {
+public:
+    explicit PReg(int num) : Operand(OpType::PReg) {
         this->num = num;
     }
     

@@ -206,6 +206,30 @@ std::string X86Reg64::print() {
     return "";
 }
 
+std::string X86RegPtr::print() {
+    switch (regType) {
+        case X86Reg::AX: return sizeAttr + " [rax]";
+        case X86Reg::BX: return sizeAttr + " [rbx]";
+        case X86Reg::CX: return sizeAttr + " [rcx]";
+        case X86Reg::DX: return sizeAttr + " [rdx]";
+        
+        case X86Reg::SI: return sizeAttr + " [rsi]";
+        case X86Reg::DI: return sizeAttr + " [rdi]";
+        case X86Reg::SP: return sizeAttr + " [rsp]";
+        case X86Reg::BP: return sizeAttr + " [rbp]";
+        
+        case X86Reg::R8: return sizeAttr + " [r8]";
+        case X86Reg::R9: return sizeAttr + " [r9]";
+        case X86Reg::R10: return sizeAttr + " [r10]";
+        case X86Reg::R11: return sizeAttr + " [r11]";
+        case X86Reg::R12: return sizeAttr + " [r12]";
+        case X86Reg::R13: return sizeAttr + " [r13]";
+        case X86Reg::R14: return sizeAttr + " [r14]";
+        case X86Reg::R15: return sizeAttr + " [r15]";
+    }
+    return "";
+}
+
 std::string X86Mem::print() {
     std::string dest =  sizeAttr + " [";
     dest += base->print();

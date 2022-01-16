@@ -65,6 +65,7 @@ enum class InstrType {
     // Memory
     Alloca,
     Load,
+    GEP,
     Store
 };
 

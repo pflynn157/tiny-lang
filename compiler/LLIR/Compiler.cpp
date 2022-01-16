@@ -120,7 +120,7 @@ void Compiler::compileStatement(AstStatement *stmt) {
         
         // An array assignment
         case AstType::ArrayAssign: {
-            AstArrayAssign *pa = static_cast<AstArrayAssign *>(stmt);
+            //AstArrayAssign *pa = static_cast<AstArrayAssign *>(stmt);
             /*Value *ptr = symtable[pa->getName()];
             DataType ptrType = typeTable[pa->getName()];
             DataType subType = ptrTable[pa->getName()];
@@ -144,6 +144,23 @@ void Compiler::compileStatement(AstStatement *stmt) {
                 Value *ep = builder->CreateGEP(arrayElementType, ptrLd, index);
                 builder->CreateStore(val, ep);
             }*/
+            AstArrayAssign *pa = static_cast<AstArrayAssign *>(stmt);
+            LLIR::Operand *ptr = symtable[pa->getName()];
+            DataType ptrType = typeTable[pa->getName()];
+            DataType subType = ptrTable[pa->getName()];
+            
+            LLIR::Operand *index = compileValue(pa->getExpressions().at(0));
+            LLIR::Operand *val = compileValue(pa->getExpressions().at(1), subType);
+            
+            if (ptrType == DataType::String) {
+            } else {
+                LLIR::Type *arrayPtrType = translateType(ptrType, subType);
+                LLIR::Type *arrayElementType = translateType(subType);
+                
+                LLIR::Operand *ptrLd = builder->createLoad(arrayPtrType, ptr);
+                LLIR::Operand *ep = builder->createGEP(arrayPtrType, ptrLd, index);
+                builder->createStore(arrayElementType, val, ep);
+            }
         } break;
         
         // A structure assignment

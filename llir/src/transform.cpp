@@ -11,8 +11,10 @@ namespace LLIR {
 std::vector<std::string> memList;
 std::map<std::string, int> regMap;
 std::map<std::string, int> argMap;
+std::map<std::string, int> ptrMap;
 int regCount = 0;
 int argCount = 0;
+int ptrCount = 0;
 
 Operand *checkOperand(Operand *input) {
     if (input->getType() != OpType::Reg) {
@@ -27,6 +29,11 @@ Operand *checkOperand(Operand *input) {
     
     if (argMap.find(reg->getName()) != argMap.end()) {
         AReg *reg2 = new AReg(argMap[reg->getName()]);
+        return reg2;
+    }
+    
+    if (ptrMap.find(reg->getName()) != ptrMap.end()) {
+        PReg *reg2 = new PReg(ptrMap[reg->getName()]);
         return reg2;
     }
     
@@ -82,6 +89,15 @@ void Module::transform() {
                     // go back to earlier registers once we hit a store instruction
                     case InstrType::Store: {
                         regCount = 0;
+                    } break;
+                    
+                    case InstrType::GEP: {
+                        Reg *reg = static_cast<Reg *>(instr->getDest());
+                        ptrMap[reg->getName()] = ptrCount;
+                        ++ptrCount;
+                        
+                        PReg *reg2 = new PReg(ptrCount - 1);
+                        instr->setDest(reg2);
                     } break;
                     
                     case InstrType::Load:
