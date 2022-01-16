@@ -88,6 +88,11 @@ void Instruction::print() {
         
         case InstrType::Br: std::cout << "br "; break;
         case InstrType::Beq: std::cout << "beq "; break;
+        case InstrType::Bne: std::cout << "bne "; break;
+        case InstrType::Bgt: std::cout << "bgt "; break;
+        case InstrType::Blt: std::cout << "blt "; break;
+        case InstrType::Bge: std::cout << "bge "; break;
+        case InstrType::Ble: std::cout << "ble "; break;
         
         case InstrType::Alloca: std::cout << "alloca "; break;
         case InstrType::Load: std::cout << "load "; break;

@@ -21,13 +21,15 @@ void Compiler::compileIfStatement(AstStatement *stmt) {
     else builder->createBr(endBlock);
 
     // Align the blocks
-    builder->addBlock(trueBlock);
+    LLIR::Block *current = builder->getInsertPoint();
+    builder->addBlockAfter(current, trueBlock);
 
     if (hasBranches) {
-        builder->addBlock(falseBlock);
+        builder->addBlockAfter(trueBlock, falseBlock);
+        builder->addBlockAfter(falseBlock, endBlock);
     } else {
+        builder->addBlockAfter(trueBlock, endBlock);
     }
-    builder->addBlock(endBlock);
 
     builder->setInsertPoint(trueBlock);
     bool hasBreak = false;
@@ -104,17 +106,24 @@ void Compiler::compileWhileStatement(AstStatement *stmt) {
     /*BasicBlock *loopBlock = BasicBlock::Create(*context, "loop_body" + std::to_string(blockCount), currentFunc);
     BasicBlock *loopCmp = BasicBlock::Create(*context, "loop_cmp" + std::to_string(blockCount), currentFunc);
     BasicBlock *loopEnd = BasicBlock::Create(*context, "loop_end" + std::to_string(blockCount), currentFunc);
+    ++blockCount;*/
+    LLIR::Block *loopBlock = new LLIR::Block("loop_body" + std::to_string(blockCount));
+    LLIR::Block *loopCmp = new LLIR::Block("loop_cmp" + std::to_string(blockCount));
+    LLIR::Block *loopEnd = new LLIR::Block("loop_end" + std::to_string(blockCount));
     ++blockCount;
 
-    BasicBlock *current = builder->GetInsertBlock();
+    /*BasicBlock *current = builder->GetInsertBlock();
     loopBlock->moveAfter(current);
     loopCmp->moveAfter(loopBlock);
-    loopEnd->moveAfter(loopCmp);
+    loopEnd->moveAfter(loopCmp);*/
+    builder->addBlock(loopBlock);
+    builder->addBlock(loopCmp);
+    builder->addBlock(loopEnd);
     
     breakStack.push(loopEnd);
     continueStack.push(loopCmp);
 
-    builder->CreateBr(loopCmp);
+    /*builder->CreateBr(loopCmp);
     builder->SetInsertPoint(loopCmp);
     Value *cond = compileValue(stmt->getExpressions().at(0));
     builder->CreateCondBr(cond, loopBlock, loopEnd);
@@ -129,4 +138,19 @@ void Compiler::compileWhileStatement(AstStatement *stmt) {
     
     breakStack.pop();
     continueStack.pop();*/
+    builder->createBr(loopCmp);
+    builder->setInsertPoint(loopCmp);
+    LLIR::Operand *cond = compileValue(stmt->getExpressions().at(0), DataType::Void, loopBlock);
+    builder->createBr(loopEnd);
+    
+    builder->setInsertPoint(loopBlock);
+    for (auto stmt : loop->getBlock()) {
+        compileStatement(stmt);
+    }
+    builder->createBr(loopCmp);
+    
+    builder->setInsertPoint(loopEnd);
+    
+    breakStack.pop();
+    continueStack.pop();
 }

@@ -64,7 +64,7 @@ private:
     
     // Block stack
     int blockCount = 0;
-    //std::stack<BasicBlock *> breakStack;
-    //std::stack<BasicBlock *> continueStack;
+    std::stack<LLIR::Block *> breakStack;
+    std::stack<LLIR::Block *> continueStack;
 };
 

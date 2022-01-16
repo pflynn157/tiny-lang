@@ -183,12 +183,12 @@ void Compiler::compileStatement(AstStatement *stmt) {
         
         // A break statement
         case AstType::Break: {
-           // builder->CreateBr(breakStack.top());
+            builder->createBr(breakStack.top());
         } break;
         
         // A continue statement
         case AstType::Continue: {
-            //builder->CreateBr(continueStack.top());
+            builder->createBr(continueStack.top());
         } break;
         
         default: {}
