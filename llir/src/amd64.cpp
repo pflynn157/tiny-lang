@@ -304,7 +304,11 @@ void Amd64Writer::compileInstruction(Instruction *instr, std::string prefix) {
             
             // Check the index, and calculate the proper offset
             int offset = 1;
-            switch (instr->getDataType()->getType()) {
+            Type *type = instr->getDataType();
+            if (type->getType() == DataType::Ptr) {
+                type = static_cast<PointerType *>(type)->getBaseType();
+            }
+            switch (type->getType()) {
                 case DataType::Void: break;
                 case DataType::I8: break;
                 case DataType::I16: offset = 2; break;
@@ -321,7 +325,8 @@ void Amd64Writer::compileInstruction(Instruction *instr, std::string prefix) {
                 indexImm->setValue(val * offset);
                 index = indexImm;
             } else {
-                // TODO
+                X86IMul *mul = new X86IMul(index, index, new X86Imm(offset));
+                file->addCode(mul);
             }
             
             X86Add *add = new X86Add(src, index);

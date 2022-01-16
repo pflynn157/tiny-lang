@@ -146,6 +146,8 @@ public:
     static PointerType *createI32PtrType() { return new PointerType(DataType::I32); }
     static PointerType *createI64PtrType() { return new PointerType(DataType::I64); }
     
+    Type *getBaseType() { return baseType; }
+    
     void print();
 private:
     Type *baseType = nullptr;
