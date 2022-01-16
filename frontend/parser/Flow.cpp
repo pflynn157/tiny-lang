@@ -37,6 +37,13 @@ AstExpression *Parser::checkCondExpression(AstExpression *toCheck) {
             expr = eq;
         } break;
         
+        case AstType::I32L: {
+            AstEQOp *eq = new AstEQOp;
+            eq->setLVal(expr);
+            eq->setRVal(new AstI32(1));
+            expr = eq;
+        } break;
+        
         default: {}
     }
     

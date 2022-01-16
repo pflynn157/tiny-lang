@@ -181,6 +181,22 @@ Operand *IRBuilder::createNeg(Type *type, Operand *op1) {
 }
 
 Operand *IRBuilder::createBeq(Type *type, Operand *op1, Operand *op2, Block *destBlock) {
+    if (op1->getType() == OpType::Imm && op2->getType() == OpType::Imm) {
+        Imm *imm1 = static_cast<Imm *>(op1);
+        Imm *imm2 = static_cast<Imm *>(op2);
+        if (imm1->getValue() == imm2->getValue()) {
+            Label *lbl = new Label(destBlock->getName());
+            Instruction *op = new Instruction(InstrType::Br);
+            op->setOperand1(lbl);
+            
+            Reg *dest = new Reg(std::to_string(regCounter));
+            ++regCounter;
+            op->setDest(dest);
+            
+            currentBlock->addInstruction(op);
+            return dest;
+        }
+    }
     return createBinaryOp(type, op1, op2, InstrType::Beq, destBlock);
 }
 

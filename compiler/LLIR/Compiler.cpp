@@ -307,8 +307,23 @@ LLIR::Operand *Compiler::compileValue(AstExpression *expr, DataType dataType, LL
             AstExpression *lvalExpr = op->getLVal();
             AstExpression *rvalExpr = op->getRVal();
             
-            LLIR::Operand *lval = compileValue(lvalExpr, dataType);
-            LLIR::Operand *rval = compileValue(rvalExpr, dataType);
+            // Do a type detection so we don't end up with null comparisons
+            DataType dType = dataType;
+            if (dataType == DataType::Void) {
+                if (lvalExpr->getType() == AstType::ID) {
+                    AstID *id = static_cast<AstID *>(lvalExpr);
+                    type = translateType(typeTable[id->getValue()], ptrTable[id->getValue()]);
+                    dType = typeTable[id->getValue()];
+                } else if (lvalExpr->getType() == AstType::ID) {
+                    AstID *id = static_cast<AstID *>(rvalExpr);
+                    type = translateType(typeTable[id->getValue()], ptrTable[id->getValue()]);
+                    dType = typeTable[id->getValue()];
+                }
+            }
+            
+            // Now, compile the operands
+            LLIR::Operand *lval = compileValue(lvalExpr, dType);
+            LLIR::Operand *rval = compileValue(rvalExpr, dType);
             
             /*bool strOp = false;
             bool rvalStr = false;
