@@ -9,6 +9,8 @@
 func main -> i32 is
     var numbers : i32[10];
     numbers[2] := 20;
+    var x : i32 := numbers[2];
+    println("%d", x);
     
     return 0;
 end

@@ -326,6 +326,12 @@ void Amd64Writer::compileInstruction(Instruction *instr, std::string prefix) {
             
             X86Add *add = new X86Add(src, index);
             file->addCode(add);
+            
+            // The destination needs to be converted to a regular register
+            X86RegPtr *dest = static_cast<X86RegPtr *>(compileOperand(instr->getDest(), instr->getDataType(), prefix));
+            X86Reg64 *dest2 = new X86Reg64(dest->getType());
+            X86Mov *mov = new X86Mov(dest2, src);
+            file->addCode(mov);
         } break;
         
         case InstrType::Store: {

@@ -120,30 +120,6 @@ void Compiler::compileStatement(AstStatement *stmt) {
         
         // An array assignment
         case AstType::ArrayAssign: {
-            //AstArrayAssign *pa = static_cast<AstArrayAssign *>(stmt);
-            /*Value *ptr = symtable[pa->getName()];
-            DataType ptrType = typeTable[pa->getName()];
-            DataType subType = ptrTable[pa->getName()];
-            
-            Value *index = compileValue(pa->getExpressions().at(0));
-            Value *val = compileValue(pa->getExpressions().at(1), subType);
-            
-            if (ptrType == DataType::String) {
-                PointerType *strPtrType = Type::getInt8PtrTy(*context);
-                Type *i8Type = Type::getInt8Ty(*context);
-                
-                Value *arrayPtr = builder->CreateLoad(strPtrType, ptr);
-                Value *ep = builder->CreateGEP(i8Type, arrayPtr, index);
-                builder->CreateStore(val, ep);
-            } else {
-                DataType subType = ptrTable[pa->getName()];
-                Type *arrayPtrType = translateType(ptrType, subType);
-                Type *arrayElementType = translateType(subType);
-                
-                Value *ptrLd = builder->CreateLoad(arrayPtrType, ptr);
-                Value *ep = builder->CreateGEP(arrayElementType, ptrLd, index);
-                builder->CreateStore(val, ep);
-            }*/
             AstArrayAssign *pa = static_cast<AstArrayAssign *>(stmt);
             LLIR::Operand *ptr = symtable[pa->getName()];
             DataType ptrType = typeTable[pa->getName()];
@@ -256,29 +232,29 @@ LLIR::Operand *Compiler::compileValue(AstExpression *expr, DataType dataType, LL
             return builder->createLoad(type, ptr);
         } break;
         
-        /*case AstType::ArrayAccess: {
+        case AstType::ArrayAccess: {
             AstArrayAccess *acc = static_cast<AstArrayAccess *>(expr);
-            AllocaInst *ptr = symtable[acc->getValue()];
+            LLIR::Reg *ptr = symtable[acc->getValue()];
             DataType ptrType = typeTable[acc->getValue()];
-            Value *index = compileValue(acc->getIndex());
+            LLIR::Operand *index = compileValue(acc->getIndex());
             
             if (ptrType == DataType::String) {
-                PointerType *strPtrType = Type::getInt8PtrTy(*context);
+                /*PointerType *strPtrType = Type::getInt8PtrTy(*context);
                 Type *i8Type = Type::getInt8Ty(*context);
                 
                 Value *arrayPtr = builder->CreateLoad(strPtrType, ptr);
                 Value *ep = builder->CreateGEP(i8Type, arrayPtr, index);
-                return builder->CreateLoad(i8Type, ep);
+                return builder->CreateLoad(i8Type, ep);*/
             } else {
                 DataType subType = ptrTable[acc->getValue()];
-                Type *arrayPtrType = translateType(ptrType, subType);
-                Type *arrayElementType = translateType(subType);
+                LLIR::Type *arrayPtrType = translateType(ptrType, subType);
+                LLIR::Type *arrayElementType = translateType(subType);
                 
-                Value *ptrLd = builder->CreateLoad(arrayPtrType, ptr);
-                Value *ep = builder->CreateGEP(arrayElementType, ptrLd, index);
-                return builder->CreateLoad(arrayElementType, ep);
+                LLIR::Operand *ptrLd = builder->createLoad(arrayPtrType, ptr);
+                LLIR::Operand *ep = builder->createGEP(arrayPtrType, ptrLd, index);
+                return builder->createLoad(arrayElementType, ep);
             }
-        } break;*/
+        } break;
 
         /*case AstType::StructAccess: {
             AstStructAccess *sa = static_cast<AstStructAccess *>(expr);
