@@ -16,7 +16,8 @@ enum class DataType {
     I64,
     F32,
     F64,
-    Ptr
+    Ptr,
+    Struct
 };
 
 enum class Linkage {
@@ -66,6 +67,7 @@ enum class InstrType {
     Alloca,
     Load,
     GEP,
+    StructStore,
     Store
 };
 
@@ -124,6 +126,22 @@ public:
     void print();
 private:
     Type *baseType = nullptr;
+};
+
+class StructType : public Type {
+public:
+    explicit StructType(std::string name, std::vector<Type *> elementTypes) {
+        this->type = DataType::Struct;
+        this->name = name;
+        this->elementTypes = elementTypes;
+    }
+    
+    std::vector<Type *> getElementTypes() { return elementTypes; }
+    
+    void print();
+private:
+    std::string name = "";
+    std::vector<Type *> elementTypes;
 };
 
 //

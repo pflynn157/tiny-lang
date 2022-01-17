@@ -89,6 +89,7 @@ void Module::transform() {
                     
                     // In order to keep from too many registers being used, we should always
                     // go back to earlier registers once we hit a store instruction
+                    case InstrType::StructStore:
                     case InstrType::Store: {
                         regCount = 0;
                     } break;

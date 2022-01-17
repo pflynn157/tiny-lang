@@ -20,6 +20,7 @@ public:
     void build();
 protected:
     std::string getSizeForType(Type *type);
+    int getIntSizeForType(Type *type);
 private:
     Module *mod = nullptr;
     X86File *file;

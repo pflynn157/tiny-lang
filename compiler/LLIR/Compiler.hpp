@@ -50,12 +50,12 @@ private:
     LLIR::IRBuilder *builder;
     LLIR::Function *currentFunc;
     DataType currentFuncType = DataType::Void;
-    //std::string funcTypeStruct = "";
+    std::string funcTypeStruct = "";
     
     // The user-defined structure table
-    //std::map<std::string, StructType*> structTable;
-    //std::map<std::string, std::string> structVarTable;
-    //std::map<std::string, std::vector<Type *>> structElementTypeTable;
+    std::map<std::string, LLIR::StructType*> structTable;
+    std::map<std::string, std::string> structVarTable;
+    std::map<std::string, std::vector<LLIR::Type *>> structElementTypeTable;
     
     // Symbol table
     std::map<std::string, LLIR::Reg *> symtable;

@@ -1,25 +1,28 @@
 
 #OUTPUT
-#Hello!
-# How are you?
-#Hello! How are you?
-#Hello!!
+#X: 10
+#Y: 20
+#Changed X: 25
 #END
 
 #RET 0
 
-func main(args:string[]) -> i32 is
-    var str1 : string := "Hello!";
-    var str2 : string := " How are you?";
+struct S1 is
+    x : i32 := 10;
+    y : i32 := 20;
+end
+
+func main -> i32 is
+    struct s : S1;
+    var v1 : i32 := 0;
+
+    #var v1 : i32 := s.x;
     
-    println(str1);
-    println(str2);
+    #println("X: %d", v1);
+    #println("Y: %d", s.y);
     
-    var str3 : string := str1 + str2;
-    println(str3);
-    
-    var str4 : string := str1 + '!';
-    println(str4);
+    #s.x := 25;
+    #println("Changed X: %d", s.x);
     
     return 0;
 end

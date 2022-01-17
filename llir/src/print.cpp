@@ -28,6 +28,15 @@ void PointerType::print() {
     baseType->print();
 }
 
+void StructType::print() {
+    std::cout << name << "{";
+    for (int i = 0; i<elementTypes.size(); i++) {
+        elementTypes.at(i)->print();
+        if (i + 1 < elementTypes.size()) std::cout << ", ";
+    }
+    std::cout << "}";
+}
+
 void Function::print() {
     dataType->print();
     std::cout << " ";
@@ -102,6 +111,7 @@ void Instruction::print() {
         case InstrType::Alloca: std::cout << "alloca "; break;
         case InstrType::Load: std::cout << "load "; break;
         case InstrType::GEP: std::cout << "getelementptr "; break;
+        case InstrType::StructStore: std::cout << "store.struct "; break;
         case InstrType::Store: std::cout << "store "; break;
     }
     dataType->print();

@@ -449,6 +449,8 @@ public:
         this->base = new X86Reg64(X86Reg::BP);
     }
     
+    X86Operand *getOffset() { return offset; }
+    
     void setSizeAttr(std::string sizeAttr) { this->sizeAttr = sizeAttr; }
     
     std::string print();

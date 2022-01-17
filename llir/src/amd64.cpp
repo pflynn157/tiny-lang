@@ -294,15 +294,11 @@ void Amd64Writer::compileInstruction(Instruction *instr, std::string prefix) {
         } break;
         
         case InstrType::Alloca: {
-            switch (instr->getDataType()->getType()) {
-                case DataType::Void: break;
-                case DataType::I8: stackPos += 1; break;
-                case DataType::I16: stackPos += 2; break;
-                case DataType::F32:
-                case DataType::I32: stackPos += 4; break;
-                case DataType::I64:
-                case DataType::F64:
-                case DataType::Ptr: stackPos += 8; break;
+            if (instr->getDataType()->getType() == DataType::Struct) {
+                StructType *type = static_cast<StructType *>(instr->getDataType());
+                for (Type *t : type->getElementTypes()) stackPos += getIntSizeForType(t);
+            } else {
+                stackPos += getIntSizeForType(instr->getDataType());
             }
             
             Mem *mem = static_cast<Mem *>(instr->getDest());
@@ -354,6 +350,28 @@ void Amd64Writer::compileInstruction(Instruction *instr, std::string prefix) {
             X86RegPtr *dest = static_cast<X86RegPtr *>(compileOperand(instr->getDest(), instr->getDataType(), prefix));
             X86Reg64 *dest2 = new X86Reg64(dest->getType());
             X86Mov *mov = new X86Mov(dest2, src);
+            file->addCode(mov);
+        } break;
+        
+        case InstrType::StructStore: {
+            // First, compile the operands
+            X86Operand *src = compileOperand(instr->getOperand1(), instr->getDataType(), prefix);
+            int position = static_cast<Imm *>(instr->getOperand2())->getValue();
+            
+            // Now, calculate the element position
+            StructType *type = static_cast<StructType *>(instr->getDataType());
+            Type *elementType = type->getElementTypes().at(position);
+            position *= getIntSizeForType(elementType);
+            
+            // Update the source with the correct position
+            X86Mem *mem = static_cast<X86Mem *>(src);
+            mem->setSizeAttr(getSizeForType(elementType));
+            X86Imm *offset = static_cast<X86Imm *>(mem->getOffset());
+            offset->setValue(offset->getValue() + position);
+            
+            // Now, do the moves
+            X86Operand *dest = compileOperand(instr->getOperand3(), elementType, prefix);
+            X86Mov *mov = new X86Mov(mem, dest);
             file->addCode(mov);
         } break;
         
@@ -486,6 +504,20 @@ std::string Amd64Writer::getSizeForType(Type *type) {
         case DataType::Ptr: return "QWORD PTR";
     }
     return "";
+}
+
+int Amd64Writer::getIntSizeForType(Type *type) {
+    switch (type->getType()) {
+        case DataType::Void: break;
+        case DataType::I8: return 1;
+        case DataType::I16: return 2;
+        case DataType::F32:
+        case DataType::I32: return 4;
+        case DataType::I64:
+        case DataType::F64:
+        case DataType::Ptr: return 8;
+    }
+    return 0;
 }
 
 } // end namespace LLIR

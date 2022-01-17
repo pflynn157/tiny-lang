@@ -82,6 +82,17 @@ Instruction *IRBuilder::createStore(Type *type, Operand *op, Operand *dest) {
     return store;
 }
 
+Instruction *IRBuilder::createStructStore(Type *type, Operand *ptr, int index, Operand *val) {
+    Instruction *op = new Instruction(InstrType::StructStore);
+    op->setDataType(type);
+    op->setOperand1(ptr);
+    op->setOperand2(new Imm(index));
+    op->setOperand3(val);
+    
+    currentBlock->addInstruction(op);
+    return op;
+}
+
 Reg *IRBuilder::createLoad(Type *type, Operand *src) {
     Instruction *load = new Instruction(InstrType::Load);
     load->setDataType(type);

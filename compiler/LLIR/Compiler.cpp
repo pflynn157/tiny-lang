@@ -19,28 +19,26 @@ Compiler::Compiler(AstTree *tree, CFlags cflags) {
 
 void Compiler::compile() {
     // Build the structures used by the program
-    /*for (auto str : tree->getStructs()) {
-        std::vector<Type *> elementTypes;
+    for (auto str : tree->getStructs()) {
+        std::vector<LLIR::Type *> elementTypes;
         
         for (auto v : str->getItems()) {
-            Type *t = translateType(v.type, v.subType);
+            LLIR::Type *t = translateType(v.type, v.subType);
             elementTypes.push_back(t);
         }
         
-        StructType *s = StructType::create(*context, elementTypes);
-        s->setName(str->getName());
-        
+        LLIR::StructType *s = new LLIR::StructType(str->getName(), elementTypes);
         structTable[str->getName()] = s;
         structElementTypeTable[str->getName()] = elementTypes;
-    }*/
+    }
 
     // Build all other functions
     for (auto global : tree->getGlobalStatements()) {
         switch (global->getType()) {
             case AstType::Func: {
-                //symtable.clear();
-                //typeTable.clear();
-                //ptrTable.clear();
+                symtable.clear();
+                typeTable.clear();
+                ptrTable.clear();
                 
                 compileFunction(global);
             } break;
@@ -76,9 +74,9 @@ void Compiler::compileStatement(AstStatement *stmt) {
         // A structure declaration
         case AstType::StructDec: {
             AstStructDec *sd = static_cast<AstStructDec *>(stmt);
-            /*StructType *type = structTable[sd->getStructName()];
+            LLIR::StructType *type = structTable[sd->getStructName()];
             
-            AllocaInst *var = builder->CreateAlloca(type);
+            LLIR::Reg *var = builder->createAlloca(type);
             symtable[sd->getVarName()] = var;
             typeTable[sd->getVarName()] = DataType::Struct;
             structVarTable[sd->getVarName()] = sd->getStructName();
@@ -97,14 +95,13 @@ void Compiler::compileStatement(AstStatement *stmt) {
                 int index = 0;
                 for (Var member : str->getItems()) {
                     AstExpression *defaultExpr = str->getDefaultExpression(member.name);
-                    Value *defaultVal = compileValue(defaultExpr, member.type);
+                    LLIR::Operand *defaultVal = compileValue(defaultExpr, member.type);
                     
-                    Value *ep = builder->CreateStructGEP(type, var, index);
-                    builder->CreateStore(defaultVal, ep);
+                    builder->createStructStore(type, var, index, defaultVal);
                     
                     ++index;
                }
-            }*/
+            }
         } break;
         
         // A variable assignment
