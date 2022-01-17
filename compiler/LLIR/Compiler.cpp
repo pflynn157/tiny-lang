@@ -139,16 +139,16 @@ void Compiler::compileStatement(AstStatement *stmt) {
         // A structure assignment
         case AstType::StructAssign: {
             AstStructAssign *sa = static_cast<AstStructAssign *>(stmt);
-            /*Value *ptr = symtable[sa->getName()];
+            LLIR::Operand *ptr = symtable[sa->getName()];
             int index = getStructIndex(sa->getName(), sa->getMember());
             
-            Value *val = compileValue(sa->getExpressions().at(0), sa->getMemberType());
+            LLIR::Operand *val = compileValue(sa->getExpressions().at(0), sa->getMemberType());
             
             std::string strTypeName = structVarTable[sa->getName()];
-            StructType *strType = structTable[strTypeName];
+            LLIR::StructType *strType = structTable[strTypeName];
             
-            Value *structPtr = builder->CreateStructGEP(strType, ptr, index);
-            builder->CreateStore(val, structPtr);*/
+            builder->createStructStore(strType, ptr, index, val);
+            //builder->CreateStore(val, structPtr);
         } break;
         
         // Function call statements
@@ -463,9 +463,9 @@ LLIR::Type *Compiler::translateType(DataType dataType, DataType subType, std::st
             }
         } break;
         
-        /*case DataType::Struct: {
+        case DataType::Struct: {
             return structTable[typeName];
-        } break;*/
+        } break;
         
         default: type = LLIR::Type::createVoidType();
     }

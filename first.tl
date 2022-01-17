@@ -20,8 +20,8 @@ func main -> i32 is
     println("X: %d", v1);
     println("Y: %d", s.y);
     
-    #s.x := 25;
-    #println("Changed X: %d", s.x);
+    s.x := 25;
+    println("Changed X: %d", s.x);
     
     return 0;
 end
