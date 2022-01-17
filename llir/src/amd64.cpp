@@ -305,6 +305,28 @@ void Amd64Writer::compileInstruction(Instruction *instr, std::string prefix) {
             memMap[mem->getName()] = stackPos;
         } break;
         
+        case InstrType::StructLoad: {
+            // First, compile the operands
+            X86Operand *src = compileOperand(instr->getOperand1(), instr->getDataType(), prefix);
+            int position = static_cast<Imm *>(instr->getOperand2())->getValue();
+            
+            // Now, calculate the element position
+            StructType *type = static_cast<StructType *>(instr->getDataType());
+            Type *elementType = type->getElementTypes().at(position);
+            position *= getIntSizeForType(elementType);
+            
+            // Update the source with the correct position
+            X86Mem *mem = static_cast<X86Mem *>(src);
+            mem->setSizeAttr(getSizeForType(elementType));
+            X86Imm *offset = static_cast<X86Imm *>(mem->getOffset());
+            offset->setValue(offset->getValue() + position);
+            
+            // Now, do the moves
+            X86Operand *dest = compileOperand(instr->getDest(), elementType, prefix);
+            X86Mov *mov = new X86Mov(dest, mem);
+            file->addCode(mov);
+        } break;
+        
         case InstrType::Load: {
             X86Operand *src = compileOperand(instr->getOperand1(), instr->getDataType(), prefix);
             X86Operand *dest = compileOperand(instr->getDest(), instr->getDataType(), prefix);

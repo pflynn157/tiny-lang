@@ -109,6 +109,7 @@ void Instruction::print() {
         case InstrType::Ble: std::cout << "ble "; break;
         
         case InstrType::Alloca: std::cout << "alloca "; break;
+        case InstrType::StructLoad: std::cout << "load.struct "; break;
         case InstrType::Load: std::cout << "load "; break;
         case InstrType::GEP: std::cout << "getelementptr "; break;
         case InstrType::StructStore: std::cout << "store.struct "; break;

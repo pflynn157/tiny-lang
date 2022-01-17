@@ -14,12 +14,11 @@ end
 
 func main -> i32 is
     struct s : S1;
-    var v1 : i32 := 0;
 
-    #var v1 : i32 := s.x;
+    var v1 : i32 := s.x;
     
-    #println("X: %d", v1);
-    #println("Y: %d", s.y);
+    println("X: %d", v1);
+    println("Y: %d", s.y);
     
     #s.x := 25;
     #println("Changed X: %d", s.x);

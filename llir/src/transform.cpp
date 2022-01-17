@@ -104,6 +104,7 @@ void Module::transform() {
                     } break;
                     
                     case InstrType::Load:
+                    case InstrType::StructLoad:
                     case InstrType::Add:
                     case InstrType::Sub:
                     case InstrType::SMul:

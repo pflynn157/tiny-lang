@@ -36,6 +36,7 @@ public:
     Instruction *createStore(Type *type, Operand *op, Operand *dest);
     Instruction *createStructStore(Type *type, Operand *ptr, int index, Operand *val);
     Reg *createLoad(Type *type, Operand *src);
+    Reg *createStructLoad(Type *type, Operand *src, int index);
     Operand *createGEP(Type *type, Operand *ptr, Operand *index);
     Operand *createAdd(Type *type, Operand *op1, Operand *op2);
     Operand *createSub(Type *type, Operand *op1, Operand *op2);

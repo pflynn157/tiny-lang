@@ -106,6 +106,20 @@ Reg *IRBuilder::createLoad(Type *type, Operand *src) {
     return dest;
 }
 
+Reg *IRBuilder::createStructLoad(Type *type, Operand *src, int index) {
+    Instruction *load = new Instruction(InstrType::StructLoad);
+    load->setDataType(type);
+    load->setOperand1(src);
+    load->setOperand2(new Imm(index));
+    
+    Reg *dest = new Reg(std::to_string(regCounter));
+    ++regCounter;
+    load->setDest(dest);
+    
+    currentBlock->addInstruction(load);
+    return dest;
+}
+
 Operand *IRBuilder::createBinaryOp(Type *type, Operand *op1, Operand *op2, InstrType iType, Block *destBlock) {
     if (op1->getType() == OpType::Imm && op2->getType() == OpType::Imm) {
         Imm *imm1 = static_cast<Imm *>(op1);

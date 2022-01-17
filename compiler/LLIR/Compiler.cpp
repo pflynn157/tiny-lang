@@ -259,18 +259,19 @@ LLIR::Operand *Compiler::compileValue(AstExpression *expr, DataType dataType, LL
             }
         } break;
 
-        /*case AstType::StructAccess: {
+        case AstType::StructAccess: {
             AstStructAccess *sa = static_cast<AstStructAccess *>(expr);
-            AllocaInst *ptr = symtable[sa->getName()];
+            LLIR::Reg *ptr = symtable[sa->getName()];
             int pos = getStructIndex(sa->getName(), sa->getMember());
             
             std::string strTypeName = structVarTable[sa->getName()];
-            StructType *strType = structTable[strTypeName];
-            Type *elementType = structElementTypeTable[strTypeName][pos];
+            LLIR::StructType *strType = structTable[strTypeName];
+            LLIR::Type *elementType = structElementTypeTable[strTypeName][pos];
 
-            Value *ep = builder->CreateStructGEP(strType, ptr, pos);
-            return builder->CreateLoad(elementType, ep);
-        } break;*/
+            //LLIR *ep = builder->CreateStructGEP(strType, ptr, pos);
+            //return builder->CreateLoad(elementType, ep);
+            return builder->createStructLoad(strType, ptr, pos);
+        } break;
         
         case AstType::FuncCallExpr: {
             AstFuncCallExpr *fc = static_cast<AstFuncCallExpr *>(expr);
@@ -473,7 +474,7 @@ LLIR::Type *Compiler::translateType(DataType dataType, DataType subType, std::st
 }
 
 int Compiler::getStructIndex(std::string name, std::string member) {
-    /*std::string name2 = structVarTable[name];
+    std::string name2 = structVarTable[name];
     if (name2 != "") name = name2;
     
     for (auto s : tree->getStructs()) {
@@ -484,7 +485,7 @@ int Compiler::getStructIndex(std::string name, std::string member) {
             if (members.at(i).name == member) return i;
         }
     }
-*/
+    
     return 0;
 }
 
