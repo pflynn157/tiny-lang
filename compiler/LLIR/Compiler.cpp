@@ -459,7 +459,7 @@ LLIR::Type *Compiler::translateType(DataType dataType, DataType subType, std::st
                 case DataType::I64:
                 case DataType::U64: type = LLIR::PointerType::createI64PtrType(); break;
                 
-                //case DataType::String: type = PointerType::getUnqual(Type::getInt8PtrTy(*context)); break;
+                case DataType::String: type = new LLIR::PointerType(LLIR::PointerType::createI8PtrType()); break;
                 
                 default: {}
             }

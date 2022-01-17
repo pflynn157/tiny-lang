@@ -1,34 +1,23 @@
 
 #OUTPUT
-#True
-#20
-#False
-#31
+#Hi!
+#How are you?
+#Good!
 #END
 
 #RET 0
 
-func test1(x:i8) is
-    if x = 20 then println("True");
-    else println("False");
-    end
-    
-    println("%d", x);
-end
-
-func test2(x:i8) is
-    if x = 20 then println("True");
-    else println("False");
-    end
-    
-    println("%d", x);
-end
-
 func main -> i32 is
-    var x1 : i8 := 20;
-    var x2 : i8 := 31;
+    var args : string[3];
+    args[0] := "Hi!";
+    args[1] := "How are you?";
+    args[2] := "Good!";
     
-    test1(x1);
-    test2(x2);
+    var i : i32 := 0;
+    while i < 3 do
+        println(args[i]);
+        i := i + 1;
+    end
+    
     return 0;
 end
