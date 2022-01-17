@@ -121,6 +121,8 @@ void Module::transform() {
                     } break;
                     
                     case InstrType::Call: {
+                        regCount = 0;
+                    
                         FunctionCall *fc = static_cast<FunctionCall *>(instr);
                         std::vector<Operand *> args;
                         for (Operand *arg : fc->getArgs()) {

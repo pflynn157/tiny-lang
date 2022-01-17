@@ -331,7 +331,7 @@ LLIR::Operand *Compiler::compileValue(AstExpression *expr, DataType dataType, LL
             LLIR::Operand *lval = compileValue(lvalExpr, dType);
             LLIR::Operand *rval = compileValue(rvalExpr, dType);
             
-            /*bool strOp = false;
+            bool strOp = false;
             bool rvalStr = false;
             
             if (lvalExpr->getType() == AstType::StringL || rvalExpr->getType() == AstType::StringL) {
@@ -358,35 +358,38 @@ LLIR::Operand *Compiler::compileValue(AstExpression *expr, DataType dataType, LL
             
             // Build a string comparison if necessary
             if (strOp) {
-                std::vector<Value *> args;
+                std::vector<LLIR::Operand *> args;
                 args.push_back(lval);
                 args.push_back(rval);
             
                 if (op->getType() == AstType::EQ || op->getType() == AstType::NEQ) {
-                    Function *strcmp = mod->getFunction("stringcmp");
-                    if (!strcmp) std::cerr << "Error: Corelib function \"stringcmp\" not found." << std::endl;
-                    Value *strcmpCall = builder->CreateCall(strcmp, args);
+                    //Function *strcmp = mod->getFunction("stringcmp");
+                    //if (!strcmp) std::cerr << "Error: Corelib function \"stringcmp\" not found." << std::endl;
+                    //Value *strcmpCall = builder->CreateCall(strcmp, args);
+                    LLIR::Operand *strcmpCall = builder->createCall(LLIR::Type::createI32Type(), "stringcmp", args);
                     
                     int cmpVal = 0;
                     if (op->getType() == AstType::NEQ) cmpVal = 0;
-                    Value *cmpValue = builder->getInt32(cmpVal);
+                    LLIR::Operand *cmpValue = builder->createI32(cmpVal);
                     
-                    return builder->CreateICmpEQ(strcmpCall, cmpValue);
+                    return builder->createBeq(LLIR::Type::createI32Type(), strcmpCall, cmpValue, destBlock);
                 } else if (op->getType() == AstType::Add) {
                     if (rvalStr) {
-                        Function *callee = mod->getFunction("strcat_str");
-                        if (!callee) std::cerr << "Error: corelib function \"strcat_str\" not found." << std::endl;
-                        return builder->CreateCall(callee, args);
+                        //Function *callee = mod->getFunction("strcat_str");
+                        //if (!callee) std::cerr << "Error: corelib function \"strcat_str\" not found." << std::endl;
+                        //return builder->CreateCall(callee, args);
+                        return builder->createCall(LLIR::PointerType::createI8PtrType(), "strcat_str", args);
                     } else {
-                        Function *callee = mod->getFunction("strcat_char");
-                        if (!callee) std::cerr << "Error: corelib function \"strcat_char\" not found." << std::endl;
-                        return builder->CreateCall(callee, args);
+                        //Function *callee = mod->getFunction("strcat_char");
+                        //if (!callee) std::cerr << "Error: corelib function \"strcat_char\" not found." << std::endl;
+                        //return builder->CreateCall(callee, args);
+                        return builder->createCall(LLIR::PointerType::createI8PtrType(), "strcat_char", args);
                     }
                 } else {
                     // Invalid
                     return nullptr;
                 }
-            }*/
+            }
             
             // Otherwise, build a normal comparison
             switch (expr->getType()) {

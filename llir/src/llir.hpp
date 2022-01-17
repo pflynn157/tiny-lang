@@ -78,33 +78,6 @@ class Reg;
 class StringPtr;
 
 //
-// The base of all LLIR projects
-//
-class Module {
-public:
-    explicit Module(std::string name) {
-        this->name = name;
-    }
-    
-    void addFunction(Function *func) { functions.push_back(func); }
-    void addStringPtr(StringPtr *ptr) { strings.push_back(ptr); }
-    
-    std::string getName() { return name; }
-    int getFunctionCount() { return functions.size(); }
-    Function *getFunction(int pos) { return functions.at(pos); }
-    int getStringCount() { return strings.size(); }
-    StringPtr *getString(int pos) { return strings.at(pos); }
-    
-    void transform();
-    
-    void print();
-private:
-    std::string name = "";
-    std::vector<Function *> functions;
-    std::vector<StringPtr *> strings;
-};
-
-//
 // Represents a data type
 //
 class Type {
@@ -248,6 +221,40 @@ private:
     std::vector<Reg *> varRegs;
     int stackSize = 0;
     int blockID = 1;
+};
+
+//
+// The base of all LLIR projects
+//
+class Module {
+public:
+    explicit Module(std::string name) {
+        this->name = name;
+    }
+    
+    void addFunction(Function *func) { functions.push_back(func); }
+    void addStringPtr(StringPtr *ptr) { strings.push_back(ptr); }
+    
+    std::string getName() { return name; }
+    int getFunctionCount() { return functions.size(); }
+    Function *getFunction(int pos) { return functions.at(pos); }
+    int getStringCount() { return strings.size(); }
+    StringPtr *getString(int pos) { return strings.at(pos); }
+    
+    Function *getFunctionByName(std::string fname) {
+        for (Function *f : functions) {
+            if (f->getName() == fname) return f;
+        }
+        return nullptr;
+    }
+    
+    void transform();
+    
+    void print();
+private:
+    std::string name = "";
+    std::vector<Function *> functions;
+    std::vector<StringPtr *> strings;
 };
 
 //

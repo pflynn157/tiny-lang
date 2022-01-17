@@ -99,6 +99,22 @@ void Compiler::compileExternFunction(AstGlobalStatement *global) {
     }
     
     Function::Create(FT, Function::ExternalLinkage, astFunc->getName(), mod.get());*/
+    LLIR::Type *funcType = translateType(astFunc->getDataType());
+    
+    std::vector<LLIR::Type *> args;
+    if (astVarArgs.size() > 0) {
+        for (auto var : astVarArgs) {
+            LLIR::Type *type = translateType(var.type, var.subType, var.typeName);
+            //if (var.type == DataType::Struct) {
+            //    type = PointerType::getUnqual(type);
+            //}
+            args.push_back(type);
+        }
+    }
+    
+    LLIR::Function *func = LLIR::Function::Create(astFunc->getName(), LLIR::Linkage::Extern, funcType);
+    func->setArgs(args);
+    mod->addFunction(func);
 }
 
 //

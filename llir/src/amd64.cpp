@@ -254,21 +254,39 @@ void Amd64Writer::compileInstruction(Instruction *instr, std::string prefix) {
         
         case InstrType::Call: {
             FunctionCall *fc = static_cast<FunctionCall *>(instr);
+            Function *callee = mod->getFunctionByName(fc->getName());
             
             int pos = 0;
             for (Operand *arg : fc->getArgs()) {
                 // TODO: Some better argument detection for the registers would be ideal
-                X86Operand *op = compileOperand(arg, Type::createI32Type(), prefix);
+                Type *argType = Type::createI32Type();
+                if (pos < callee->getArgCount()) argType = callee->getArgType(pos);
+                X86Operand *op = compileOperand(arg, argType, prefix);
                 
                 X86Reg regType = argRegMap[pos];
                 ++pos;
                 
                 X86Operand *dest = new X86Reg32(regType);
+                switch (argType->getType()) {
+                    case DataType::Void: break;
+                    case DataType::I8:
+                    case DataType::I16:
+                    case DataType::I32: dest = new X86Reg32(regType); break;
+                    case DataType::Ptr:
+                    case DataType::I64: dest = new X86Reg64(regType); break;
+                    case DataType::F32:
+                    case DataType::F64: break;
+                }
                 if (op->getType() == X86Type::String)
                     dest = new X86Reg64(regType);
                     
-                X86Mov *mov = new X86Mov(dest, op);
-                file->addCode(mov);
+                if (op->getType() == X86Type::Reg8 || op->getType() == X86Type::Reg16) {
+                    X86Movsx *mov = new X86Movsx(dest, op);
+                    file->addCode(mov);
+                } else {
+                    X86Mov *mov = new X86Mov(dest, op);
+                    file->addCode(mov);
+                }
             }
             
             X86Call *call = new X86Call(fc->getName());
