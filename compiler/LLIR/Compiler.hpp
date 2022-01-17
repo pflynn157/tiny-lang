@@ -56,6 +56,7 @@ private:
     std::map<std::string, LLIR::StructType*> structTable;
     std::map<std::string, std::string> structVarTable;
     std::map<std::string, std::vector<LLIR::Type *>> structElementTypeTable;
+    std::vector<std::string> structArgs;
     
     // Symbol table
     std::map<std::string, LLIR::Reg *> symtable;

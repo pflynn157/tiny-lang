@@ -53,6 +53,10 @@ std::string X86Movsx::print() {
     return "movsx " + op1->print() + ", " + op2->print();
 }
 
+std::string X86Lea::print() {
+    return "lea " + op1->print() + ", " + op2->print();
+}
+
 std::string X86Add::print() {
     return "add " + op1->print() + ", " + op2->print();
 }

@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include <exception>
+#include <algorithm>
 
 #include <LLIR/Compiler.hpp>
 
@@ -270,7 +271,16 @@ LLIR::Operand *Compiler::compileValue(AstExpression *expr, DataType dataType, LL
 
             //LLIR *ep = builder->CreateStructGEP(strType, ptr, pos);
             //return builder->CreateLoad(elementType, ep);
+            if (std::find(structArgs.begin(), structArgs.end(), sa->getName()) != structArgs.end()) {
+                LLIR::PointerType *strPtrType = new LLIR::PointerType(strType);
+                LLIR::PointerType *elementPtrType = new LLIR::PointerType(elementType);
+                
+                ptr = builder->createLoad(strPtrType, ptr);
+                LLIR::Operand *ep = builder->createGEP(elementPtrType, ptr, new LLIR::Imm(pos));
+                return builder->createLoad(elementType, ep);
+            } else {
             return builder->createStructLoad(strType, ptr, pos);
+            }
         } break;
         
         case AstType::FuncCallExpr: {
@@ -458,6 +468,8 @@ LLIR::Type *Compiler::translateType(DataType dataType, DataType subType, std::st
                 case DataType::U64: type = LLIR::PointerType::createI64PtrType(); break;
                 
                 case DataType::String: type = new LLIR::PointerType(LLIR::PointerType::createI8PtrType()); break;
+                
+                case DataType::Struct: type = new LLIR::PointerType(structTable[typeName]); break;
                 
                 default: {}
             }

@@ -19,6 +19,7 @@ enum class X86Type {
     Push,
     Mov,
     Movsx,
+    Lea,
     Call,
     Cdq,
     Leave,
@@ -186,6 +187,17 @@ public:
 class X86Movsx : public X86Instr {
 public:
     explicit X86Movsx(X86Operand *op1, X86Operand *op2) : X86Instr(X86Type::Movsx) {
+        this->op1 = op1;
+        this->op2 = op2;
+    }
+    
+    std::string print();
+};
+
+// An LEA instruction
+class X86Lea : public X86Instr {
+public:
+    explicit X86Lea(X86Operand *op1, X86Operand *op2) : X86Instr(X86Type::Lea) {
         this->op1 = op1;
         this->op2 = op2;
     }

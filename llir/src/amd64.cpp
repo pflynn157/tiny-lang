@@ -272,6 +272,7 @@ void Amd64Writer::compileInstruction(Instruction *instr, std::string prefix) {
                     case DataType::I8:
                     case DataType::I16:
                     case DataType::I32: dest = new X86Reg32(regType); break;
+                    case DataType::Struct:
                     case DataType::Ptr:
                     case DataType::I64: dest = new X86Reg64(regType); break;
                     case DataType::F32:
@@ -280,12 +281,23 @@ void Amd64Writer::compileInstruction(Instruction *instr, std::string prefix) {
                 if (op->getType() == X86Type::String)
                     dest = new X86Reg64(regType);
                     
-                if (op->getType() == X86Type::Reg8 || op->getType() == X86Type::Reg16) {
-                    X86Movsx *mov = new X86Movsx(dest, op);
-                    file->addCode(mov);
+                if (argType->getType() == DataType::Ptr) {
+                    PointerType *ptr = static_cast<PointerType *>(argType);
+                    if (ptr->getBaseType()->getType() == DataType::Struct) {
+                        X86Lea *lea = new X86Lea(dest, op);
+                        file->addCode(lea);
+                    } else {
+                        X86Mov *mov = new X86Mov(dest, op);
+                        file->addCode(mov);
+                    }
                 } else {
-                    X86Mov *mov = new X86Mov(dest, op);
-                    file->addCode(mov);
+                    if (op->getType() == X86Type::Reg8 || op->getType() == X86Type::Reg16) {
+                        X86Movsx *mov = new X86Movsx(dest, op);
+                        file->addCode(mov);
+                    } else {
+                        X86Mov *mov = new X86Mov(dest, op);
+                        file->addCode(mov);
+                    }
                 }
             }
             
@@ -433,6 +445,7 @@ X86Operand *Amd64Writer::compileOperand(Operand *src, Type *type, std::string pr
                 case DataType::I8: return new X86Reg8(rType);
                 case DataType::I16: return new X86Reg16(rType);
                 case DataType::I32: return new X86Reg32(rType);
+                case DataType::Struct:
                 case DataType::Ptr:
                 case DataType::I64: return new X86Reg64(rType);
                 case DataType::F32:
@@ -450,6 +463,7 @@ X86Operand *Amd64Writer::compileOperand(Operand *src, Type *type, std::string pr
                 case DataType::I8: return new X86Reg8(rType);
                 case DataType::I16: return new X86Reg16(rType);
                 case DataType::I32: return new X86Reg32(rType);
+                case DataType::Struct:
                 case DataType::Ptr:
                 case DataType::I64: return new X86Reg64(rType);
                 case DataType::F32:

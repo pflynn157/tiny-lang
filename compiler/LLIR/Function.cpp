@@ -15,7 +15,7 @@ void Compiler::compileFunction(AstGlobalStatement *global) {
     symtable.clear();
     typeTable.clear();
     ptrTable.clear();
-    //structVarTable.clear();
+    structVarTable.clear();
     
     AstFunction *astFunc = static_cast<AstFunction *>(global);
 
@@ -29,9 +29,9 @@ void Compiler::compileFunction(AstGlobalStatement *global) {
     if (astVarArgs.size() > 0) {
         for (auto var : astVarArgs) {
             LLIR::Type *type = translateType(var.type, var.subType, var.typeName);
-            //if (var.type == DataType::Struct) {
-            //    type = PointerType::getUnqual(type);
-            //}
+            if (var.type == DataType::Struct) {
+                type = translateType(DataType::Ptr, var.type, var.typeName);
+            }
             args.push_back(type);
         }
     }
@@ -50,14 +50,22 @@ void Compiler::compileFunction(AstGlobalStatement *global) {
             Var var = astVarArgs.at(i);
             
             // Build the alloca for the local var
-            LLIR::Type *type = translateType(var.type, var.subType, var.typeName);
-            /*if (var.type == DataType::Struct) {
-                symtable[var.name] = (AllocaInst *)func->getArg(i);
-                typeTable[var.name] = var.type;
-                ptrTable[var.name] = var.subType;
+            //LLIR::Type *type = translateType(var.type, var.subType, var.typeName);
+            LLIR::Type *type = args.at(i);
+            // TODO: Combine this with below
+            if (var.type == DataType::Struct) {
+                LLIR::Reg *alloca = builder->createAlloca(type);
+               // symtable[var.name] = func->getArg(i);
+                symtable[var.name] = alloca;
+                typeTable[var.name] = DataType::Ptr;
+                ptrTable[var.name] = var.type;
                 structVarTable[var.name] = var.typeName;
+                structArgs.push_back(var.name);
+                
+                LLIR::Operand *param = func->getArg(i);
+                builder->createStore(type, param, alloca);
                 continue;
-            }*/
+            }
             
             LLIR::Reg *alloca = builder->createAlloca(type);
             symtable[var.name] = alloca;
