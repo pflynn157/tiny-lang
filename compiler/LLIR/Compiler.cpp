@@ -147,8 +147,18 @@ void Compiler::compileStatement(AstStatement *stmt) {
             
             std::string strTypeName = structVarTable[sa->getName()];
             LLIR::StructType *strType = structTable[strTypeName];
+            LLIR::Type *elementType = structElementTypeTable[strTypeName][index];
             
-            builder->createStructStore(strType, ptr, index, val);
+            if (std::find(structArgs.begin(), structArgs.end(), sa->getName()) != structArgs.end()) {
+                LLIR::PointerType *strPtrType = new LLIR::PointerType(strType);
+                LLIR::PointerType *elementPtrType = new LLIR::PointerType(elementType);
+                
+                ptr = builder->createLoad(strPtrType, ptr);
+                LLIR::Operand *ep = builder->createGEP(elementPtrType, ptr, new LLIR::Imm(index));
+                builder->createStore(elementType, val, ep);
+            } else {
+                builder->createStructStore(strType, ptr, index, val);
+            }
             //builder->CreateStore(val, structPtr);
         } break;
         
@@ -279,7 +289,7 @@ LLIR::Operand *Compiler::compileValue(AstExpression *expr, DataType dataType, LL
                 LLIR::Operand *ep = builder->createGEP(elementPtrType, ptr, new LLIR::Imm(pos));
                 return builder->createLoad(elementType, ep);
             } else {
-            return builder->createStructLoad(strType, ptr, pos);
+                return builder->createStructLoad(strType, ptr, pos);
             }
         } break;
         

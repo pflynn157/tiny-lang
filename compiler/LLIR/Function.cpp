@@ -16,6 +16,7 @@ void Compiler::compileFunction(AstGlobalStatement *global) {
     typeTable.clear();
     ptrTable.clear();
     structVarTable.clear();
+    structArgs.clear();
     
     AstFunction *astFunc = static_cast<AstFunction *>(global);
 

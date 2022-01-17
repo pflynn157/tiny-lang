@@ -20,21 +20,22 @@ func printStruct(s:S1) is
     println("Y: %d", s.y);
 end
 
-#func updateStruct(s:S1) is
-#    s.x := 25;
-#    s.y := 35;
-#end
+func updateStruct(s:S1) is
+    s.x := 25;
+    s.y := 35;
+end
 
 func main -> i32 is
     #var nums : i32[10];
     #var x : i32 := nums[1];
 
     struct s : S1;
+    s.x := 30;
     
     println("Before:");
     printStruct(s);
     
-    #updateStruct(s);
+    updateStruct(s);
     
     println("After:");
     printStruct(s);
