@@ -23,8 +23,8 @@ void Compiler::compileFunction(AstGlobalStatement *global) {
     std::vector<Var> astVarArgs = astFunc->getArguments();
     LLIR::Type *funcType = translateType(astFunc->getDataType(), astFunc->getPtrType(), astFunc->getDataTypeName());
     currentFuncType = astFunc->getDataType();
-    //if (currentFuncType == DataType::Struct)
-        //funcTypeStruct = astFunc->getDataTypeName();
+    if (currentFuncType == DataType::Struct)
+        funcTypeStruct = astFunc->getDataTypeName();
     
     std::vector<LLIR::Type *> args;
     if (astVarArgs.size() > 0) {
@@ -152,13 +152,13 @@ void Compiler::compileReturnStatement(AstStatement *stmt) {
     if (stmt->getExpressionCount() == 1) {
         LLIR::Operand *op = compileValue(stmt->getExpressions().at(0), currentFuncType);
         LLIR::Type *type = translateType(currentFuncType);
-        /*if (currentFuncType == DataType::Struct) {
-            StructType *type = structTable[funcTypeStruct];
-            Value *ld = builder->CreateLoad(type, val);
-            builder->CreateRet(ld);
-        } else {*/
+        if (currentFuncType == DataType::Struct) {
+            LLIR::StructType *type = structTable[funcTypeStruct];
+           // LLIR::Operand *ld = builder->createLoad(type, op);
             builder->createRet(type, op);
-        //}
+        } else {
+            builder->createRet(type, op);
+        }
     } else {
         builder->createRetVoid();
     }

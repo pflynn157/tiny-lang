@@ -77,6 +77,15 @@ void Compiler::compileStatement(AstStatement *stmt) {
             AstStructDec *sd = static_cast<AstStructDec *>(stmt);
             LLIR::StructType *type = structTable[sd->getStructName()];
             
+            if (sd->isNoInit()) {
+                LLIR::PointerType *typePtr = new LLIR::PointerType(type);
+                LLIR::Reg *alloca = builder->createAlloca(typePtr);
+                symtable[sd->getVarName()] = alloca;
+                typeTable[sd->getVarName()] = DataType::Ptr;
+                ptrTable[sd->getVarName()] = DataType::Struct;
+                structVarTable[sd->getVarName()] = sd->getStructName();
+                structArgs.push_back(sd->getVarName());            // This is a hack
+            } else {
             LLIR::Reg *var = builder->createAlloca(type);
             symtable[sd->getVarName()] = var;
             typeTable[sd->getVarName()] = DataType::Struct;
@@ -92,7 +101,7 @@ void Compiler::compileStatement(AstStatement *stmt) {
             if (str == nullptr) return;
             
             // Init the elements
-            if (!sd->isNoInit()) {
+            //if (!sd->isNoInit()) {
                 int index = 0;
                 for (Var member : str->getItems()) {
                     AstExpression *defaultExpr = str->getDefaultExpression(member.name);
@@ -102,6 +111,7 @@ void Compiler::compileStatement(AstStatement *stmt) {
                     
                     ++index;
                }
+            //}
             }
         } break;
         
@@ -111,7 +121,12 @@ void Compiler::compileStatement(AstStatement *stmt) {
             LLIR::Reg *ptr = symtable[va->getName()];
             DataType ptrType = typeTable[va->getName()];
             LLIR::Operand *val = compileValue(stmt->getExpressions().at(0), ptrType);
+            
             LLIR::Type *type = translateType(ptrType);
+            if (ptrType == DataType::Struct) {
+                std::string strTypeName = structVarTable[va->getName()];
+                type = structTable[strTypeName];
+            }
             
             builder->createStore(type, val, ptr);
         } break;
@@ -235,6 +250,13 @@ LLIR::Operand *Compiler::compileValue(AstExpression *expr, DataType dataType, LL
             AstID *id = static_cast<AstID *>(expr);
             LLIR::Reg *ptr = symtable[id->getValue()];
             LLIR::Type *type = translateType(typeTable[id->getValue()], ptrTable[id->getValue()]);
+                        
+            if (typeTable[id->getValue()] == DataType::Ptr && ptrTable[id->getValue()] == DataType::Struct) {
+                /*std::string strTypeName = structVarTable[id->getValue()];
+                LLIR::StructType *strType = structTable[strTypeName];
+                type = new LLIR::PointerType(strType);*/
+                return ptr;
+            }
             
             if (typeTable[id->getValue()] == DataType::Struct) return ptr;
             return builder->createLoad(type, ptr);

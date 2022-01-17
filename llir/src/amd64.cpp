@@ -112,6 +112,8 @@ void Amd64Writer::compileInstruction(Instruction *instr, std::string prefix) {
                 case DataType::I8: dest = new X86Reg8(X86Reg::AX); break;
                 case DataType::I16: dest = new X86Reg16(X86Reg::AX); break;
                 case DataType::I32: dest = new X86Reg32(X86Reg::AX); break;
+                case DataType::Struct:
+                case DataType::Ptr:
                 case DataType::I64: dest = new X86Reg64(X86Reg::AX); break;
                 
                 default: {}
