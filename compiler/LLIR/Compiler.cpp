@@ -245,6 +245,12 @@ LLIR::Operand *Compiler::compileValue(AstExpression *expr, DataType dataType, LL
                 Value *arrayPtr = builder->CreateLoad(strPtrType, ptr);
                 Value *ep = builder->CreateGEP(i8Type, arrayPtr, index);
                 return builder->CreateLoad(i8Type, ep);*/
+                LLIR::PointerType *strPtrType = LLIR::PointerType::createI8PtrType();
+                LLIR::Type *i8Type = LLIR::Type::createI8Type();
+                
+                LLIR::Operand *ptrLd = builder->createLoad(strPtrType, ptr);
+                LLIR::Operand *ep = builder->createGEP(strPtrType, ptrLd, index);
+                return builder->createLoad(i8Type, ep);
             } else {
                 DataType subType = ptrTable[acc->getValue()];
                 LLIR::Type *arrayPtrType = translateType(ptrType, subType);
