@@ -82,8 +82,8 @@ void Amd64Writer::compile() {
             stackImm->setValue(16);
         } else {
             int i = 16;
-            for (; i < (stackPos + 4); i += 8) {}
-            i += 8;
+            for (; i < (stackPos + 4); i += 16) {}
+            i += 16;
             stackImm->setValue(i);
         }
         stackPos = 0;

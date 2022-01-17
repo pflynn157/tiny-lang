@@ -63,8 +63,8 @@ run_test 'test/cond/*.tl' 'sys' $flags
 run_test 'test/loop/*.tl' 'sys' $flags
 run_test 'test/array/*.tl' 'sys' $flags
 run_test 'test/func/*.tl' 'sys' $flags
-run_test 'test/struct/*.tl' 'sys' $flags
 run_test 'test/str/*.tl' 'sys' $flags
+run_test 'test/struct/*.tl' 'sys' $flags
 
 echo ""
 echo "$test_count tests passed successfully."
