@@ -61,6 +61,8 @@ void Module::transform() {
         regCount = 0;
         argMap.clear();
         argCount = 0;
+        ptrMap.clear();
+        ptrCount = 0;
         
         for (int i = 0; i<func->getBlockCount(); i++) {
             Block *block = func->getBlock(i);

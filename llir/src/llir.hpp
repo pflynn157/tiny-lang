@@ -163,10 +163,10 @@ public:
     }
     
     void addInstruction(Instruction *i) { instrs.push_back(i); }
-    void setPosition(int pos) { this->pos = pos; }
+    void setID(int id) { this->id = id; }
     
     std::string getName() { return name; }
-    int getPosition() { return pos; }
+    int getID() { return id; }
     
     int getInstrCount() { return instrs.size(); }
     Instruction *getInstruction(int pos) { return instrs.at(pos); }
@@ -175,7 +175,7 @@ public:
 private:
     std::string name = "";
     std::vector<Instruction *> instrs;
-    int pos = 0;
+    int id = 0;
 };
 
 //
@@ -210,14 +210,19 @@ public:
     }
     
     void addBlock(Block *block) {
+        block->setID(blockID);
+        ++blockID;
         blocks.push_back(block);
-        block->setPosition(blocks.size() - 1);
     }
     
     void addBlockAfter(Block *block, Block *newBlock) {
-        int pos = block->getPosition();
-        blocks.insert(blocks.begin() + pos + 1, newBlock);
-        newBlock->setPosition(pos + 1);
+        for (int i = 0; i<blocks.size(); i++) {
+            if (block->getID() == blocks.at(i)->getID()) {
+                blocks.insert(blocks.begin() + i + 1, newBlock);
+                newBlock->setID(blockID);
+                ++blockID;
+            }
+        }
     }
     
     void setStackSize(int size) { stackSize = size; }
@@ -242,6 +247,7 @@ private:
     std::vector<Type *> args;
     std::vector<Reg *> varRegs;
     int stackSize = 0;
+    int blockID = 1;
 };
 
 //
