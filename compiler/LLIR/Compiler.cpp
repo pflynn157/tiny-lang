@@ -84,24 +84,23 @@ void Compiler::compileStatement(AstStatement *stmt) {
                 typeTable[sd->getVarName()] = DataType::Ptr;
                 ptrTable[sd->getVarName()] = DataType::Struct;
                 structVarTable[sd->getVarName()] = sd->getStructName();
-                structArgs.push_back(sd->getVarName());            // This is a hack
+                structArgs.push_back(sd->getVarName());            // This is a hack. Aka, it sucks
             } else {
-            LLIR::Reg *var = builder->createAlloca(type);
-            symtable[sd->getVarName()] = var;
-            typeTable[sd->getVarName()] = DataType::Struct;
-            structVarTable[sd->getVarName()] = sd->getStructName();
-            
-            AstStruct *str = nullptr;
-            for (AstStruct *s : tree->getStructs()) {
-                if (s->getName() == sd->getStructName()) {
-                    str = s;
-                    break;
+                LLIR::Reg *var = builder->createAlloca(type);
+                symtable[sd->getVarName()] = var;
+                typeTable[sd->getVarName()] = DataType::Struct;
+                structVarTable[sd->getVarName()] = sd->getStructName();
+                
+                AstStruct *str = nullptr;
+                for (AstStruct *s : tree->getStructs()) {
+                    if (s->getName() == sd->getStructName()) {
+                        str = s;
+                        break;
+                    }
                 }
-            }
-            if (str == nullptr) return;
-            
-            // Init the elements
-            //if (!sd->isNoInit()) {
+                if (str == nullptr) return;
+                
+                // Init the elements
                 int index = 0;
                 for (Var member : str->getItems()) {
                     AstExpression *defaultExpr = str->getDefaultExpression(member.name);
@@ -111,7 +110,6 @@ void Compiler::compileStatement(AstStatement *stmt) {
                     
                     ++index;
                }
-            //}
             }
         } break;
         
@@ -252,9 +250,6 @@ LLIR::Operand *Compiler::compileValue(AstExpression *expr, DataType dataType, LL
             LLIR::Type *type = translateType(typeTable[id->getValue()], ptrTable[id->getValue()]);
                         
             if (typeTable[id->getValue()] == DataType::Ptr && ptrTable[id->getValue()] == DataType::Struct) {
-                /*std::string strTypeName = structVarTable[id->getValue()];
-                LLIR::StructType *strType = structTable[strTypeName];
-                type = new LLIR::PointerType(strType);*/
                 return ptr;
             }
             
@@ -269,12 +264,6 @@ LLIR::Operand *Compiler::compileValue(AstExpression *expr, DataType dataType, LL
             LLIR::Operand *index = compileValue(acc->getIndex());
             
             if (ptrType == DataType::String) {
-                /*PointerType *strPtrType = Type::getInt8PtrTy(*context);
-                Type *i8Type = Type::getInt8Ty(*context);
-                
-                Value *arrayPtr = builder->CreateLoad(strPtrType, ptr);
-                Value *ep = builder->CreateGEP(i8Type, arrayPtr, index);
-                return builder->CreateLoad(i8Type, ep);*/
                 LLIR::PointerType *strPtrType = LLIR::PointerType::createI8PtrType();
                 LLIR::Type *i8Type = LLIR::Type::createI8Type();
                 
@@ -300,9 +289,7 @@ LLIR::Operand *Compiler::compileValue(AstExpression *expr, DataType dataType, LL
             std::string strTypeName = structVarTable[sa->getName()];
             LLIR::StructType *strType = structTable[strTypeName];
             LLIR::Type *elementType = structElementTypeTable[strTypeName][pos];
-
-            //LLIR *ep = builder->CreateStructGEP(strType, ptr, pos);
-            //return builder->CreateLoad(elementType, ep);
+            
             if (std::find(structArgs.begin(), structArgs.end(), sa->getName()) != structArgs.end()) {
                 LLIR::PointerType *strPtrType = new LLIR::PointerType(strType);
                 LLIR::PointerType *elementPtrType = new LLIR::PointerType(elementType);
@@ -403,9 +390,6 @@ LLIR::Operand *Compiler::compileValue(AstExpression *expr, DataType dataType, LL
                 args.push_back(rval);
             
                 if (op->getType() == AstType::EQ || op->getType() == AstType::NEQ) {
-                    //Function *strcmp = mod->getFunction("stringcmp");
-                    //if (!strcmp) std::cerr << "Error: Corelib function \"stringcmp\" not found." << std::endl;
-                    //Value *strcmpCall = builder->CreateCall(strcmp, args);
                     LLIR::Operand *strcmpCall = builder->createCall(LLIR::Type::createI32Type(), "stringcmp", args);
                     
                     int cmpVal = 0;
@@ -415,14 +399,8 @@ LLIR::Operand *Compiler::compileValue(AstExpression *expr, DataType dataType, LL
                     return builder->createBeq(LLIR::Type::createI32Type(), strcmpCall, cmpValue, destBlock);
                 } else if (op->getType() == AstType::Add) {
                     if (rvalStr) {
-                        //Function *callee = mod->getFunction("strcat_str");
-                        //if (!callee) std::cerr << "Error: corelib function \"strcat_str\" not found." << std::endl;
-                        //return builder->CreateCall(callee, args);
                         return builder->createCall(LLIR::PointerType::createI8PtrType(), "strcat_str", args);
                     } else {
-                        //Function *callee = mod->getFunction("strcat_char");
-                        //if (!callee) std::cerr << "Error: corelib function \"strcat_char\" not found." << std::endl;
-                        //return builder->CreateCall(callee, args);
                         return builder->createCall(LLIR::PointerType::createI8PtrType(), "strcat_char", args);
                     }
                 } else {

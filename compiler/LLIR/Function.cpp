@@ -51,12 +51,10 @@ void Compiler::compileFunction(AstGlobalStatement *global) {
             Var var = astVarArgs.at(i);
             
             // Build the alloca for the local var
-            //LLIR::Type *type = translateType(var.type, var.subType, var.typeName);
             LLIR::Type *type = args.at(i);
             // TODO: Combine this with below
             if (var.type == DataType::Struct) {
                 LLIR::Reg *alloca = builder->createAlloca(type);
-               // symtable[var.name] = func->getArg(i);
                 symtable[var.name] = alloca;
                 typeTable[var.name] = DataType::Ptr;
                 ptrTable[var.name] = var.type;
@@ -91,32 +89,12 @@ void Compiler::compileExternFunction(AstGlobalStatement *global) {
     AstExternFunction *astFunc = static_cast<AstExternFunction *>(global);
     
     std::vector<Var> astVarArgs = astFunc->getArguments();
-    /*FunctionType *FT;
-    
-    Type *retType = translateType(astFunc->getDataType());
-    
-    if (astVarArgs.size() == 0) {
-        FT = FunctionType::get(retType, astFunc->isVarArgs());
-    } else {
-        std::vector<Type *> args;
-        for (auto var : astVarArgs) {
-            Type *type = translateType(var.type, var.subType);
-            args.push_back(type);
-        }
-        
-        FT = FunctionType::get(retType, args, astFunc->isVarArgs());
-    }
-    
-    Function::Create(FT, Function::ExternalLinkage, astFunc->getName(), mod.get());*/
     LLIR::Type *funcType = translateType(astFunc->getDataType());
     
     std::vector<LLIR::Type *> args;
     if (astVarArgs.size() > 0) {
         for (auto var : astVarArgs) {
             LLIR::Type *type = translateType(var.type, var.subType, var.typeName);
-            //if (var.type == DataType::Struct) {
-            //    type = PointerType::getUnqual(type);
-            //}
             args.push_back(type);
         }
     }
@@ -129,8 +107,6 @@ void Compiler::compileExternFunction(AstGlobalStatement *global) {
 //
 // Compiles a function call statement
 // This is different from an expression; this is where its a free-standing statement
-//
-// // TODO: We should not do error handeling in the compiler. Check for invalid functions in the AST level
 //
 void Compiler::compileFuncCallStatement(AstStatement *stmt) {
     AstFuncCallStmt *fc = static_cast<AstFuncCallStmt *>(stmt);
@@ -154,7 +130,6 @@ void Compiler::compileReturnStatement(AstStatement *stmt) {
         LLIR::Type *type = translateType(currentFuncType);
         if (currentFuncType == DataType::Struct) {
             LLIR::StructType *type = structTable[funcTypeStruct];
-           // LLIR::Operand *ld = builder->createLoad(type, op);
             builder->createRet(type, op);
         } else {
             builder->createRet(type, op);
