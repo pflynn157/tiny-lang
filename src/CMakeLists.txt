@@ -12,7 +12,7 @@ target_link_libraries(tlc
     tlcompiler_llvm
 )
 
-if (EXISTS "${CMAKE_SOURCE_DIR}/llir" AND IS_DIRECTORY "${CMAKE_SOURCE_DIR}/llir")
+if (LLIR)
     add_executable(tlc2 llir_main.cpp)
     
     target_link_libraries(tlc2
