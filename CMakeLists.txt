@@ -11,9 +11,13 @@ include_directories(${LLVM_INCLUDE_DIRS})
 separate_arguments(LLVM_DEFINITIONS_LIST NATIVE_COMMAND ${LLVM_DEFINITIONS})
 add_definitions(${LLVM_DEFINITIONS})
 
-add_subdirectory(llir)
+if (EXISTS "${CMAKE_SOURCE_DIR}/llir" AND IS_DIRECTORY "${CMAKE_SOURCE_DIR}/llir")
+    add_subdirectory(llir)
+    add_subdirectory(compiler/LLIR)
+endif()
+
 add_subdirectory(frontend)
-add_subdirectory(compiler)
+add_subdirectory(compiler/LLVM)
 add_subdirectory(src)
 add_subdirectory(lib)
 
