@@ -62,6 +62,12 @@ end
 
 The compiler is completely written in C++ and uses only the standard library and LLVM. The lexer, parser, and AST (the frontend) is written from scratch. The backend uses LLVM for simplicity.
 
+### Submodule Note
+
+You may notice several Git commits mentioning LLIR, and you likely have noticed the LLIR submodule. This is a new compiler backend that I have been working on as an alternative to LLVM (the LLVM backend will not be going anywhere; this is to show how TinyLang can use different backends, and to provide me with a practical and more useful way to test LLIR).
+
+LLIR is still very alpha at this point, so it's in a private Gitlab repo at the moment. I'll make it public once its more stable. CMake will not build it by default.
+
 ### License
 
 This program is licensed under the BSD-3 License.
