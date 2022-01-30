@@ -32,8 +32,6 @@ enum TokenType {
     Break,
     Continue,
     Import,
-    Enum,
-    Of,
     
     // Datatype Keywords
     Bool,

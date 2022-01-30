@@ -219,14 +219,3 @@ bool Parser::buildStructAssign(AstBlock *block, Token idToken) {
     return true;
 }
 
-//
-// Enum section
-//
-
-// Parses and builds an enum
-bool Parser::buildEnum() {
-    
-
-    return true;
-}
-

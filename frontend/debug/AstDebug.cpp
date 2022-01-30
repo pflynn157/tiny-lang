@@ -32,7 +32,6 @@ void AstTree::print() {
     std::cout << std::endl;
     
     for (auto str : structs) str->print();
-    for (auto enm : enums) enm->print();
     
     for (auto stmt : global_statements) {
         stmt->print();
@@ -75,15 +74,6 @@ void AstFunction::print() {
         }
     }
     std::cout << std::endl;
-}
-
-void AstEnum::print() {
-    std::cout << "ENUM " << name << " of " << printDataType(type);
-    std::cout << std::endl;
-    for (auto var : values) {
-        std::cout << "    ";
-        std::cout << var.name << std::endl;
-    }
 }
 
 void AstStruct::print() {

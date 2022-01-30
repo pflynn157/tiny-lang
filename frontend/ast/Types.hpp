@@ -107,27 +107,6 @@ private:
     std::vector<AstStatement *> block;
 };
 
-// Represents an enum
-class AstEnum {
-public:
-    explicit AstEnum(std::string name, DataType type = DataType::I32) {
-        this->name = name;
-        this->type = type;
-    }
-    
-    void addValue(Var v) { values.push_back(v); }
-    
-    std::string getName() { return name; }
-    DataType getType() { return type; }
-    std::vector<Var> getValues() { return values; }
-    
-    void print();
-private:
-    std::string name = "";
-    DataType type = DataType::I32;
-    std::vector<Var> values;
-};
-
 // Represents a struct
 class AstStruct {
 public:

@@ -246,8 +246,6 @@ TokenType Scanner::getKeyword() {
     else if (buffer == "false") return False;
     else if (buffer == "and") return Logical_And;
     else if (buffer == "or") return Logical_Or;
-    else if (buffer == "enum") return Enum;
-    else if (buffer == "of") return Of;
     return EmptyToken;
 }
 
