@@ -1,7 +1,7 @@
 //
-// Copyright 2021 Patrick Flynn
-// This file is part of the Tiny Lang compiler.
-// Tiny Lang is licensed under the BSD-3 license. See the COPYING file for more information.
+// Copyright 2022 Patrick Flynn
+// This file is part of the Eos compiler.
+// Eos is licensed under the BSD-3 license. See the COPYING file for more information.
 //
 #include <iostream>
 #include <string>
@@ -70,7 +70,9 @@ bool Parser::buildVariableDec(AstBlock *block) {
     // We have an array
     if (token.type == LBracket) {
         AstVarDec *empty = new AstVarDec("", DataType::Ptr);
-        if (!buildExpression(empty, DataType::I32, RBracket)) return false;   
+        AstExpression *arg = buildExpression(DataType::I32, RBracket);
+        if (!arg) return false;
+        empty->setExpression(arg); 
         
         token = scanner->getNext();
         if (token.type != SemiColon) {
@@ -82,7 +84,7 @@ bool Parser::buildVariableDec(AstBlock *block) {
             vars.push_back(name);
             AstVarDec *vd = new AstVarDec(name, DataType::Ptr);
             block->addStatement(vd);
-            vd->addExpression(empty->getExpression());
+            vd->setExpression(empty->getExpression());
             vd->setPtrType(dataType);
             
             // Create an assignment to a malloc call
@@ -92,13 +94,16 @@ bool Parser::buildVariableDec(AstBlock *block) {
             block->addStatement(va);
             
             AstFuncCallExpr *callMalloc = new AstFuncCallExpr("malloc");
-            callMalloc->setArguments(vd->getExpressions());
-            va->addExpression(callMalloc);
+            //callMalloc->setArguments(vd->getExpressions());
+            
+            va->setExpression(callMalloc);
             
             // In order to get a proper malloc, we need to multiply the argument by
             // the size of the type. Get the arguments, and do that
-            AstExpression *arg = callMalloc->getArguments().at(0);
-            callMalloc->clearArguments();
+            ///AstExpression *arg = callMalloc->getArguments().at(0);
+            ///callMalloc->clearArguments();
+            AstExprList *list = new AstExprList;
+            callMalloc->setArgExpression(list);
             
             AstI32 *size;
             if (dataType == DataType::I32 | dataType == DataType::U32) size = new AstI32(4);
@@ -108,11 +113,12 @@ bool Parser::buildVariableDec(AstBlock *block) {
             
             AstMulOp *op = new AstMulOp;
             op->setLVal(size);
-            op->setRVal(arg);
-            callMalloc->addArgument(op);
+            op->setRVal(vd->getExpression());
+            //callMalloc->addArgument(op);
+            list->addExpression(op);
             
             // Finally, set the size of the declaration
-            vd->setPtrSize(arg);
+            vd->setPtrSize(vd->getExpression());
             
             typeMap[name] = std::pair<DataType, DataType>(DataType::Ptr, dataType);
         }
@@ -124,8 +130,8 @@ bool Parser::buildVariableDec(AstBlock *block) {
         
     // Otherwise, we have a regular variable
     } else {
-        AstVarAssign *empty = new AstVarAssign("");
-        if (!buildExpression(empty, dataType)) return false;
+        AstExpression *arg = buildExpression(dataType);
+        if (!arg) return false;
     
         for (std::string name : toDeclare) {
             vars.push_back(name);
@@ -137,7 +143,7 @@ bool Parser::buildVariableDec(AstBlock *block) {
     
             AstVarAssign *va = new AstVarAssign(name);
             va->setDataType(dataType);
-            va->addExpression(empty->getExpression());
+            va->setExpression(arg);
             block->addStatement(va);
         }
     }
@@ -152,9 +158,11 @@ bool Parser::buildVariableAssign(AstBlock *block, Token idToken) {
     va->setDataType(dataType);
     block->addStatement(va);
     
-    if (!buildExpression(va, dataType)) return false;
+    AstExpression *arg = buildExpression(dataType);
+    if (!arg) return false;
+    va->setExpression(arg);
     
-    if (va->getExpressionCount() == 0) {
+    if (!va->hasExpression()) {
         syntax->addError(scanner->getLine(), "Invalid variable assignment.");
         return false;
     }
@@ -170,7 +178,9 @@ bool Parser::buildArrayAssign(AstBlock *block, Token idToken) {
     pa->setPtrType(dataType);
     block->addStatement(pa);
     
-    if (!buildExpression(pa, DataType::I32, RBracket)) return false;
+    AstExpression *arg = buildExpression(DataType::I32, RBracket);
+    if (!arg) return false;
+    pa->setIndex(arg);
     
     Token token = scanner->getNext();
     if (token.type != Assign) {
@@ -178,7 +188,9 @@ bool Parser::buildArrayAssign(AstBlock *block, Token idToken) {
         return false;
     }
     
-    if (!buildExpression(pa, dataType)) return false;
+    arg = buildExpression(dataType);
+    if (!arg) return false;
+    pa->setExpression(arg);
 
     return true;
 }
@@ -232,8 +244,8 @@ bool Parser::buildConst(bool isGlobal) {
     }
     
     // Build the expression. We create a dummy statement for this
-    AstExpression *expr = nullptr;
-    if (!buildExpression(nullptr, dataType, SemiColon, EmptyToken, &expr, true)) return false;
+    AstExpression *expr = buildExpression(dataType, SemiColon, true);
+    if (!expr) return false;
     
     // Put it all together
     if (isGlobal) {

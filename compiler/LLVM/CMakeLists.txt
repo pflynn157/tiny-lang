@@ -6,6 +6,7 @@ set(SRC
     Compiler.cpp
     Flow.cpp
     Function.cpp
+    Variable.cpp
 )
 
 add_library(tlcompiler_llvm STATIC ${SRC})

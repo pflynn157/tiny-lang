@@ -1,7 +1,7 @@
 //
-// Copyright 2021 Patrick Flynn
-// This file is part of the Tiny Lang compiler.
-// Tiny Lang is licensed under the BSD-3 license. See the COPYING file for more information.
+// Copyright 2022 Patrick Flynn
+// This file is part of the Eos compiler.
+// Eos is licensed under the BSD-3 license. See the COPYING file for more information.
 //
 #include <parser/Parser.hpp>
 #include <ast.hpp>
@@ -37,13 +37,6 @@ AstExpression *Parser::checkCondExpression(AstExpression *toCheck) {
             expr = eq;
         } break;
         
-        case AstType::I32L: {
-            AstEQOp *eq = new AstEQOp;
-            eq->setLVal(expr);
-            eq->setRVal(new AstI32(1));
-            expr = eq;
-        } break;
-        
         default: {}
     }
     
@@ -53,12 +46,13 @@ AstExpression *Parser::checkCondExpression(AstExpression *toCheck) {
 // Builds a conditional statement
 bool Parser::buildConditional(AstBlock *block) {
     AstIfStmt *cond = new AstIfStmt;
-    if (!buildExpression(cond, DataType::Void, Then)) return false;
+    AstExpression *arg = buildExpression(DataType::Void, Then);
+    if (!arg) return false;
+    cond->setExpression(arg);
     block->addStatement(cond);
     
-    AstExpression *expr = checkCondExpression(cond->getExpressions().at(0));
-    cond->clearExpressions();
-    cond->addExpression(expr);
+    AstExpression *expr = checkCondExpression(cond->getExpression());
+    cond->setExpression(expr);
 
     ++layer;
     buildBlock(cond->getBlockStmt(), layer, cond);
@@ -69,12 +63,13 @@ bool Parser::buildConditional(AstBlock *block) {
 // Builds an ELIF statement
 bool Parser::buildElif(AstIfStmt *block) {
     AstElifStmt *elif = new AstElifStmt;
-    if (!buildExpression(elif, DataType::Void, Then)) return false;
+    AstExpression *arg = buildExpression(DataType::Void, Then);
+    if (!arg) return false;
+    elif->setExpression(arg);
     block->addBranch(elif);
     
-    AstExpression *expr = checkCondExpression(elif->getExpressions().at(0));
-    elif->clearExpressions();
-    elif->addExpression(expr);
+    AstExpression *expr = checkCondExpression(elif->getExpression());
+    elif->setExpression(expr);
     
     buildBlock(elif->getBlockStmt(), layer, block, true);
     return true;
@@ -92,12 +87,13 @@ bool Parser::buildElse(AstIfStmt *block) {
 // Builds a while statement
 bool Parser::buildWhile(AstBlock *block) {
     AstWhileStmt *loop = new AstWhileStmt;
-    if (!buildExpression(loop, DataType::Void, Do)) return false;
+    AstExpression *arg = buildExpression(DataType::Void, Do);
+    if (!arg) return false;
+    loop->setExpression(arg);
     block->addStatement(loop);
     
-    AstExpression *expr = checkCondExpression(loop->getExpressions().at(0));
-    loop->clearExpressions();
-    loop->addExpression(expr);
+    AstExpression *expr = checkCondExpression(loop->getExpression());
+    loop->setExpression(expr);
     
     ++layer;
     buildBlock(loop->getBlockStmt(), layer);

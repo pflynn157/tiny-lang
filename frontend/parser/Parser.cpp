@@ -1,7 +1,7 @@
 //
-// Copyright 2021 Patrick Flynn
-// This file is part of the Tiny Lang compiler.
-// Tiny Lang is licensed under the BSD-3 license. See the COPYING file for more information.
+// Copyright 2022 Patrick Flynn
+// This file is part of the Eos compiler.
+// Eos is licensed under the BSD-3 license. See the COPYING file for more information.
 //
 #include <iostream>
 #include <algorithm>
@@ -19,7 +19,7 @@ Parser::Parser(std::string input) {
     //string malloc(string)
     funcs.push_back("malloc");
     AstExternFunction *FT1 = new AstExternFunction("malloc");
-    FT1->addArgument(Var(DataType::String));
+    FT1->addArgument(Var(DataType::I32));
     FT1->setDataType(DataType::String);
     tree->addGlobalStatement(FT1);
     
@@ -90,6 +90,7 @@ bool Parser::parse() {
             
             case Const: code = buildConst(true); break;
             case Struct: code = buildStruct(); break;
+            case Enum: code = buildEnum(); break;
             
             case Eof:
             case Nl: break;

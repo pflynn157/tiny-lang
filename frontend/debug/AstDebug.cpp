@@ -1,7 +1,7 @@
 //
-// Copyright 2021 Patrick Flynn
-// This file is part of the Tiny Lang compiler.
-// Tiny Lang is licensed under the BSD-3 license. See the COPYING file for more information.
+// Copyright 2022 Patrick Flynn
+// This file is part of the Eos compiler.
+// Eos is licensed under the BSD-3 license. See the COPYING file for more information.
 //
 #include <iostream>
 
@@ -32,6 +32,7 @@ void AstTree::print() {
     std::cout << std::endl;
     
     for (auto str : structs) str->print();
+    for (auto enm : enums) enm->print();
     
     for (auto stmt : global_statements) {
         stmt->print();
@@ -67,15 +68,22 @@ void AstFunction::print() {
     
     for (auto stmt : block->getBlock()) {
         stmt->print();
-        if (stmt->getExpressionCount()) {
-            for (auto expr : stmt->getExpressions()) {
-                for (int i = 0; i<8; i++) std::cout << " ";
-                expr->print();
-            }
+        if (stmt->hasExpression()) {
+            for (int i = 0; i<8; i++) std::cout << " ";
+                stmt->getExpression()->print();
             std::cout << std::endl;
         }
     }
     std::cout << std::endl;
+}
+
+void AstEnum::print() {
+    std::cout << "ENUM " << name << " of " << printDataType(type);
+    std::cout << std::endl;
+    for (auto var : values) {
+        std::cout << "    ";
+        std::cout << var.name << std::endl;
+    }
 }
 
 void AstStruct::print() {
@@ -138,7 +146,9 @@ void AstVarAssign::print() {
 
 void AstArrayAssign::print() {
     std::cout << "    ";
-    std::cout << "ARR= " << name;
+    std::cout << "ARR[";
+    index->print();
+    std::cout << "]= " << name;
     std::cout << std::endl;
 }
 
@@ -155,11 +165,9 @@ void AstIfStmt::print() {
     std::cout << "=========================" << std::endl;
     for (auto stmt : block->getBlock()) {
         stmt->print();
-        if (stmt->getExpressionCount()) {
-            for (auto expr : stmt->getExpressions()) {
-                for (int i = 0; i<8; i++) std::cout << " ";
-                expr->print();
-            }
+        if (stmt->hasExpression()) {
+            for (int i = 0; i<8; i++) std::cout << " ";
+                stmt->getExpression()->print();
             std::cout << std::endl;
         }
     }
@@ -168,11 +176,9 @@ void AstIfStmt::print() {
     
     for (auto stmt : branches) {
         stmt->print();
-        if (stmt->getExpressionCount()) {
-            for (auto expr : stmt->getExpressions()) {
-                for (int i = 0; i<8; i++) std::cout << " ";
-                expr->print();
-            }
+        if (stmt->hasExpression()) {
+            for (int i = 0; i<8; i++) std::cout << " ";
+                stmt->getExpression()->print();
             std::cout << std::endl;
         }
     }
@@ -187,11 +193,9 @@ void AstElifStmt::print() {
     std::cout << "-------------------------" << std::endl;
     for (auto stmt : block->getBlock()) {
         stmt->print();
-        if (stmt->getExpressionCount()) {
-            for (auto expr : stmt->getExpressions()) {
-                for (int i = 0; i<8; i++) std::cout << " ";
-                expr->print();
-            }
+        if (stmt->hasExpression()) {
+            for (int i = 0; i<8; i++) std::cout << " ";
+                stmt->getExpression()->print();
             std::cout << std::endl;
         }
     }
@@ -205,11 +209,9 @@ void AstElseStmt::print() {
     std::cout << "-------------------------" << std::endl;
     for (auto stmt : block->getBlock()) {
         stmt->print();
-        if (stmt->getExpressionCount()) {
-            for (auto expr : stmt->getExpressions()) {
-                for (int i = 0; i<8; i++) std::cout << " ";
-                expr->print();
-            }
+        if (stmt->hasExpression()) {
+            for (int i = 0; i<8; i++) std::cout << " ";
+                stmt->getExpression()->print();
             std::cout << std::endl;
         }
     }
@@ -223,11 +225,9 @@ void AstWhileStmt::print() {
     std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
     for (auto stmt : block->getBlock()) {
         stmt->print();
-        if (stmt->getExpressionCount()) {
-            for (auto expr : stmt->getExpressions()) {
-                for (int i = 0; i<8; i++) std::cout << " ";
-                expr->print();
-            }
+        if (stmt->hasExpression()) {
+            for (int i = 0; i<8; i++) std::cout << " ";
+                stmt->getExpression()->print();
             std::cout << std::endl;
         }
     }
@@ -249,6 +249,15 @@ void AstEnd::print() {
     std::cout << "END";
     
     std::cout << std::endl;
+}
+
+void AstExprList::print() {
+    std::cout << "{";
+    for (auto item : list) {
+        item->print();
+        std::cout << ", ";
+    }
+    std::cout << "}";
 }
 
 void AstNegOp::print() {
@@ -417,10 +426,7 @@ void AstStructAccess::print() {
 
 void AstFuncCallExpr::print() {
     std::cout << name << "(";
-    for (auto arg : args) {
-        arg->print();
-        std::cout << ", ";
-    }
+    expr->print();
     std::cout << ")";
 }
 

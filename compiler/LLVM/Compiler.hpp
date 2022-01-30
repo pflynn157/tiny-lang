@@ -1,7 +1,7 @@
 //
-// Copyright 2021 Patrick Flynn
-// This file is part of the Tiny Lang compiler.
-// Tiny Lang is licensed under the BSD-3 license. See the COPYING file for more information.
+// Copyright 2022 Patrick Flynn
+// This file is part of the Eos compiler.
+// Eos is licensed under the BSD-3 license. See the COPYING file for more information.
 //
 #pragma once
 
@@ -45,6 +45,11 @@ protected:
     // Flow.cpp
     void compileIfStatement(AstStatement *stmt);
     void compileWhileStatement(AstStatement *stmt);
+    
+    // Variable.cpp
+    void compileStructDeclaration(AstStatement *stmt);
+    void compileStructAssign(AstStatement *stmt);
+    Value *compileStructAccess(AstExpression *expr);
 private:
     AstTree *tree;
     CFlags cflags;
@@ -71,5 +76,7 @@ private:
     int blockCount = 0;
     std::stack<BasicBlock *> breakStack;
     std::stack<BasicBlock *> continueStack;
+    std::stack<BasicBlock *> logicalAndStack;
+    std::stack<BasicBlock *> logicalOrStack;
 };
 

@@ -1,7 +1,7 @@
 //
-// Copyright 2021 Patrick Flynn
-// This file is part of the Tiny Lang compiler.
-// Tiny Lang is licensed under the BSD-3 license. See the COPYING file for more information.
+// Copyright 2022 Patrick Flynn
+// This file is part of the Eos compiler.
+// Eos is licensed under the BSD-3 license. See the COPYING file for more information.
 //
 #include <fstream>
 #include <iostream>
@@ -63,7 +63,7 @@ std::string preprocessFile(std::string input, bool print) {
         
         // Load the include path
         // TODO: We need better path support
-        path = "/usr/local/include/tinylang/" + path + ".th";
+        path = "/usr/local/include/eos/" + path + ".eh";
         std::string preprocInclude = preprocessFile(path, false);
         
         std::ifstream reader(preprocInclude.c_str());

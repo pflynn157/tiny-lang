@@ -1,7 +1,7 @@
 //
-// Copyright 2021 Patrick Flynn
-// This file is part of the Tiny Lang compiler.
-// Tiny Lang is licensed under the BSD-3 license. See the COPYING file for more information.
+// Copyright 2022 Patrick Flynn
+// This file is part of the Eos compiler.
+// Eos is licensed under the BSD-3 license. See the COPYING file for more information.
 //
 // Structure.cpp
 // Handles parsing for structs
@@ -80,9 +80,8 @@ bool Parser::buildStructMember(AstStruct *str, Token token) {
     token = scanner->getNext();
         
     if (token.type == LBracket) {
-        AstExpression *expr = nullptr;
-        if (!buildExpression(nullptr, DataType::I32, RBracket, EmptyToken, &expr, true))
-            return false;
+        AstExpression *expr = buildExpression(DataType::I32, RBracket, true);
+        if (!expr) return false;
                 
         token = scanner->getNext();
         if (token.type != SemiColon) {
@@ -98,8 +97,8 @@ bool Parser::buildStructMember(AstStruct *str, Token token) {
         str->addItem(v, expr);
     } else if (token.type == Assign) {
         AstExpression *expr = nullptr;
-        if (!buildExpression(nullptr, dataType, SemiColon, EmptyToken, &expr, true))
-            return false;
+        expr = buildExpression(dataType, SemiColon, true);
+        if (!expr) return false;
                 
         Var v;
         v.name = valName;
@@ -164,7 +163,9 @@ bool Parser::buildStructDec(AstBlock *block) {
     } else if (token.type == Assign) {
         dec->setNoInit(true);
         AstVarAssign *empty = new AstVarAssign(name);
-        if (!buildExpression(empty, DataType::Struct)) return false;
+        AstExpression *arg = buildExpression(DataType::Struct);
+        if (!arg) return false;
+        empty->setExpression(arg);
         block->addStatement(empty);
         
         // TODO: The body should only be a function call expression or an ID
@@ -207,7 +208,9 @@ bool Parser::buildStructAssign(AstBlock *block, Token idToken) {
             }
         }
         
-        if (!buildExpression(sa, memberType)) return false;
+        AstExpression *arg = buildExpression(memberType);
+        if (!arg) return false;
+        sa->setExpression(arg);
     } else {
         syntax->addError(scanner->getLine(), "Invalid structure or class operation.");
         return false;
@@ -215,3 +218,15 @@ bool Parser::buildStructAssign(AstBlock *block, Token idToken) {
     
     return true;
 }
+
+//
+// Enum section
+//
+
+// Parses and builds an enum
+bool Parser::buildEnum() {
+    
+
+    return true;
+}
+

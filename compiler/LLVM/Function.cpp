@@ -1,7 +1,7 @@
 //
-// Copyright 2021 Patrick Flynn
-// This file is part of the Tiny Lang compiler.
-// Tiny Lang is licensed under the BSD-3 license. See the COPYING file for more information.
+// Copyright 2022 Patrick Flynn
+// This file is part of the Eos compiler.
+// Eos is licensed under the BSD-3 license. See the COPYING file for more information.
 //
 #include <iostream>
 
@@ -116,8 +116,13 @@ void Compiler::compileFuncCallStatement(AstStatement *stmt) {
     AstFuncCallStmt *fc = static_cast<AstFuncCallStmt *>(stmt);
     std::vector<Value *> args;
     
-    for (auto stmt : stmt->getExpressions()) {
+    /*for (auto stmt : stmt->getExpressions()) {
         Value *val = compileValue(stmt);
+        args.push_back(val);
+    }*/
+    AstExprList *list = static_cast<AstExprList *>(fc->getExpression());
+    for (auto arg : list->getList()) {
+        Value *val = compileValue(arg);
         args.push_back(val);
     }
     
@@ -131,10 +136,10 @@ void Compiler::compileFuncCallStatement(AstStatement *stmt) {
 // TODO: We may want to rethink this some
 //
 void Compiler::compileReturnStatement(AstStatement *stmt) {
-    if (stmt->getExpressionCount() == 0) {
+    if (!stmt->hasExpression()) {
         builder->CreateRetVoid();
-    } else if (stmt->getExpressionCount() == 1) {
-        Value *val = compileValue(stmt->getExpressions().at(0), currentFuncType);
+    } else if (stmt->hasExpression()) {
+        Value *val = compileValue(stmt->getExpression(), currentFuncType);
         if (currentFuncType == DataType::Struct) {
             StructType *type = structTable[funcTypeStruct];
             Value *ld = builder->CreateLoad(type, val);

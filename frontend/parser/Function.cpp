@@ -1,7 +1,7 @@
 //
-// Copyright 2021 Patrick Flynn
-// This file is part of the Tiny Lang compiler.
-// Tiny Lang is licensed under the BSD-3 license. See the COPYING file for more information.
+// Copyright 2022 Patrick Flynn
+// This file is part of the Eos compiler.
+// Eos is licensed under the BSD-3 license. See the COPYING file for more information.
 //
 #include <iostream>
 
@@ -212,10 +212,10 @@ bool Parser::buildFunction(Token startToken, std::string className) {
     AstType lastType = func->getBlock()->getBlock().back()->getType();
     if (lastType == AstType::Return) {
         AstStatement *ret = func->getBlock()->getBlock().back();
-        if (func->getDataType() == DataType::Void && ret->getExpressionCount() > 0) {
+        if (func->getDataType() == DataType::Void && ret->hasExpression()) {
             syntax->addError(scanner->getLine(), "Cannot return from void function.");
             return false;
-        } else if (ret->getExpressionCount() == 0) {
+        } else if (!ret->hasExpression()) {
             syntax->addError(scanner->getLine(), "Expected return value.");
             return false;
         }
@@ -242,13 +242,9 @@ bool Parser::buildFunctionCallStmt(AstBlock *block, Token idToken) {
     AstFuncCallStmt *fc = new AstFuncCallStmt(idToken.id_val);
     block->addStatement(fc);
     
-    if (!buildExpression(fc, DataType::Void, RParen, Comma)) return false;
-    
-    Token token = scanner->getNext();
-    if (token.type != SemiColon) {
-        syntax->addError(scanner->getLine() - 1, "Expected \';\'.");
-        return false;
-    }
+    AstExpression *args = buildExpression(DataType::Void, SemiColon, false, true);
+    if (!args) return false;
+    fc->setExpression(args);
     
     return true;
 }
@@ -258,7 +254,9 @@ bool Parser::buildReturn(AstBlock *block) {
     AstReturnStmt *stmt = new AstReturnStmt;
     block->addStatement(stmt);
     
-    if (!buildExpression(stmt, DataType::Void)) return false;
+    AstExpression *arg = buildExpression(DataType::Void);
+    if (!arg) return false;
+    stmt->setExpression(arg);
     
     return true;
 }

@@ -1,7 +1,7 @@
 //
-// Copyright 2021 Patrick Flynn
-// This file is part of the Tiny Lang compiler.
-// Tiny Lang is licensed under the BSD-3 license. See the COPYING file for more information.
+// Copyright 2022 Patrick Flynn
+// This file is part of the Eos compiler.
+// Eos is licensed under the BSD-3 license. See the COPYING file for more information.
 //
 #include <LLVM/Compiler.hpp>
 
@@ -13,12 +13,24 @@ void Compiler::compileIfStatement(AstStatement *stmt) {
     BasicBlock *trueBlock = BasicBlock::Create(*context, "true" + std::to_string(blockCount), currentFunc);
     BasicBlock *falseBlock = nullptr;
     BasicBlock *endBlock = BasicBlock::Create(*context, "end" + std::to_string(blockCount), currentFunc);
-    if (hasBranches) falseBlock = BasicBlock::Create(*context, "false" + std::to_string(blockCount), currentFunc);
+    
+    // The break stack pushes are for the logical boolean expressions
+    logicalOrStack.push(trueBlock);
+    if (hasBranches) {
+        falseBlock = BasicBlock::Create(*context, "false" + std::to_string(blockCount), currentFunc);
+        logicalAndStack.push(falseBlock);
+    } else {
+        logicalAndStack.push(endBlock);
+    }
     ++blockCount;
+    
 
-    Value *cond = compileValue(stmt->getExpressions().at(0));
+    Value *cond = compileValue(stmt->getExpression());
     if (hasBranches) builder->CreateCondBr(cond, trueBlock, falseBlock);
     else builder->CreateCondBr(cond, trueBlock, endBlock);
+    
+    logicalAndStack.pop();
+    logicalOrStack.pop();
 
     // Align the blocks
     BasicBlock *current = builder->GetInsertBlock();
@@ -52,14 +64,20 @@ void Compiler::compileIfStatement(AstStatement *stmt) {
             BasicBlock *trueBlock2 = BasicBlock::Create(*context, "true" + std::to_string(blockCount), currentFunc);
             BasicBlock *falseBlock2 = BasicBlock::Create(*context, "false" + std::to_string(blockCount), currentFunc);
             
+            logicalAndStack.push(falseBlock2);
+            logicalOrStack.push(trueBlock2);
+            
             // Align
             if (!hadElif) builder->SetInsertPoint(falseBlock);
             BasicBlock *current = builder->GetInsertBlock();
             trueBlock2->moveAfter(current);
             falseBlock2->moveAfter(trueBlock2);
             
-            Value *cond = compileValue(stmt->getExpressions().at(0));
+            Value *cond = compileValue(stmt->getExpression());
             builder->CreateCondBr(cond, trueBlock2, falseBlock2);
+            
+            logicalAndStack.pop();
+            logicalOrStack.pop();
             
             builder->SetInsertPoint(trueBlock2);
             bool hasBreak = false;
@@ -95,6 +113,7 @@ void Compiler::compileIfStatement(AstStatement *stmt) {
 
     // Start at the end block
     builder->SetInsertPoint(endBlock);
+    
 }
 
 // Translates a while statement to LLVM
@@ -116,7 +135,7 @@ void Compiler::compileWhileStatement(AstStatement *stmt) {
 
     builder->CreateBr(loopCmp);
     builder->SetInsertPoint(loopCmp);
-    Value *cond = compileValue(stmt->getExpressions().at(0));
+    Value *cond = compileValue(stmt->getExpression());
     builder->CreateCondBr(cond, loopBlock, loopEnd);
 
     builder->SetInsertPoint(loopBlock);

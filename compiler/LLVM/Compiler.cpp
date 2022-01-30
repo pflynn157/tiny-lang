@@ -1,7 +1,7 @@
 //
-// Copyright 2021 Patrick Flynn
-// This file is part of the Tiny Lang compiler.
-// Tiny Lang is licensed under the BSD-3 license. See the COPYING file for more information.
+// Copyright 2022 Patrick Flynn
+// This file is part of the Eos compiler.
+// Eos is licensed under the BSD-3 license. See the COPYING file for more information.
 //
 #include "llvm/IR/BasicBlock.h"
 #include "llvm/Support/TargetRegistry.h"
@@ -91,45 +91,14 @@ void Compiler::compileStatement(AstStatement *stmt) {
         } break;
         
         // A structure declaration
-        case AstType::StructDec: {
-            AstStructDec *sd = static_cast<AstStructDec *>(stmt);
-            StructType *type = structTable[sd->getStructName()];
-            
-            AllocaInst *var = builder->CreateAlloca(type);
-            symtable[sd->getVarName()] = var;
-            typeTable[sd->getVarName()] = DataType::Struct;
-            structVarTable[sd->getVarName()] = sd->getStructName();
-            
-            AstStruct *str = nullptr;
-            for (AstStruct *s : tree->getStructs()) {
-                if (s->getName() == sd->getStructName()) {
-                    str = s;
-                    break;
-                }
-            }
-            if (str == nullptr) return;
-            
-            // Init the elements
-            if (!sd->isNoInit()) {
-                int index = 0;
-                for (Var member : str->getItems()) {
-                    AstExpression *defaultExpr = str->getDefaultExpression(member.name);
-                    Value *defaultVal = compileValue(defaultExpr, member.type);
-                    
-                    Value *ep = builder->CreateStructGEP(type, var, index);
-                    builder->CreateStore(defaultVal, ep);
-                    
-                    ++index;
-               }
-            }
-        } break;
+        case AstType::StructDec: compileStructDeclaration(stmt); break;
         
         // A variable assignment
         case AstType::VarAssign: {
             AstVarAssign *va = static_cast<AstVarAssign *>(stmt);
             AllocaInst *ptr = symtable[va->getName()];
             DataType ptrType = typeTable[va->getName()];
-            Value *val = compileValue(stmt->getExpressions().at(0), ptrType);
+            Value *val = compileValue(stmt->getExpression(), ptrType);
             
             builder->CreateStore(val, ptr);
         } break;
@@ -141,8 +110,8 @@ void Compiler::compileStatement(AstStatement *stmt) {
             DataType ptrType = typeTable[pa->getName()];
             DataType subType = ptrTable[pa->getName()];
             
-            Value *index = compileValue(pa->getExpressions().at(0));
-            Value *val = compileValue(pa->getExpressions().at(1), subType);
+            Value *index = compileValue(pa->getIndex());
+            Value *val = compileValue(pa->getExpression(), subType);
             
             if (ptrType == DataType::String) {
                 PointerType *strPtrType = Type::getInt8PtrTy(*context);
@@ -163,19 +132,7 @@ void Compiler::compileStatement(AstStatement *stmt) {
         } break;
         
         // A structure assignment
-        case AstType::StructAssign: {
-            AstStructAssign *sa = static_cast<AstStructAssign *>(stmt);
-            Value *ptr = symtable[sa->getName()];
-            int index = getStructIndex(sa->getName(), sa->getMember());
-            
-            Value *val = compileValue(sa->getExpressions().at(0), sa->getMemberType());
-            
-            std::string strTypeName = structVarTable[sa->getName()];
-            StructType *strType = structTable[strTypeName];
-            
-            Value *structPtr = builder->CreateStructGEP(strType, ptr, index);
-            builder->CreateStore(val, structPtr);
-        } break;
+        case AstType::StructAssign: compileStructAssign(stmt); break;
         
         // Function call statements
         case AstType::FuncCallStmt: {
@@ -277,25 +234,15 @@ Value *Compiler::compileValue(AstExpression *expr, DataType dataType) {
             }
         } break;
 
-        case AstType::StructAccess: {
-            AstStructAccess *sa = static_cast<AstStructAccess *>(expr);
-            AllocaInst *ptr = symtable[sa->getName()];
-            int pos = getStructIndex(sa->getName(), sa->getMember());
-            
-            std::string strTypeName = structVarTable[sa->getName()];
-            StructType *strType = structTable[strTypeName];
-            Type *elementType = structElementTypeTable[strTypeName][pos];
-
-            Value *ep = builder->CreateStructGEP(strType, ptr, pos);
-            return builder->CreateLoad(elementType, ep);
-        } break;
+        case AstType::StructAccess: return compileStructAccess(expr);
         
         case AstType::FuncCallExpr: {
             AstFuncCallExpr *fc = static_cast<AstFuncCallExpr *>(expr);
             std::vector<Value *> args;
             
-            for (auto stmt : fc->getArguments()) {
-                Value *val = compileValue(stmt);
+            AstExprList *list = static_cast<AstExprList *>(fc->getArgExpression());
+            for (auto arg : list->getList()) {
+                Value *val = compileValue(arg);
                 args.push_back(val);
             }
             
@@ -311,6 +258,36 @@ Value *Compiler::compileValue(AstExpression *expr, DataType dataType) {
             return builder->CreateNeg(val);
         } break;
         
+        case AstType::LogicalAnd:
+        case AstType::LogicalOr: {
+            AstBinaryOp *op = static_cast<AstBinaryOp *>(expr);
+            AstExpression *lvalExpr = op->getLVal();
+            AstExpression *rvalExpr = op->getRVal();
+            
+            // We only want the LVal first
+            Value *lval = compileValue(lvalExpr, dataType);
+            
+            // Create the blocks
+            BasicBlock *trueBlock = BasicBlock::Create(*context, "true" + std::to_string(blockCount), currentFunc);
+            ++blockCount;
+            
+            BasicBlock *current = builder->GetInsertBlock();
+            trueBlock->moveAfter(current);
+            
+            // Create the conditional branch
+            if (expr->getType() == AstType::LogicalAnd) {
+                BasicBlock *falseBlock = logicalAndStack.top();
+                builder->CreateCondBr(lval, trueBlock, falseBlock);
+            } else if (expr->getType() == AstType::LogicalOr) {
+                BasicBlock *trueBlock1 = logicalOrStack.top();
+                builder->CreateCondBr(lval, trueBlock1, trueBlock);
+            }
+            
+            // Now, build the body of the second block
+            builder->SetInsertPoint(trueBlock);
+            return compileValue(rvalExpr, dataType);
+        } break;
+        
         case AstType::Add:
         case AstType::Sub: 
         case AstType::Mul:
@@ -323,9 +300,9 @@ Value *Compiler::compileValue(AstExpression *expr, DataType dataType) {
         case AstType::GT:
         case AstType::LT:
         case AstType::GTE:
-        case AstType::LTE:
-        case AstType::LogicalAnd:
-        case AstType::LogicalOr: {
+        case AstType::LTE: {
+        //case AstType::LogicalAnd:
+        //case AstType::LogicalOr: {
             AstBinaryOp *op = static_cast<AstBinaryOp *>(expr);
             AstExpression *lvalExpr = op->getLVal();
             AstExpression *rvalExpr = op->getRVal();
@@ -407,12 +384,6 @@ Value *Compiler::compileValue(AstExpression *expr, DataType dataType) {
                 case AstType::LT: return builder->CreateICmpSLT(lval, rval);
                 case AstType::GTE: return builder->CreateICmpSGE(lval, rval);
                 case AstType::LTE: return builder->CreateICmpSLE(lval, rval);
-                
-/*
-TODO: We need to find a way to detect this
-                case AstType::LogicalAnd: return builder->CreateLogicalAnd(lval, rval);
-                case AstType::LogicalOr: return builder->CreateLogicalOr(lval, rval);
-*/
                     
                 default: {}
             }

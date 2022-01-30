@@ -1,7 +1,7 @@
 //
-// Copyright 2021 Patrick Flynn
-// This file is part of the Tiny Lang compiler.
-// Tiny Lang is licensed under the BSD-3 license. See the COPYING file for more information.
+// Copyright 2022 Patrick Flynn
+// This file is part of the Eos compiler.
+// Eos is licensed under the BSD-3 license. See the COPYING file for more information.
 //
 #include <iostream>
 #include <cctype>
@@ -246,6 +246,8 @@ TokenType Scanner::getKeyword() {
     else if (buffer == "false") return False;
     else if (buffer == "and") return Logical_And;
     else if (buffer == "or") return Logical_Or;
+    else if (buffer == "enum") return Enum;
+    else if (buffer == "of") return Of;
     return EmptyToken;
 }
 

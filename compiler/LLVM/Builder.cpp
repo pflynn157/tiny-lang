@@ -1,7 +1,7 @@
 //
-// Copyright 2021 Patrick Flynn
-// This file is part of the Tiny Lang compiler.
-// Tiny Lang is licensed under the BSD-3 license. See the COPYING file for more information.
+// Copyright 2022 Patrick Flynn
+// This file is part of the Eos compiler.
+// Eos is licensed under the BSD-3 license. See the COPYING file for more information.
 //
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/Host.h"
@@ -81,10 +81,10 @@ void Compiler::assemble() {
 // TODO: Same as above...
 void Compiler::link() {
     std::string cmd = "ld ";
-    cmd += "/usr/local/lib/tinylang/ti_start.o ";
+    cmd += "/usr/local/lib/eos/eos_start.o ";
     cmd += "/tmp/" + cflags.name + ".o -o " + cflags.name;
     cmd += " -dynamic-linker /lib64/ld-linux-x86-64.so.2 ";
-    cmd += "-ltinylang -lc";
+    cmd += "-lstdeos -lc";
     system(cmd.c_str());
 }
 

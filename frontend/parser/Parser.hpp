@@ -1,7 +1,7 @@
 //
-// Copyright 2021 Patrick Flynn
-// This file is part of the Tiny Lang compiler.
-// Tiny Lang is licensed under the BSD-3 license. See the COPYING file for more information.
+// Copyright 2022 Patrick Flynn
+// This file is part of the Eos compiler.
+// Eos is licensed under the BSD-3 license. See the COPYING file for more information.
 //
 #pragma once
 
@@ -51,6 +51,7 @@ protected:
     bool buildStructMember(AstStruct *str, Token token);
     bool buildStructDec(AstBlock *block);
     bool buildStructAssign(AstBlock *block, Token idToken);
+    bool buildEnum();
     
     // Expression.cpp
     struct ExprContext {
@@ -62,10 +63,10 @@ protected:
     
     AstExpression *buildConstExpr(Token token);
     bool buildOperator(Token token, ExprContext *ctx);
+    bool buildIDExpr(Token token, ExprContext *ctx);
     bool applyHigherPred(ExprContext *ctx);
-    bool buildExpression(AstStatement *stmt, DataType currentType,
-                        TokenType stopToken = SemiColon, TokenType separateToken = EmptyToken,
-                        AstExpression **dest = nullptr, bool isConst = false);
+    bool applyAssoc(ExprContext *ctx);
+    AstExpression *buildExpression(DataType currentType, TokenType stopToken = SemiColon, bool isConst = false, bool buildList = false);
     AstExpression *checkExpression(AstExpression *expr, DataType varType);
     
     bool buildBlock(AstBlock *block, int stopLayer = 0, AstIfStmt *parentBlock = nullptr, bool inElif = false);

@@ -1,7 +1,7 @@
 //
-// Copyright 2021 Patrick Flynn
-// This file is part of the Tiny Lang compiler.
-// Tiny Lang is licensed under the BSD-3 license. See the COPYING file for more information.
+// Copyright 2022 Patrick Flynn
+// This file is part of the Eos compiler.
+// Eos is licensed under the BSD-3 license. See the COPYING file for more information.
 //
 #pragma once
 
@@ -25,6 +25,20 @@ protected:
     AstType type = AstType::EmptyAst;
 };
 
+// Holds a list of expressions
+class AstExprList : public AstExpression {
+public:
+    AstExprList() : AstExpression(AstType::ExprList) {}
+    
+    void addExpression(AstExpression *expr) { list.push_back(expr); }
+    std::vector<AstExpression *> getList() { return list; }
+    
+    void print();
+private:
+    std::vector<AstExpression *> list;
+};
+
+// Represents the base of operators
 class AstOp : public AstExpression {
 public:
     bool isBinaryOp() { return isBinary; }
@@ -375,18 +389,13 @@ public:
         this->name = name;
     }
     
-    void setArguments(std::vector<AstExpression *> args) {
-        this->args = args;
-    }
-    
-    void addArgument(AstExpression *arg) { args.push_back(arg); }
-    void clearArguments() { args.clear(); }
-    
-    std::vector<AstExpression *> getArguments() { return args; }
+    void setArgExpression(AstExpression *expr) { this->expr = expr; }
+    AstExpression *getArgExpression() { return expr; }
     std::string getName() { return name; }
+    
     void print();
 private:
-    std::vector<AstExpression *> args;
+    AstExpression *expr;
     std::string name = "";
 };
 

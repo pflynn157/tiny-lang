@@ -1,7 +1,7 @@
 //
-// Copyright 2021 Patrick Flynn
-// This file is part of the Tiny Lang compiler.
-// Tiny Lang is licensed under the BSD-3 license. See the COPYING file for more information.
+// Copyright 2022 Patrick Flynn
+// This file is part of the Eos compiler.
+// Eos is licensed under the BSD-3 license. See the COPYING file for more information.
 //
 #pragma once
 
@@ -23,24 +23,14 @@ public:
         this->type = type;
     }
     
-    void addExpression(AstExpression *expr) {
-        expressions.push_back(expr);
-    }
+    void setExpression(AstExpression *expr) { this->expr = expr; }
+    AstExpression *getExpression() { return expr; }
+    bool hasExpression() { return expr != nullptr; }
     
-    int getExpressionCount() {
-        return expressions.size();
-    }
-    
-    void clearExpressions() {
-        expressions.clear();
-    }
-    
-    std::vector<AstExpression *> getExpressions() { return expressions; }
-    AstExpression *getExpression() { return expressions.at(0); }
     AstType getType() { return type; }
     virtual void print() {}
 private:
-    std::vector<AstExpression *> expressions;
+    AstExpression *expr = nullptr;
     AstType type = AstType::EmptyAst;
 };
 
@@ -140,16 +130,19 @@ public:
     
     void setDataType(DataType dataType) { this->dataType = dataType; }
     void setPtrType(DataType dataType) { this->ptrType = dataType; }
+    void setIndex(AstExpression *index) { this->index = index; }
     
     std::string getName() { return name; }
     DataType getDataType() { return dataType; }
     DataType getPtrType() { return ptrType; }
+    AstExpression *getIndex() { return index; }
     
     void print();
 private:
     std::string name = "";
     DataType dataType = DataType::Void;
     DataType ptrType = DataType::Void;
+    AstExpression *index;
 };
 
 // Represents a struct assignment

@@ -1,7 +1,7 @@
 //
-// Copyright 2021 Patrick Flynn
-// This file is part of the Tiny Lang compiler.
-// Tiny Lang is licensed under the BSD-3 license. See the COPYING file for more information.
+// Copyright 2022 Patrick Flynn
+// This file is part of the Eos compiler.
+// Eos is licensed under the BSD-3 license. See the COPYING file for more information.
 //
 #pragma once
 
@@ -61,7 +61,9 @@ enum class AstType {
     StringL,
     ID,
     ArrayAccess,
-    StructAccess
+    StructAccess,
+    
+    ExprList
 };
 
 enum class DataType {
@@ -105,6 +107,27 @@ private:
     std::vector<AstStatement *> block;
 };
 
+// Represents an enum
+class AstEnum {
+public:
+    explicit AstEnum(std::string name, DataType type = DataType::I32) {
+        this->name = name;
+        this->type = type;
+    }
+    
+    void addValue(Var v) { values.push_back(v); }
+    
+    std::string getName() { return name; }
+    DataType getType() { return type; }
+    std::vector<Var> getValues() { return values; }
+    
+    void print();
+private:
+    std::string name = "";
+    DataType type = DataType::I32;
+    std::vector<Var> values;
+};
+
 // Represents a struct
 class AstStruct {
 public:
@@ -115,10 +138,29 @@ public:
     void addItem(Var var, AstExpression *defaultExpression) {
         items.push_back(var);
         defaultExpressions[var.name] = defaultExpression;
+        
+        switch (var.type) {
+            case DataType::Char:
+            case DataType::I8:
+            case DataType::U8: size += 1; break;
+            case DataType::I16:
+            case DataType::U16: size += 2; break;
+            case DataType::Bool:
+            case DataType::I32:
+            case DataType::U32: size += 4; break;
+            case DataType::String:
+            case DataType::Ptr:
+            case DataType::Struct:
+            case DataType::I64:
+            case DataType::U64: size += 8; break;
+            
+            default: {}
+        }
     }
     
     std::string getName() { return name; }
     std::vector<Var> getItems() { return items; }
+    int getSize() { return size; }
     
     AstExpression *getDefaultExpression(std::string name) {
         return defaultExpressions[name];
@@ -129,4 +171,6 @@ private:
     std::string name;
     std::vector<Var> items;
     std::map<std::string, AstExpression*> defaultExpressions;
+    int size = 0;
 };
+
