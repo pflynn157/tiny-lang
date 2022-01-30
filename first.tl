@@ -1,23 +1,26 @@
-
 #OUTPUT
-#0|2|4|6|8|10|12|14|16|18|20|
-#Done
+#True
+#True
+#False
+#False
+#False
 #END
 
 #RET 0
 
-func main -> i32 is
-    var i : i32 := 0;
-    
-    while true do
-        print("%d|", i);
-        i := i + 2;
-        
-        if i = 22 then break; end
+func test1(x:i32) is
+    if x > 20 and x < 30 then
+        println("True");
+    else
+        println("False");
     end
-    
-    println("\nDone");
-    
-    return 0;
 end
 
+func main -> i32 is
+    test1(21);
+    test1(25);
+    test1(30);
+    test1(20);
+    test1(100);
+    return 0;
+end

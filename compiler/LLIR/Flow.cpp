@@ -13,12 +13,23 @@ void Compiler::compileIfStatement(AstStatement *stmt) {
     LLIR::Block *trueBlock = new LLIR::Block("true" + std::to_string(blockCount));
     LLIR::Block *falseBlock = nullptr;
     LLIR::Block *endBlock = new LLIR::Block("end" + std::to_string(blockCount));
-    if (hasBranches) falseBlock = new LLIR::Block("false" + std::to_string(blockCount));
+    
+    // The break stack pushes are for the logical boolean expressions
+    logicalOrStack.push(trueBlock);
+    if (hasBranches) {
+        falseBlock = new LLIR::Block("false" + std::to_string(blockCount));
+        logicalAndStack.push(falseBlock);
+    } else {
+        logicalAndStack.push(endBlock);
+    }
     ++blockCount;
 
     LLIR::Operand *cond = compileValue(stmt->getExpression(), DataType::Void, trueBlock);
     if (hasBranches) builder->createBr(falseBlock);
     else builder->createBr(endBlock);
+    
+    logicalAndStack.pop();
+    logicalOrStack.pop();
 
     // Align the blocks
     LLIR::Block *current = builder->getInsertPoint();
@@ -54,6 +65,9 @@ void Compiler::compileIfStatement(AstStatement *stmt) {
             LLIR::Block *falseBlock2 = new LLIR::Block(std::to_string(subCount) + "false" + std::to_string(blockCount));
             ++subCount;
             
+            logicalAndStack.push(falseBlock2);
+            logicalOrStack.push(trueBlock2);
+            
             // Align
             if (!hadElif) builder->setInsertPoint(falseBlock);
             LLIR::Block *current = builder->getInsertPoint();
@@ -62,6 +76,9 @@ void Compiler::compileIfStatement(AstStatement *stmt) {
             
             LLIR::Operand *cond = compileValue(stmt->getExpression(), DataType::Void, trueBlock2);
             builder->createBr(falseBlock2);
+            
+            logicalAndStack.pop();
+            logicalOrStack.pop();
             
             builder->setInsertPoint(trueBlock2);
             bool hasBreak = false;

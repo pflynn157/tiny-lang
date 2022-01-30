@@ -322,6 +322,38 @@ LLIR::Operand *Compiler::compileValue(AstExpression *expr, DataType dataType, LL
             return builder->createNeg(type, val);
         } break;
         
+        case AstType::LogicalAnd:
+        case AstType::LogicalOr: {
+            AstBinaryOp *op = static_cast<AstBinaryOp *>(expr);
+            AstExpression *lvalExpr = op->getLVal();
+            AstExpression *rvalExpr = op->getRVal();
+            
+            // We only want the LVal first
+            //LLIR::Operand *lval = compileValue(lvalExpr, dataType);
+            
+            // Create the blocks
+            LLIR::Block *trueBlock = new LLIR::Block("true" + std::to_string(blockCount));
+            ++blockCount;
+            
+            LLIR::Block *current = builder->getInsertPoint();
+            builder->addBlockAfter(current, trueBlock);
+            
+            // Create the conditional branch
+            if (expr->getType() == AstType::LogicalAnd) {
+                LLIR::Block *falseBlock = logicalAndStack.top();
+                LLIR::Operand *lval = compileValue(lvalExpr, dataType, trueBlock);
+                builder->createBr(falseBlock);
+            } else if (expr->getType() == AstType::LogicalOr) {
+                LLIR::Block *trueBlock1 = logicalOrStack.top();
+                LLIR::Operand *lval = compileValue(lvalExpr, dataType, trueBlock1);
+                builder->createBr(trueBlock);
+            }
+            
+            // Now, build the body of the second block
+            builder->setInsertPoint(trueBlock);
+            return compileValue(rvalExpr, dataType, destBlock);
+        } break;
+        
         case AstType::Add:
         case AstType::Sub: 
         case AstType::Mul:
@@ -334,9 +366,7 @@ LLIR::Operand *Compiler::compileValue(AstExpression *expr, DataType dataType, LL
         case AstType::GT:
         case AstType::LT:
         case AstType::GTE:
-        case AstType::LTE:
-        case AstType::LogicalAnd:
-        case AstType::LogicalOr: {
+        case AstType::LTE: {
             AstBinaryOp *op = static_cast<AstBinaryOp *>(expr);
             AstExpression *lvalExpr = op->getLVal();
             AstExpression *rvalExpr = op->getRVal();
@@ -427,9 +457,6 @@ LLIR::Operand *Compiler::compileValue(AstExpression *expr, DataType dataType, LL
                 case AstType::LT: return builder->createBlt(type, lval, rval, destBlock);
                 case AstType::GTE: return builder->createBge(type, lval, rval, destBlock);
                 case AstType::LTE: return builder->createBle(type, lval, rval, destBlock);
-                
-                //case AstType::LogicalAnd: return builder->CreateLogicalAnd(lval, rval);
-                //case AstType::LogicalOr: return builder->CreateLogicalOr(lval, rval);
                     
                 default: {}
             }

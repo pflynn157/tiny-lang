@@ -67,5 +67,7 @@ private:
     int blockCount = 0;
     std::stack<LLIR::Block *> breakStack;
     std::stack<LLIR::Block *> continueStack;
+    std::stack<LLIR::Block *> logicalAndStack;
+    std::stack<LLIR::Block *> logicalOrStack;
 };
 
