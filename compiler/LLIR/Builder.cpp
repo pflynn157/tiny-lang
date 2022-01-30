@@ -5,7 +5,7 @@
 //
 
 #include <LLIR/Compiler.hpp>
-#include <amd64.hpp>
+#include <amd64/amd64.hpp>
 
 void Compiler::writeAssembly(bool printTransform) {
     // Run the transform pass so it can be printed
