@@ -118,7 +118,7 @@ void Compiler::compileStatement(AstStatement *stmt) {
             AstVarAssign *va = static_cast<AstVarAssign *>(stmt);
             LLIR::Reg *ptr = symtable[va->getName()];
             DataType ptrType = typeTable[va->getName()];
-            LLIR::Operand *val = compileValue(stmt->getExpressions().at(0), ptrType);
+            LLIR::Operand *val = compileValue(stmt->getExpression(), ptrType);
             
             LLIR::Type *type = translateType(ptrType);
             if (ptrType == DataType::Struct) {
@@ -136,8 +136,8 @@ void Compiler::compileStatement(AstStatement *stmt) {
             DataType ptrType = typeTable[pa->getName()];
             DataType subType = ptrTable[pa->getName()];
             
-            LLIR::Operand *index = compileValue(pa->getExpressions().at(0));
-            LLIR::Operand *val = compileValue(pa->getExpressions().at(1), subType);
+            LLIR::Operand *index = compileValue(pa->getIndex());
+            LLIR::Operand *val = compileValue(pa->getExpression(), subType);
             
             if (ptrType == DataType::String) {
             } else {
@@ -156,7 +156,7 @@ void Compiler::compileStatement(AstStatement *stmt) {
             LLIR::Operand *ptr = symtable[sa->getName()];
             int index = getStructIndex(sa->getName(), sa->getMember());
             
-            LLIR::Operand *val = compileValue(sa->getExpressions().at(0), sa->getMemberType());
+            LLIR::Operand *val = compileValue(sa->getExpression(), sa->getMemberType());
             
             std::string strTypeName = structVarTable[sa->getName()];
             LLIR::StructType *strType = structTable[strTypeName];
@@ -306,8 +306,9 @@ LLIR::Operand *Compiler::compileValue(AstExpression *expr, DataType dataType, LL
             AstFuncCallExpr *fc = static_cast<AstFuncCallExpr *>(expr);
             std::vector<LLIR::Operand *> args;
             
-            for (auto stmt : fc->getArguments()) {
-                LLIR::Operand *val = compileValue(stmt);
+            AstExprList *list = static_cast<AstExprList *>(fc->getArgExpression());
+            for (auto arg : list->getList()) {
+                LLIR::Operand *val = compileValue(arg);
                 args.push_back(val);
             }
             

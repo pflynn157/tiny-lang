@@ -112,8 +112,9 @@ void Compiler::compileFuncCallStatement(AstStatement *stmt) {
     AstFuncCallStmt *fc = static_cast<AstFuncCallStmt *>(stmt);
     std::vector<LLIR::Operand *> args;
     
-    for (auto stmt : stmt->getExpressions()) {
-        LLIR::Operand *val = compileValue(stmt);
+    AstExprList *list = static_cast<AstExprList *>(fc->getExpression());
+    for (auto arg : list->getList()) {
+        LLIR::Operand *val = compileValue(arg);
         args.push_back(val);
     }
     
@@ -125,8 +126,8 @@ void Compiler::compileFuncCallStatement(AstStatement *stmt) {
 // TODO: We may want to rethink this some
 //
 void Compiler::compileReturnStatement(AstStatement *stmt) {
-    if (stmt->getExpressionCount() == 1) {
-        LLIR::Operand *op = compileValue(stmt->getExpressions().at(0), currentFuncType);
+    if (stmt->hasExpression()) {
+        LLIR::Operand *op = compileValue(stmt->getExpression(), currentFuncType);
         LLIR::Type *type = translateType(currentFuncType);
         if (currentFuncType == DataType::Struct) {
             LLIR::StructType *type = structTable[funcTypeStruct];

@@ -16,7 +16,7 @@ void Compiler::compileIfStatement(AstStatement *stmt) {
     if (hasBranches) falseBlock = new LLIR::Block("false" + std::to_string(blockCount));
     ++blockCount;
 
-    LLIR::Operand *cond = compileValue(stmt->getExpressions().at(0), DataType::Void, trueBlock);
+    LLIR::Operand *cond = compileValue(stmt->getExpression(), DataType::Void, trueBlock);
     if (hasBranches) builder->createBr(falseBlock);
     else builder->createBr(endBlock);
 
@@ -60,7 +60,7 @@ void Compiler::compileIfStatement(AstStatement *stmt) {
             builder->addBlockAfter(current, trueBlock2);
             builder->addBlockAfter(trueBlock2, falseBlock2);
             
-            LLIR::Operand *cond = compileValue(stmt->getExpressions().at(0), DataType::Void, trueBlock2);
+            LLIR::Operand *cond = compileValue(stmt->getExpression(), DataType::Void, trueBlock2);
             builder->createBr(falseBlock2);
             
             builder->setInsertPoint(trueBlock2);
@@ -118,7 +118,7 @@ void Compiler::compileWhileStatement(AstStatement *stmt) {
     
     builder->createBr(loopCmp);
     builder->setInsertPoint(loopCmp);
-    LLIR::Operand *cond = compileValue(stmt->getExpressions().at(0), DataType::Void, loopBlock);
+    LLIR::Operand *cond = compileValue(stmt->getExpression(), DataType::Void, loopBlock);
     builder->createBr(loopEnd);
     
     builder->setInsertPoint(loopBlock);

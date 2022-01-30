@@ -1,47 +1,23 @@
 
 #OUTPUT
-#Before:
-#X: 40
-#Y: 50
-#After:
-#X: 25
-#Y: 35
+#0|2|4|6|8|10|12|14|16|18|20|
+#Done
 #END
 
 #RET 0
 
-struct S1 is
-    x : i32 := 10;
-    y : i32 := 20;
-end
-
-func initStruct -> S1 is
-    struct s : S1;
-    s.x := 40;
-    s.y := 50;
-    return s;
-end
-
-func printStruct(s:S1) is
-    println("X: %d", s.x);
-    println("Y: %d", s.y);
-end
-
-func updateStruct(s:S1) is
-    s.x := 25;
-    s.y := 35;
-end
-
 func main -> i32 is
-    struct s : S1 := initStruct();
+    var i : i32 := 0;
     
-    println("Before:");
-    printStruct(s);
+    while true do
+        print("%d|", i);
+        i := i + 2;
+        
+        if i = 22 then break; end
+    end
     
-    updateStruct(s);
-    
-    println("After:");
-    printStruct(s);
+    println("\nDone");
     
     return 0;
 end
+
