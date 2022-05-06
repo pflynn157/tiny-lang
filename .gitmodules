@@ -1,3 +1,3 @@
 [submodule "llir"]
 	path = llir
-	url = git@gitlab.com:ootoproject/llir.git
+	url = git@github.com:patrickf2000/llir.git
