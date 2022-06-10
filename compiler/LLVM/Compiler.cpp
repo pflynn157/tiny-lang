@@ -242,7 +242,7 @@ Value *Compiler::compileValue(AstExpression *expr, DataType dataType, bool isAss
             }
         } break;
 
-        case AstType::StructAccess: return compileStructAccess(expr);
+        case AstType::StructAccess: return compileStructAccess(expr, isAssign);
         
         case AstType::FuncCallExpr: {
             AstFuncCallExpr *fc = static_cast<AstFuncCallExpr *>(expr);

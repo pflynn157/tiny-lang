@@ -182,7 +182,20 @@ bool Parser::buildStructDec(AstBlock *block) {
 // TODO: SHould we get our own syntax?
 //
 bool Parser::buildStructAssign(AstBlock *block, Token idToken) {
-    Token token = scanner->getNext();
+    DataType dataType = typeMap[idToken.id_val].second;
+    DataType ptrType = DataType::Void;
+    
+    AstExpression *expr = buildExpression(DataType::Void);
+    if (!expr) return false;
+    
+    AstExprStatement *stmt = new AstExprStatement;
+    stmt->setDataType(DataType::Void, ptrType);
+    stmt->setExpression(expr);
+    block->addStatement(stmt);
+    
+    return true;
+    
+    /*Token token = scanner->getNext();
     std::string member = token.id_val;
     
     if (token.type != Id) {
@@ -216,6 +229,6 @@ bool Parser::buildStructAssign(AstBlock *block, Token idToken) {
         return false;
     }
     
-    return true;
+    return true;*/
 }
 

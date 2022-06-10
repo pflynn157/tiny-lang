@@ -75,7 +75,7 @@ void Compiler::compileStructAssign(AstStatement *stmt) {
 }
 
 // Compiles a structure access expression
-Value *Compiler::compileStructAccess(AstExpression *expr) {
+Value *Compiler::compileStructAccess(AstExpression *expr, bool isAssign) {
     AstStructAccess *sa = static_cast<AstStructAccess *>(expr);
     Value *ptr = symtable[sa->getName()];
     int pos = getStructIndex(sa->getName(), sa->getMember());
@@ -90,6 +90,7 @@ Value *Compiler::compileStructAccess(AstExpression *expr) {
     
     // Now, load the structure element
     Value *ep = builder->CreateStructGEP(strType, ptr, pos);
-    return builder->CreateLoad(elementType, ep);
+    if (isAssign) return ep;
+    else return builder->CreateLoad(elementType, ep);
 }
 
