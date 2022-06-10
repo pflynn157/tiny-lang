@@ -175,7 +175,7 @@ void Compiler::compileStatement(AstStatement *stmt) {
 }
 
 // Converts an AST value to an LLVM value
-Value *Compiler::compileValue(AstExpression *expr, DataType dataType) {
+Value *Compiler::compileValue(AstExpression *expr, DataType dataType, bool isAssign) {
     switch (expr->getType()) {
         case AstType::I8L: {
             AstI8 *i8 = static_cast<AstI8 *>(expr);
@@ -212,7 +212,7 @@ Value *Compiler::compileValue(AstExpression *expr, DataType dataType) {
             AllocaInst *ptr = symtable[id->getValue()];
             Type *type = translateType(typeTable[id->getValue()], ptrTable[id->getValue()]);
             
-            if (typeTable[id->getValue()] == DataType::Struct) return ptr;
+            if (typeTable[id->getValue()] == DataType::Struct || isAssign) return ptr;
             return builder->CreateLoad(type, ptr);
         } break;
         
@@ -228,7 +228,8 @@ Value *Compiler::compileValue(AstExpression *expr, DataType dataType) {
                 
                 Value *arrayPtr = builder->CreateLoad(strPtrType, ptr);
                 Value *ep = builder->CreateGEP(i8Type, arrayPtr, index);
-                return builder->CreateLoad(i8Type, ep);
+                if (isAssign) return ep;
+                else return builder->CreateLoad(i8Type, ep);
             } else {
                 DataType subType = ptrTable[acc->getValue()];
                 Type *arrayPtrType = translateType(ptrType, subType);
@@ -236,7 +237,8 @@ Value *Compiler::compileValue(AstExpression *expr, DataType dataType) {
                 
                 Value *ptrLd = builder->CreateLoad(arrayPtrType, ptr);
                 Value *ep = builder->CreateGEP(arrayElementType, ptrLd, index);
-                return builder->CreateLoad(arrayElementType, ep);
+                if (isAssign) return ep;
+                else return builder->CreateLoad(arrayElementType, ep);
             }
         } break;
 
@@ -266,9 +268,15 @@ Value *Compiler::compileValue(AstExpression *expr, DataType dataType) {
         
         case AstType::Assign: {
             AstAssignOp *op = static_cast<AstAssignOp *>(expr);
+            AstExpression *lvalExpr = op->getLVal();
+            Value *ptr;
             
-            AstID *id = static_cast<AstID *>(op->getLVal());
-            AllocaInst *ptr = symtable[id->getValue()];
+            //if (lvalExpr->getType() == AstType::ID) {
+            //    AstID *id = static_cast<AstID *>(lvalExpr);
+            //    ptr = symtable[id->getValue()];
+            //} else {
+                ptr = compileValue(lvalExpr, dataType, true);
+            //}
             
             Value *rval = compileValue(op->getRVal(), dataType);
             

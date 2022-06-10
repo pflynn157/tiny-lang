@@ -138,8 +138,6 @@ void AstVarDec::print() {
 void AstStructDec::print() {
     std::cout << "STRUCT " << varName << " : " << structName;
     if (noInit) std::cout << " NOINIT";
-    std::cout << " := ";
-    getExpression()->print();
     std::cout << std::endl;
 }
 

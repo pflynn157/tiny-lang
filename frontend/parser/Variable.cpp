@@ -169,25 +169,16 @@ bool Parser::buildVariableAssign(AstBlock *block, Token idToken) {
 // Builds an array assignment
 bool Parser::buildArrayAssign(AstBlock *block, Token idToken) {
     DataType dataType = typeMap[idToken.id_val].second;
-    AstArrayAssign *pa = new AstArrayAssign(idToken.id_val);
-    pa->setDataType(typeMap[idToken.id_val].first);
-    pa->setPtrType(dataType);
-    block->addStatement(pa);
+    DataType ptrType = typeMap[idToken.id_val].first;
     
-    AstExpression *arg = buildExpression(DataType::I32, RBracket);
-    if (!arg) return false;
-    pa->setIndex(arg);
+    AstExpression *expr = buildExpression(dataType);
+    if (!expr) return false;
     
-    Token token = scanner->getNext();
-    if (token.type != Assign) {
-        syntax->addError(scanner->getLine(), "Expected \'=\' after array assignment.");
-        return false;
-    }
+    AstExprStatement *stmt = new AstExprStatement;
+    stmt->setDataType(dataType, ptrType);
+    stmt->setExpression(expr);
+    block->addStatement(stmt);
     
-    arg = buildExpression(dataType);
-    if (!arg) return false;
-    pa->setExpression(arg);
-
     return true;
 }
 

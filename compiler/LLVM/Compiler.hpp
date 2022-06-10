@@ -32,7 +32,7 @@ public:
     void link();
 protected:
     void compileStatement(AstStatement *stmt);
-    Value *compileValue(AstExpression *expr, DataType dataType = DataType::Void);
+    Value *compileValue(AstExpression *expr, DataType dataType = DataType::Void, bool isAssign = false);
     Type *translateType(DataType dataType, DataType subType = DataType::Void, std::string typeName = "");
     int getStructIndex(std::string name, std::string member);
 

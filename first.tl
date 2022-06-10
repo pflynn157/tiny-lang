@@ -1,6 +1,18 @@
 
+struct S is
+    x : i32 := 10;
+end
+
 func main is
-    var x : i32 := 20;
-    x := 30 * x;
+    var nums : i32[10];
+    nums[0] := 20;
+    println("%d", nums[0]);
+    
+    var x : i32 := 10;
+    x := 30;
     println("%d", x);
+    
+    struct s : S;
+    s.x := 40;
+    println("%d", s.x);
 end
