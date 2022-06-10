@@ -141,31 +141,6 @@ void AstStructDec::print() {
     std::cout << std::endl;
 }
 
-void AstVarAssign::print() {
-    std::cout << "VAR= " << name << " : " << printDataType(dataType);
-    if (ptrType != DataType::Void) {
-        std::cout << "*" << printDataType(ptrType);
-        std::cout << "[]";
-    }
-    std::cout << " := ";
-    getExpression()->print();
-    std::cout << std::endl;
-}
-
-void AstArrayAssign::print() {
-    std::cout << "ARR[";
-    index->print();
-    std::cout << "]= " << name;
-    getExpression()->print();
-    std::cout << std::endl;
-}
-
-void AstStructAssign::print() {
-    std::cout << "STRUCT= " << name << "." << member << " := ";
-    getExpression()->print();
-    std::cout << std::endl;
-}
-
 void AstIfStmt::print(int indent) {
     std::cout << "IF ";
     getExpression()->print();

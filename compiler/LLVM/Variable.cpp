@@ -54,26 +54,6 @@ void Compiler::compileStructDeclaration(AstStatement *stmt) {
     }
 }
 
-// Compiles a structure assignment statement
-void Compiler::compileStructAssign(AstStatement *stmt) {
-    AstStructAssign *sa = static_cast<AstStructAssign *>(stmt);
-    Value *ptr = symtable[sa->getName()];
-    int index = getStructIndex(sa->getName(), sa->getMember());
-    
-    Value *val = compileValue(sa->getExpression(), sa->getMemberType());
-    
-    std::string strTypeName = structVarTable[sa->getName()];
-    StructType *strType = structTable[strTypeName];
-    
-    //First, load the pointer
-    PointerType *strTypePtr = PointerType::getUnqual(strType);
-    ptr = builder->CreateLoad(strTypePtr, ptr);
-    
-    // Now, load the structure
-    Value *structPtr = builder->CreateStructGEP(strType, ptr, index);
-    builder->CreateStore(val, structPtr);
-}
-
 // Compiles a structure access expression
 Value *Compiler::compileStructAccess(AstExpression *expr, bool isAssign) {
     AstStructAccess *sa = static_cast<AstStructAccess *>(expr);

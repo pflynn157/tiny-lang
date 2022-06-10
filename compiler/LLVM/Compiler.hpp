@@ -48,7 +48,6 @@ protected:
     
     // Variable.cpp
     void compileStructDeclaration(AstStatement *stmt);
-    void compileStructAssign(AstStatement *stmt);
     Value *compileStructAccess(AstExpression *expr, bool isAssign = false);
 private:
     AstTree *tree;

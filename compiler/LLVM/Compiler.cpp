@@ -99,47 +99,6 @@ void Compiler::compileStatement(AstStatement *stmt) {
         // A structure declaration
         case AstType::StructDec: compileStructDeclaration(stmt); break;
         
-        // A variable assignment
-        case AstType::VarAssign: {
-            AstVarAssign *va = static_cast<AstVarAssign *>(stmt);
-            AllocaInst *ptr = symtable[va->getName()];
-            DataType ptrType = typeTable[va->getName()];
-            Value *val = compileValue(stmt->getExpression(), ptrType);
-            
-            builder->CreateStore(val, ptr);
-        } break;
-        
-        // An array assignment
-        case AstType::ArrayAssign: {
-            AstArrayAssign *pa = static_cast<AstArrayAssign *>(stmt);
-            Value *ptr = symtable[pa->getName()];
-            DataType ptrType = typeTable[pa->getName()];
-            DataType subType = ptrTable[pa->getName()];
-            
-            Value *index = compileValue(pa->getIndex());
-            Value *val = compileValue(pa->getExpression(), subType);
-            
-            if (ptrType == DataType::String) {
-                PointerType *strPtrType = Type::getInt8PtrTy(*context);
-                Type *i8Type = Type::getInt8Ty(*context);
-                
-                Value *arrayPtr = builder->CreateLoad(strPtrType, ptr);
-                Value *ep = builder->CreateGEP(i8Type, arrayPtr, index);
-                builder->CreateStore(val, ep);
-            } else {
-                DataType subType = ptrTable[pa->getName()];
-                Type *arrayPtrType = translateType(ptrType, subType);
-                Type *arrayElementType = translateType(subType);
-                
-                Value *ptrLd = builder->CreateLoad(arrayPtrType, ptr);
-                Value *ep = builder->CreateGEP(arrayElementType, ptrLd, index);
-                builder->CreateStore(val, ep);
-            }
-        } break;
-        
-        // A structure assignment
-        case AstType::StructAssign: compileStructAssign(stmt); break;
-        
         // Function call statements
         case AstType::FuncCallStmt: {
             compileFuncCallStatement(stmt);

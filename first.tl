@@ -13,6 +13,8 @@ func main is
     println("%d", x);
     
     struct s : S;
+    println("%d", s.x);
     s.x := 40;
     println("%d", s.x);
 end
+

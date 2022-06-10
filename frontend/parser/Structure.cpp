@@ -162,10 +162,14 @@ bool Parser::buildStructDec(AstBlock *block) {
         return true;
     } else if (token.type == Assign) {
         dec->setNoInit(true);
-        AstVarAssign *empty = new AstVarAssign(name);
+        AstExprStatement *empty = new AstExprStatement;
         AstExpression *arg = buildExpression(DataType::Struct);
         if (!arg) return false;
-        empty->setExpression(arg);
+        
+        AstID *id = new AstID(name);
+        AstAssignOp *assign = new AstAssignOp(id, arg);
+        
+        empty->setExpression(assign);
         block->addStatement(empty);
         
         // TODO: The body should only be a function call expression or an ID

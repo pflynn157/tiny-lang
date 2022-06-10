@@ -93,9 +93,16 @@ protected:
 // Represents an assignment operation
 class AstAssignOp : public AstBinaryOp {
 public:
-    AstAssignOp() {
+    explicit AstAssignOp() {
         this->type = AstType::Assign;
         this->precedence = 16;
+    }
+    
+    explicit AstAssignOp(AstExpression *lval, AstExpression *rval) {
+        this->type = AstType::Assign;
+        this->precedence = 16;
+        this->lval = lval;
+        this->rval = rval;
     }
     
     void print();

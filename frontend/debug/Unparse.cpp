@@ -79,9 +79,6 @@ void unparse(AstFuncCallStmt *stmt);
 void unparse(AstReturnStmt *stmt);
 void unparse(AstVarDec *stmt);
 void unparse(AstStructDec *stmt);
-void unparse(AstVarAssign *stmt);
-void unparse(AstArrayAssign *stmt);
-void unparse(AstStructAssign *stmt);
 void unparse(AstBlockStmt *stmt, int indent);
 void unparse(AstIfStmt *stmt, int indent);
 void unparse(AstElifStmt *stmt, int indent);
@@ -112,18 +109,6 @@ void unparse(AstVarDec *stmt) {
 }
 
 void unparse(AstStructDec *stmt) {
-
-}
-
-void unparse(AstVarAssign *stmt) {
-
-}
-
-void unparse(AstArrayAssign *stmt) {
-
-}
-
-void unparse(AstStructAssign *stmt) {
 
 }
 

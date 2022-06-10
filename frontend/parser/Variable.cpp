@@ -88,20 +88,18 @@ bool Parser::buildVariableDec(AstBlock *block) {
             vd->setPtrType(dataType);
             
             // Create an assignment to a malloc call
-            AstVarAssign *va = new AstVarAssign(name);
-            va->setDataType(DataType::Ptr);
-            va->setPtrType(dataType);
+            AstExprStatement *va = new AstExprStatement;
+            va->setDataType(DataType::Ptr, dataType);
             block->addStatement(va);
             
+            AstID *id = new AstID(name);
             AstFuncCallExpr *callMalloc = new AstFuncCallExpr("malloc");
-            //callMalloc->setArguments(vd->getExpressions());
+            AstAssignOp *assign = new AstAssignOp(id, callMalloc);
             
-            va->setExpression(callMalloc);
+            va->setExpression(assign);
             
             // In order to get a proper malloc, we need to multiply the argument by
             // the size of the type. Get the arguments, and do that
-            ///AstExpression *arg = callMalloc->getArguments().at(0);
-            ///callMalloc->clearArguments();
             AstExprList *list = new AstExprList;
             callMalloc->setArgExpression(list);
             
@@ -114,7 +112,6 @@ bool Parser::buildVariableDec(AstBlock *block) {
             AstMulOp *op = new AstMulOp;
             op->setLVal(size);
             op->setRVal(vd->getExpression());
-            //callMalloc->addArgument(op);
             list->addExpression(op);
             
             // Finally, set the size of the declaration
@@ -140,10 +137,13 @@ bool Parser::buildVariableDec(AstBlock *block) {
             
             auto typePair = std::pair<DataType, DataType>(dataType, DataType::Void);
             typeMap[name] = typePair;
-    
-            AstVarAssign *va = new AstVarAssign(name);
+            
+            AstID *id = new AstID(name);
+            AstAssignOp *assign = new AstAssignOp(id, arg);
+            
+            AstExprStatement *va = new AstExprStatement;
             va->setDataType(dataType);
-            va->setExpression(arg);
+            va->setExpression(assign);
             block->addStatement(va);
         }
     }
@@ -175,7 +175,7 @@ bool Parser::buildArrayAssign(AstBlock *block, Token idToken) {
     if (!expr) return false;
     
     AstExprStatement *stmt = new AstExprStatement;
-    stmt->setDataType(dataType, ptrType);
+    stmt->setDataType(DataType::Ptr, dataType);
     stmt->setExpression(expr);
     block->addStatement(stmt);
     
