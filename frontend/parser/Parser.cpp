@@ -131,6 +131,8 @@ bool Parser::buildBlock(AstBlock *block, AstIfStmt *parentBlock) {
                 token = scanner->getNext();
                 
                 if (token.type == Assign) {
+                    scanner->rewind(token);
+                    scanner->rewind(idToken);
                     code = buildVariableAssign(block, idToken);
                 } else if (token.type == LBracket) {
                     code = buildArrayAssign(block, idToken);

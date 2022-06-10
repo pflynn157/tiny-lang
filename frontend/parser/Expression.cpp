@@ -25,6 +25,7 @@ AstExpression *Parser::buildConstExpr(Token token) {
 
 bool Parser::buildOperator(Token token, ExprContext *ctx) {
     switch (token.type) {
+        case Assign:
         case Plus: 
         case Minus:
         case Mul:
@@ -44,6 +45,7 @@ bool Parser::buildOperator(Token token, ExprContext *ctx) {
             AstUnaryOp *op1 = new AstUnaryOp;
             bool useUnary = false;
             switch (token.type) {
+                case Assign: op = new AstAssignOp; break;
                 case Plus: op = new AstAddOp; break;
                 case Mul: op = new AstMulOp; break;
                 case Div: op = new AstDivOp; break;
@@ -251,6 +253,7 @@ AstExpression *Parser::buildExpression(DataType currentType, TokenType stopToken
                 if (!buildIDExpr(token, ctx)) return nullptr;
             } break;
             
+            case Assign:
             case Plus: 
             case Minus:
             case Mul:

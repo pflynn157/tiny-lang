@@ -34,6 +34,26 @@ private:
     AstType type = AstType::EmptyAst;
 };
 
+// Represents an AST expression statement
+// This is basically the same as a statement
+class AstExprStatement : public AstStatement {
+public:
+    explicit AstExprStatement() : AstStatement(AstType::ExprStmt) {}
+    void print();
+    
+    void setDataType(DataType dataType, DataType ptrType = DataType::Void) {
+        this->dataType = dataType;
+        this->ptrType = ptrType;
+    }
+    
+    DataType getDataType() { return dataType; }
+    DataType getPtrType() { return ptrType; }
+    
+private:
+    DataType dataType = DataType::Void;
+    DataType ptrType = DataType::Void;
+};
+
 // Represents a function call statement
 class AstFuncCallStmt : public AstStatement {
 public:

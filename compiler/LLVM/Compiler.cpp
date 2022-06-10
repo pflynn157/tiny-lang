@@ -79,6 +79,12 @@ void Compiler::emitLLVM(std::string path) {
 // Compiles an individual statement
 void Compiler::compileStatement(AstStatement *stmt) {
     switch (stmt->getType()) {
+        // Expression statement
+        case AstType::ExprStmt: {
+            AstExprStatement *expr_stmt = static_cast<AstExprStatement *>(stmt);
+            compileValue(expr_stmt->getExpression(), expr_stmt->getDataType());
+        } break;
+    
         // A variable declaration (alloca) statement
         case AstType::VarDec: {
             AstVarDec *vd = static_cast<AstVarDec *>(stmt);
@@ -256,6 +262,17 @@ Value *Compiler::compileValue(AstExpression *expr, DataType dataType) {
             Value *val = compileValue(op->getVal(), dataType);
             
             return builder->CreateNeg(val);
+        } break;
+        
+        case AstType::Assign: {
+            AstAssignOp *op = static_cast<AstAssignOp *>(expr);
+            
+            AstID *id = static_cast<AstID *>(op->getLVal());
+            AllocaInst *ptr = symtable[id->getValue()];
+            
+            Value *rval = compileValue(op->getRVal(), dataType);
+            
+            builder->CreateStore(rval, ptr);
         } break;
         
         case AstType::LogicalAnd:

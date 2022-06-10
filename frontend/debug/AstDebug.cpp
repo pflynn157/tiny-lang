@@ -101,6 +101,17 @@ void AstStruct::print() {
     std::cout << std::endl;
 }
 
+void AstExprStatement::print() {
+    std::cout << "EXPR " << printDataType(dataType);
+    if (ptrType != DataType::Void) {
+        std::cout << "*" << printDataType(ptrType);
+    }
+    
+    std::cout << " ";
+    getExpression()->print();
+    std::cout << std::endl;
+}
+
 void AstFuncCallStmt::print() {
     std::cout << "FC " << name;
     getExpression()->print();
@@ -121,8 +132,6 @@ void AstVarDec::print() {
         size->print();
         std::cout << "]";
     }
-    std::cout << " := ";
-    getExpression()->print();
     std::cout << std::endl;
 }
 
@@ -214,6 +223,14 @@ void AstExprList::print() {
 void AstNegOp::print() {
     std::cout << "(-";
     val->print();
+    std::cout << ")";
+}
+
+void AstAssignOp::print() {
+    std::cout << "(";
+    lval->print();
+    std::cout << ") := (";
+    rval->print();
     std::cout << ")";
 }
 

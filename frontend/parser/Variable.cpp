@@ -154,18 +154,14 @@ bool Parser::buildVariableDec(AstBlock *block) {
 // Builds a variable assignment
 bool Parser::buildVariableAssign(AstBlock *block, Token idToken) {
     DataType dataType = typeMap[idToken.id_val].first;
-    AstVarAssign *va = new AstVarAssign(idToken.id_val);
-    va->setDataType(dataType);
-    block->addStatement(va);
     
-    AstExpression *arg = buildExpression(dataType);
-    if (!arg) return false;
-    va->setExpression(arg);
+    AstExpression *expr = buildExpression(dataType);
+    if (!expr) return false;
     
-    if (!va->hasExpression()) {
-        syntax->addError(scanner->getLine(), "Invalid variable assignment.");
-        return false;
-    }
+    AstExprStatement *stmt = new AstExprStatement;
+    stmt->setDataType(dataType);
+    stmt->setExpression(expr);
+    block->addStatement(stmt);
     
     return true;
 }

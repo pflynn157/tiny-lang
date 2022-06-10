@@ -90,6 +90,17 @@ protected:
     int precedence = 0;
 };
 
+// Represents an assignment operation
+class AstAssignOp : public AstBinaryOp {
+public:
+    AstAssignOp() {
+        this->type = AstType::Assign;
+        this->precedence = 16;
+    }
+    
+    void print();
+};
+
 // Represents an add operation
 class AstAddOp : public AstBinaryOp {
 public:

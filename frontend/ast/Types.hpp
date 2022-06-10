@@ -14,6 +14,8 @@ enum class AstType {
     Func,
     Return,
     
+    ExprStmt,
+    
     FuncCallStmt,
     FuncCallExpr,
     
@@ -33,6 +35,7 @@ enum class AstType {
     
     Neg,
     
+    Assign,
     Add,
     Sub,
     Mul,
