@@ -52,6 +52,7 @@ void AstExternFunction::print() {
 }
 
 void AstFunction::print() {
+    std::cout << std::endl;
     std::cout << "FUNC " << name << "(";
     for (auto var : args) {
         std::cout << printDataType(var.type);
@@ -65,15 +66,23 @@ void AstFunction::print() {
     std::cout << printDataType(dataType);
     std::cout << std::endl;
     
-    for (auto stmt : block->getBlock()) {
-        stmt->print();
-        if (stmt->hasExpression()) {
-            for (int i = 0; i<8; i++) std::cout << " ";
-                stmt->getExpression()->print();
-            std::cout << std::endl;
+    block->print();
+}
+
+void AstBlock::print(int indent) {
+    for (auto stmt : block) {
+        for (int i = 0; i<indent; i++) std::cout << " ";
+        switch (stmt->getType()) {
+            case AstType::If:
+            case AstType::Elif:
+            case AstType::Else:
+            case AstType::While: {
+                static_cast<AstBlockStmt *>(stmt)->print(indent);
+            } break;
+            
+            default: stmt->print();
         }
     }
-    std::cout << std::endl;
 }
 
 void AstStruct::print() {
@@ -93,20 +102,18 @@ void AstStruct::print() {
 }
 
 void AstFuncCallStmt::print() {
-    std::cout << "    ";
     std::cout << "FC " << name;
+    getExpression()->print();
     std::cout << std::endl;
 }
 
 void AstReturnStmt::print() {
-    std::cout << "    ";
     std::cout << "RETURN ";
-    
+    if (getExpression()) getExpression()->print();
     std::cout << std::endl;
 }
 
 void AstVarDec::print() {
-    std::cout << "    ";
     std::cout << "VAR_DEC " << name << " : " << printDataType(dataType);
     if (ptrType != DataType::Void) {
         std::cout << "*" << printDataType(ptrType);
@@ -114,123 +121,84 @@ void AstVarDec::print() {
         size->print();
         std::cout << "]";
     }
+    std::cout << " := ";
+    getExpression()->print();
     std::cout << std::endl;
 }
 
 void AstStructDec::print() {
-    std::cout << "    ";
     std::cout << "STRUCT " << varName << " : " << structName;
     if (noInit) std::cout << " NOINIT";
+    std::cout << " := ";
+    getExpression()->print();
     std::cout << std::endl;
 }
 
 void AstVarAssign::print() {
-    std::cout << "    ";
     std::cout << "VAR= " << name << " : " << printDataType(dataType);
     if (ptrType != DataType::Void) {
         std::cout << "*" << printDataType(ptrType);
         std::cout << "[]";
     }
+    std::cout << " := ";
+    getExpression()->print();
     std::cout << std::endl;
 }
 
 void AstArrayAssign::print() {
-    std::cout << "    ";
     std::cout << "ARR[";
     index->print();
     std::cout << "]= " << name;
+    getExpression()->print();
     std::cout << std::endl;
 }
 
 void AstStructAssign::print() {
-    std::cout << "    ";
-    std::cout << "STRUCT= " << name << "." << member;
+    std::cout << "STRUCT= " << name << "." << member << " := ";
+    getExpression()->print();
     std::cout << std::endl;
 }
 
-void AstIfStmt::print() {
-    std::cout << "    ";
-    std::cout << "IF " << std::endl;
+void AstIfStmt::print(int indent) {
+    std::cout << "IF ";
+    getExpression()->print();
+    std::cout << " THEN" << std::endl;
+    block->print(indent + 4);
     
-    std::cout << "=========================" << std::endl;
-    for (auto stmt : block->getBlock()) {
-        stmt->print();
-        if (stmt->hasExpression()) {
-            for (int i = 0; i<8; i++) std::cout << " ";
-                stmt->getExpression()->print();
-            std::cout << std::endl;
-        }
+    for (auto br : branches) {
+        for (int i = 0; i<indent; i++) std::cout << " ";
+        static_cast<AstBlockStmt *>(br)->print(indent);
     }
     
-    std::cout << ">>" << std::endl;
-    
-    for (auto stmt : branches) {
-        stmt->print();
-        if (stmt->hasExpression()) {
-            for (int i = 0; i<8; i++) std::cout << " ";
-                stmt->getExpression()->print();
-            std::cout << std::endl;
-        }
-    }
-    
-    std::cout << "=========================" << std::endl;
+    for (int i = 0; i<indent; i++) std::cout << " ";
+    std::cout << "end" << std::endl;
 }
 
-void AstElifStmt::print() {
-    std::cout << "    ";
-    std::cout << "ELIF" << std::endl;
-    
-    std::cout << "-------------------------" << std::endl;
-    for (auto stmt : block->getBlock()) {
-        stmt->print();
-        if (stmt->hasExpression()) {
-            for (int i = 0; i<8; i++) std::cout << " ";
-                stmt->getExpression()->print();
-            std::cout << std::endl;
-        }
-    }
-    std::cout << "-------------------------" << std::endl;
+void AstElifStmt::print(int indent) {
+    std::cout << "ELIF ";
+    getExpression()->print();
+    std::cout << " THEN" << std::endl;
+    block->print(indent + 4);
 }
 
-void AstElseStmt::print() {
-    std::cout << "    ";
+void AstElseStmt::print(int indent) {
     std::cout << "ELSE" << std::endl;
-    
-    std::cout << "-------------------------" << std::endl;
-    for (auto stmt : block->getBlock()) {
-        stmt->print();
-        if (stmt->hasExpression()) {
-            for (int i = 0; i<8; i++) std::cout << " ";
-                stmt->getExpression()->print();
-            std::cout << std::endl;
-        }
-    }
-    std::cout << "-------------------------" << std::endl;
+    block->print(indent + 4);
 }
 
-void AstWhileStmt::print() {
-    std::cout << "    ";
-    std::cout << "WHILE" << std::endl;
+void AstWhileStmt::print(int indent) {
+    std::cout << "WHILE ";
+    getExpression()->print();
+    std::cout << " DO" << std::endl;
     
-    std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
-    for (auto stmt : block->getBlock()) {
-        stmt->print();
-        if (stmt->hasExpression()) {
-            for (int i = 0; i<8; i++) std::cout << " ";
-                stmt->getExpression()->print();
-            std::cout << std::endl;
-        }
-    }
-    std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+    block->print(indent+4);
 }
 
 void AstBreak::print() {
-    std::cout << "    ";
     std::cout << "BREAK" << std::endl;
 }
 
 void AstContinue::print() {
-    std::cout << "    ";
     std::cout << "CONTINUE" << std::endl;
 }
 

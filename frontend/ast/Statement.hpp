@@ -179,6 +179,8 @@ public:
     
     AstBlock *getBlockStmt() { return block; }
     std::vector<AstStatement *> getBlock() { return block->getBlock(); }
+    
+    virtual void print(int indent = 0) {}
 protected:
     AstBlock *block;
 };
@@ -191,7 +193,7 @@ public:
     void addBranch(AstStatement *stmt) { branches.push_back(stmt); }
     std::vector<AstStatement *> getBranches() { return branches; }
     
-    void print();
+    void print(int indent = 0);
 private:
     std::vector<AstStatement *> branches;
 };
@@ -200,14 +202,14 @@ class AstElifStmt : public AstBlockStmt {
 public:
     explicit AstElifStmt() : AstBlockStmt(AstType::Elif) {}
     
-    void print();
+    void print(int indent = 0);
 };
 
 class AstElseStmt : public AstBlockStmt {
 public:
     explicit AstElseStmt() : AstBlockStmt(AstType::Else) {}
     
-    void print();
+    void print(int indent = 0);
 };
 
 // Represents a while statement
@@ -215,7 +217,7 @@ class AstWhileStmt : public AstBlockStmt {
 public:
     explicit AstWhileStmt() : AstBlockStmt(AstType::While) {}
     
-    void print();
+    void print(int indent = 0);
 };
 
 // Represents a break statement for a loop

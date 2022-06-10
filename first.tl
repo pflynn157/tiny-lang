@@ -11,8 +11,14 @@
 func test1(x:i32) is
     if x > 20 and x < 30 then
         println("True");
+    elif x < 20 then
+        println("ID");
     else
         println("False");
+    end
+    
+    while x < 50 do
+        x := x + 1;
     end
 end
 

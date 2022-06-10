@@ -102,6 +102,8 @@ public:
     void addStatement(AstStatement *stmt) { block.push_back(stmt); }
     void addStatements(std::vector<AstStatement *> block) { this->block = block; }
     std::vector<AstStatement *> getBlock() { return block; }
+    
+    void print(int indent = 4);
 private:
     std::vector<AstStatement *> block;
 };
