@@ -130,16 +130,12 @@ bool Parser::buildBlock(AstBlock *block, AstIfStmt *parentBlock) {
                 Token idToken = token;
                 token = scanner->getNext();
                 
-                if (token.type == Assign || token.type == LBracket) {
+                if (token.type == Assign || token.type == LBracket || token.type == Dot) {
                     scanner->rewind(token);
                     scanner->rewind(idToken);
                     code = buildVariableAssign(block, idToken);
                 } else if (token.type == LParen) {
                     code = buildFunctionCallStmt(block, idToken);
-                } else if (token.type == Dot) {
-                    scanner->rewind(token);
-                    scanner->rewind(idToken);
-                    code = buildStructAssign(block, idToken);
                 } else {
                     syntax->addError(scanner->getLine(), "Invalid use of identifier.");
                     token.print();

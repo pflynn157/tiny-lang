@@ -49,7 +49,6 @@ protected:
     bool buildStruct();
     bool buildStructMember(AstStruct *str, Token token);
     bool buildStructDec(AstBlock *block);
-    bool buildStructAssign(AstBlock *block, Token idToken);
     
     // Expression.cpp
     struct ExprContext {
