@@ -151,31 +151,16 @@ bool Parser::buildVariableDec(AstBlock *block) {
     return true;
 }
 
-// Builds a variable assignment
+// Builds a variable or an array assignment
 bool Parser::buildVariableAssign(AstBlock *block, Token idToken) {
     DataType dataType = typeMap[idToken.id_val].first;
+    DataType ptrType = typeMap[idToken.id_val].second;
     
-    AstExpression *expr = buildExpression(dataType);
+    AstExpression *expr = buildExpression((dataType == DataType::Ptr) ? dataType : ptrType);
     if (!expr) return false;
     
     AstExprStatement *stmt = new AstExprStatement;
-    stmt->setDataType(dataType);
-    stmt->setExpression(expr);
-    block->addStatement(stmt);
-    
-    return true;
-}
-
-// Builds an array assignment
-bool Parser::buildArrayAssign(AstBlock *block, Token idToken) {
-    DataType dataType = typeMap[idToken.id_val].second;
-    DataType ptrType = typeMap[idToken.id_val].first;
-    
-    AstExpression *expr = buildExpression(dataType);
-    if (!expr) return false;
-    
-    AstExprStatement *stmt = new AstExprStatement;
-    stmt->setDataType(DataType::Ptr, dataType);
+    stmt->setDataType(dataType, ptrType);
     stmt->setExpression(expr);
     block->addStatement(stmt);
     

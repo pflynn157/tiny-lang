@@ -36,7 +36,6 @@ protected:
     // Variable.cpp
     bool buildVariableDec(AstBlock *block);
     bool buildVariableAssign(AstBlock *block, Token idToken);
-    bool buildArrayAssign(AstBlock *block, Token idToken);
     bool buildConst(bool isGlobal);
     
     // Flow.cpp
