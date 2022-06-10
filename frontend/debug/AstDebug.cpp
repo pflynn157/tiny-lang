@@ -234,13 +234,6 @@ void AstContinue::print() {
     std::cout << "CONTINUE" << std::endl;
 }
 
-void AstEnd::print() {
-    std::cout << "    ";
-    std::cout << "END";
-    
-    std::cout << std::endl;
-}
-
 void AstExprList::print() {
     std::cout << "{";
     for (auto item : list) {

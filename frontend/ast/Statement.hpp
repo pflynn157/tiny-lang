@@ -232,10 +232,3 @@ public:
     void print();
 };
 
-// Represents a block end
-class AstEnd : public AstStatement {
-public:
-    explicit AstEnd() : AstStatement(AstType::End) {}
-    void print();
-};
-
