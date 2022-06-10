@@ -68,7 +68,7 @@ protected:
     AstExpression *buildExpression(DataType currentType, TokenType stopToken = SemiColon, bool isConst = false, bool buildList = false);
     AstExpression *checkExpression(AstExpression *expr, DataType varType);
     
-    bool buildBlock(AstBlock *block, int stopLayer = 0, AstIfStmt *parentBlock = nullptr, bool inElif = false);
+    bool buildBlock(AstBlock *block, AstIfStmt *parentBlock = nullptr);
     AstExpression *checkCondExpression(AstExpression *toCheck);
     int isConstant(std::string name);
     bool isVar(std::string name);
@@ -78,7 +78,6 @@ private:
     Scanner *scanner;
     AstTree *tree;
     ErrorManager *syntax;
-    int layer = 0;
     
     std::map<std::string, std::pair<DataType,DataType>> typeMap;
     std::map<std::string, std::pair<DataType, AstExpression*>> globalConsts;

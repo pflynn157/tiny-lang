@@ -25,6 +25,8 @@ public:
     explicit AstTree(std::string file) { this-> file = file; }
     ~AstTree() {}
     
+    std::string getFile() { return file; }
+    
     std::vector<AstGlobalStatement *> getGlobalStatements() {
         return global_statements;
     }

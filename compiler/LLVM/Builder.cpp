@@ -81,10 +81,10 @@ void Compiler::assemble() {
 // TODO: Same as above...
 void Compiler::link() {
     std::string cmd = "ld ";
-    cmd += "/usr/local/lib/eos/eos_start.o ";
+    cmd += "/usr/local/lib/tinylang/ti_start.o ";
     cmd += "/tmp/" + cflags.name + ".o -o " + cflags.name;
     cmd += " -dynamic-linker /lib64/ld-linux-x86-64.so.2 ";
-    cmd += "-lstdeos -lc";
+    cmd += "-ltinylang -lc";
     system(cmd.c_str());
 }
 

@@ -6,6 +6,7 @@ set(SRC
     
     debug/AstDebug.cpp
     debug/LexDebug.cpp
+    debug/Unparse.cpp
     
     error/Manager.cpp
     

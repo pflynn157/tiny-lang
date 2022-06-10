@@ -206,7 +206,7 @@ bool Parser::buildFunction(Token startToken, std::string className) {
     
     // Build the body
     int stopLayer = 0;
-    if (!buildBlock(func->getBlock(), stopLayer)) return false;
+    if (!buildBlock(func->getBlock())) return false;
     
     // Make sure we end with a return statement
     AstType lastType = func->getBlock()->getBlock().back()->getType();

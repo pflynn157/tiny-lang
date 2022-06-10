@@ -19,7 +19,7 @@ Parser::Parser(std::string input) {
     //string malloc(string)
     funcs.push_back("malloc");
     AstExternFunction *FT1 = new AstExternFunction("malloc");
-    FT1->addArgument(Var(DataType::I32));
+    FT1->addArgument(Var(DataType::I32, DataType::Void, "size"));
     FT1->setDataType(DataType::String);
     tree->addGlobalStatement(FT1);
     
@@ -27,7 +27,7 @@ Parser::Parser(std::string input) {
     funcs.push_back("println");
     AstExternFunction *FT2 = new AstExternFunction("println");
     FT2->setVarArgs();
-    FT2->addArgument(Var(DataType::String));
+    FT2->addArgument(Var(DataType::String, DataType::Void, "str"));
     FT2->setDataType(DataType::Void);
     tree->addGlobalStatement(FT2);
     
@@ -35,38 +35,38 @@ Parser::Parser(std::string input) {
     funcs.push_back("print");
     AstExternFunction *FT3 = new AstExternFunction("print");
     FT3->setVarArgs();
-    FT3->addArgument(Var(DataType::String));
+    FT3->addArgument(Var(DataType::String, DataType::Void, "str"));
     FT3->setDataType(DataType::Void);
     tree->addGlobalStatement(FT3);
     
     //i32 strlen(string)
     funcs.push_back("strlen");
     AstExternFunction *FT4 = new AstExternFunction("strlen");
-    FT4->addArgument(Var(DataType::String));
+    FT4->addArgument(Var(DataType::String, DataType::Void, "str"));
     FT4->setDataType(DataType::I32);
     tree->addGlobalStatement(FT4);
     
     //i32 stringcmp(string, string)
     funcs.push_back("stringcmp");
     AstExternFunction *FT5 = new AstExternFunction("stringcmp");
-    FT5->addArgument(Var(DataType::String));
-    FT5->addArgument(Var(DataType::String));
+    FT5->addArgument(Var(DataType::String, DataType::Void, "str"));
+    FT5->addArgument(Var(DataType::String, DataType::Void, "str"));
     FT5->setDataType(DataType::I32);
     tree->addGlobalStatement(FT5);
     
     //string strcat_str(string, string)
     funcs.push_back("strcat_str");
     AstExternFunction *FT6 = new AstExternFunction("strcat_str");
-    FT6->addArgument(Var(DataType::String));
-    FT6->addArgument(Var(DataType::String));
+    FT6->addArgument(Var(DataType::String, DataType::Void, "str"));
+    FT6->addArgument(Var(DataType::String, DataType::Void, "str"));
     FT6->setDataType(DataType::String);
     tree->addGlobalStatement(FT6);
     
     //string strcat_char(string, char)
     funcs.push_back("strcat_char");
     AstExternFunction *FT7 = new AstExternFunction("strcat_char");
-    FT7->addArgument(Var(DataType::String));
-    FT7->addArgument(Var(DataType::Char));
+    FT7->addArgument(Var(DataType::String, DataType::Void, "str"));
+    FT7->addArgument(Var(DataType::Char, DataType::Void, "c"));
     FT7->setDataType(DataType::String);
     tree->addGlobalStatement(FT7);
 }
@@ -115,9 +115,9 @@ bool Parser::parse() {
 }
 
 // Builds a statement block
-bool Parser::buildBlock(AstBlock *block, int stopLayer, AstIfStmt *parentBlock, bool inElif) {
+bool Parser::buildBlock(AstBlock *block, AstIfStmt *parentBlock) {
     Token token = scanner->getNext();
-    while (token.type != Eof) {
+    while (token.type != End && token.type != Eof) {
         bool code = true;
         bool end = false;
         
@@ -148,45 +148,20 @@ bool Parser::buildBlock(AstBlock *block, int stopLayer, AstIfStmt *parentBlock, 
             case Return: code = buildReturn(block); break;
             
             // Handle conditionals
-            // Yes, ELIF and ElSE are similar, but if you look closely, there is a subtle
-            // difference (one very much needed)
             case If: code = buildConditional(block); break;
             case Elif: {
-                if (inElif) {
-                    scanner->rewind(token);
-                    end = true;
-                } else {
-                    code = buildElif(parentBlock);
-                }
+                code = buildElif(parentBlock);
+                end = true;
             } break;
             case Else: {
-                if (inElif) {
-                    scanner->rewind(token);
-                    end = true;
-                } else {
-                    code = buildElse(parentBlock);
-                    end = true;
-                }
+                code = buildElse(parentBlock);
+                end = true;
             } break;
             
             // Handle loops
             case While: code = buildWhile(block); break;
             case Break: code = buildLoopCtrl(block, true); break;
             case Continue: code = buildLoopCtrl(block, false); break;
-            
-            // Handle the END keyword
-            // This is kind of tricky in conditionals
-            case End: {
-                if (inElif) {
-                    scanner->rewind(token);
-                    end = true;
-                    break;
-                }
-                if (layer == stopLayer) {
-                    end = true;
-                }
-                if (layer > 0) --layer;
-            } break;
             
             case Nl: break;
             

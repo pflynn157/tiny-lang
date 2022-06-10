@@ -60,9 +60,8 @@ bool Parser::buildConditional(AstBlock *block) {
     
     AstExpression *expr = checkCondExpression(cond->getExpression());
     cond->setExpression(expr);
-
-    ++layer;
-    buildBlock(cond->getBlockStmt(), layer, cond);
+    
+    buildBlock(cond->getBlockStmt(), cond);
     
     return true;
 }
@@ -78,7 +77,8 @@ bool Parser::buildElif(AstIfStmt *block) {
     AstExpression *expr = checkCondExpression(elif->getExpression());
     elif->setExpression(expr);
     
-    buildBlock(elif->getBlockStmt(), layer, block, true);
+    buildBlock(elif->getBlockStmt(), block);
+    
     return true;
 }
 
@@ -87,7 +87,7 @@ bool Parser::buildElse(AstIfStmt *block) {
     AstElseStmt *elsee = new AstElseStmt;
     block->addBranch(elsee);
     
-    buildBlock(elsee->getBlockStmt(), layer);
+    buildBlock(elsee->getBlockStmt());
     return true;
 }
 
@@ -102,8 +102,7 @@ bool Parser::buildWhile(AstBlock *block) {
     AstExpression *expr = checkCondExpression(loop->getExpression());
     loop->setExpression(expr);
     
-    ++layer;
-    buildBlock(loop->getBlockStmt(), layer);
+    buildBlock(loop->getBlockStmt());
     
     return true;
 }
