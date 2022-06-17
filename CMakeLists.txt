@@ -5,20 +5,14 @@ find_package(LLVM REQUIRED CONFIG)
 
 add_compile_options(-std=c++17 -g)
 
-include_directories(frontend compiler llir/src)
+include_directories(frontend compiler)
 
 include_directories(${LLVM_INCLUDE_DIRS})
 separate_arguments(LLVM_DEFINITIONS_LIST NATIVE_COMMAND ${LLVM_DEFINITIONS})
 add_definitions(${LLVM_DEFINITIONS})
 
-option(LLIR "Use the LLIR backend" OFF)
-if (LLIR)
-    add_subdirectory(llir)
-    add_subdirectory(compiler/LLIR)
-endif()
-
 add_subdirectory(frontend)
-add_subdirectory(compiler/LLVM)
+add_subdirectory(compiler)
 add_subdirectory(src)
 add_subdirectory(lib)
 

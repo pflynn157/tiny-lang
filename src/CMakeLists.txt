@@ -12,11 +12,3 @@ target_link_libraries(tlc
     tlcompiler_llvm
 )
 
-if (LLIR)
-    add_executable(tlc2 llir_main.cpp)
-    
-    target_link_libraries(tlc2
-        tlparser
-        tlcompiler_llir
-    )
-endif()

@@ -5,7 +5,7 @@
 //
 #include <iostream>
 
-#include <LLVM/Compiler.hpp>
+#include <Compiler.hpp>
 
 // Compiles a structure declaration
 void Compiler::compileStructDeclaration(AstStatement *stmt) {

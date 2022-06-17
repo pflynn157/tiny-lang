@@ -15,7 +15,7 @@
 using namespace llvm;
 using namespace llvm::sys;
 
-#include <LLVM/Compiler.hpp>
+#include <Compiler.hpp>
 
 void Compiler::writeAssembly() {
     std::string triple = "";

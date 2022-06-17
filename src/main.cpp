@@ -11,7 +11,7 @@
 #include <parser/Parser.hpp>
 #include <ast.hpp>
 
-#include <LLVM/Compiler.hpp>
+#include <Compiler.hpp>
 
 bool isError = false;
 

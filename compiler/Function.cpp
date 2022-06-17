@@ -5,7 +5,7 @@
 //
 #include <iostream>
 
-#include <LLVM/Compiler.hpp>
+#include <Compiler.hpp>
 
 //
 // Compiles a function and its body
