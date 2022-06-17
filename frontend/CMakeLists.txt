@@ -8,8 +8,7 @@ set(SRC
     debug/LexDebug.cpp
     debug/Unparse.cpp
     
-    error/Manager.cpp
-    
+    parser/ErrorManager.cpp
     parser/Expression.cpp
     parser/Flow.cpp
     parser/Function.cpp

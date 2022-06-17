@@ -5,7 +5,7 @@
 //
 #include <iostream>
 
-#include <error/Manager.hpp>
+#include <parser/ErrorManager.hpp>
 
 // Adds a syntax error message
 void ErrorManager::addError(int line, std::string message) {

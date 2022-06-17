@@ -9,7 +9,7 @@
 #include <map>
 
 #include <lex/Lex.hpp>
-#include <error/Manager.hpp>
+#include <parser/ErrorManager.hpp>
 #include <ast.hpp>
 
 // The parser class
