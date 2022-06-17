@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ast.hpp>
+#include <ast/ast.hpp>
 
 void unparse(AstTree *tree);
 

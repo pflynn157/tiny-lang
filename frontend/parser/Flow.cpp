@@ -4,7 +4,7 @@
 // Tiny Lang is licensed under the BSD-3 license. See the COPYING file for more information.
 //
 #include <parser/Parser.hpp>
-#include <ast.hpp>
+#include <ast/ast.hpp>
 
 // Called if a conditional statement has only one operand. If it does,
 // we have to expand to have two operands before we get down to the

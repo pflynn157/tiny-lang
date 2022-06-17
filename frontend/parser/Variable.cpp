@@ -8,7 +8,7 @@
 #include <vector>
 
 #include <parser/Parser.hpp>
-#include <ast.hpp>
+#include <ast/ast.hpp>
 
 // Builds a variable declaration
 // A variable declaration is composed of an Alloca and optionally, an assignment

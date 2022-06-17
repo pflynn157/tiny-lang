@@ -9,7 +9,7 @@
 
 #include <preproc/Preproc.hpp>
 #include <parser/Parser.hpp>
-#include <ast.hpp>
+#include <ast/ast.hpp>
 
 #include <Compiler.hpp>
 

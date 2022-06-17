@@ -15,7 +15,7 @@ using namespace llvm;
 #include <map>
 #include <stack>
 
-#include <ast.hpp>
+#include <ast/ast.hpp>
 
 struct CFlags {
     std::string name;

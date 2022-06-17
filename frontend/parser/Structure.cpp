@@ -8,7 +8,7 @@
 #include <map>
 
 #include <parser/Parser.hpp>
-#include <ast.hpp>
+#include <ast/ast.hpp>
 
 // Parses and builds a structure
 bool Parser::buildStruct() {

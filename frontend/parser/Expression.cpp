@@ -6,7 +6,7 @@
 #include <iostream>
 
 #include <parser/Parser.hpp>
-#include <ast.hpp>
+#include <ast/ast.hpp>
 
 // Builds a constant expression value
 AstExpression *Parser::buildConstExpr(Token token) {

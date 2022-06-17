@@ -10,7 +10,7 @@
 
 #include <lex/Lex.hpp>
 #include <parser/ErrorManager.hpp>
-#include <ast.hpp>
+#include <ast/ast.hpp>
 
 // The parser class
 // The parser is in charge of performing all parsing and AST-building tasks

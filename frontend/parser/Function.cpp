@@ -6,7 +6,7 @@
 #include <iostream>
 
 #include <parser/Parser.hpp>
-#include <ast.hpp>
+#include <ast/ast.hpp>
 
 // Returns the function arguments
 bool Parser::getFunctionArgs(std::vector<Var> &args) {

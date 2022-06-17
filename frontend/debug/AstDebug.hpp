@@ -5,6 +5,6 @@
 //
 #pragma once
 
-#include <ast.hpp>
+#include <ast/ast.hpp>
 
 std::string printDataType(DataType dataType);
