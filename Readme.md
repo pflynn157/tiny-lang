@@ -62,11 +62,14 @@ end
 
 The compiler is completely written in C++ and uses only the standard library and LLVM. The lexer, parser, and AST (the frontend) is written from scratch. The backend uses LLVM for simplicity.
 
-### Submodule Note
 
-You may notice several Git commits mentioning LLIR, and you likely have noticed the LLIR submodule. This is a new compiler backend that I have been working on as an alternative to LLVM (the LLVM backend will not be going anywhere; this is to show how TinyLang can use different backends, and to provide me with a practical and more useful way to test LLIR).
+### Dependencies
 
-LLIR is still very alpha at this point, so it's in a private Gitlab repo at the moment. I'll make it public once its more stable. CMake will not build it by default.
+In order to build, you need a C++ compiler, LLVM (most versions should), and minilex.
+
+Minilex is a recent addition to this project. It's my own project, so you can find here on my Github profile. Minilex is a simple lexical analyzer generator. All that's needed is a config file (see src/lex), and a compatible lexical analyzer is generated in the build directory. The source for minilex was originally based on the Tiny Lang lexical analyzer, so needless to say, it works perfectly! :)
+
+For the curious, adding minilex was to make it even easier to fork.
 
 ### License
 
