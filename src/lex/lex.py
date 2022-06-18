@@ -1,9 +1,8 @@
 ##
-## This is an example of a user-generated configuration file for
-## simple-lex.
+## This is the configuration file for generating the lexical analyzer.
+## The analyzer will end up in the source root of the build directory.
+## You will minilex in order to run this.
 ##
-
-#output_path = "./src"
 
 # Define the keywords
 keywords = [

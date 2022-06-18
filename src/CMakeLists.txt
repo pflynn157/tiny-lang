@@ -10,9 +10,22 @@ add_custom_command(
 )
 include_directories(${CMAKE_BINARY_DIR}/src)
 
+if (LLIR)
+    set(COMPILER_SRC
+    
+    )
+else()
+    set(COMPILER_SRC
+        compiler/LLVM/Builder.cpp
+        compiler/LLVM/Compiler.cpp
+        compiler/LLVM/Flow.cpp
+        compiler/LLVM/Function.cpp
+        compiler/LLVM/Variable.cpp
+    )
+endif()
+
 set(SRC
     # Frontend sources
-    #lex/Lex.cpp
     ${CMAKE_BINARY_DIR}/src/lex.cpp
     ${CMAKE_BINARY_DIR}/src/lex_debug.cpp
     
@@ -30,11 +43,7 @@ set(SRC
     preproc/Preproc.cpp
     
     # Compile sources
-    compiler/Builder.cpp
-    compiler/Compiler.cpp
-    compiler/Flow.cpp
-    compiler/Function.cpp
-    compiler/Variable.cpp
+    ${COMPILER_SRC}
     
     # Program sources
     main.cpp

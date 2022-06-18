@@ -5,7 +5,7 @@
 //
 #include <iostream>
 
-#include <compiler/Compiler.hpp>
+#include "Compiler.hpp"
 
 //
 // Compiles a function and its body

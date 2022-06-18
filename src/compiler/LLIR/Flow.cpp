@@ -1,49 +1,48 @@
 //
-// Copyright 2021-2022 Patrick Flynn
+// Copyright 2021 Patrick Flynn
 // This file is part of the Tiny Lang compiler.
 // Tiny Lang is licensed under the BSD-3 license. See the COPYING file for more information.
 //
-#include <compiler/Compiler.hpp>
+#include <LLIR/Compiler.hpp>
 
 // Translates an AST IF statement to LLVM
 void Compiler::compileIfStatement(AstStatement *stmt) {
     AstIfStmt *condStmt = static_cast<AstIfStmt *>(stmt);
     bool hasBranches = condStmt->getBranches().size();
 
-    BasicBlock *trueBlock = BasicBlock::Create(*context, "true" + std::to_string(blockCount), currentFunc);
-    BasicBlock *falseBlock = nullptr;
-    BasicBlock *endBlock = BasicBlock::Create(*context, "end" + std::to_string(blockCount), currentFunc);
+    LLIR::Block *trueBlock = new LLIR::Block("true" + std::to_string(blockCount));
+    LLIR::Block *falseBlock = nullptr;
+    LLIR::Block *endBlock = new LLIR::Block("end" + std::to_string(blockCount));
     
     // The break stack pushes are for the logical boolean expressions
     logicalOrStack.push(trueBlock);
     if (hasBranches) {
-        falseBlock = BasicBlock::Create(*context, "false" + std::to_string(blockCount), currentFunc);
+        falseBlock = new LLIR::Block("false" + std::to_string(blockCount));
         logicalAndStack.push(falseBlock);
     } else {
         logicalAndStack.push(endBlock);
     }
     ++blockCount;
-    
 
-    Value *cond = compileValue(stmt->getExpression());
-    if (hasBranches) builder->CreateCondBr(cond, trueBlock, falseBlock);
-    else builder->CreateCondBr(cond, trueBlock, endBlock);
+    LLIR::Operand *cond = compileValue(stmt->getExpression(), DataType::Void, trueBlock);
+    if (hasBranches) builder->createBr(falseBlock);
+    else builder->createBr(endBlock);
     
     logicalAndStack.pop();
     logicalOrStack.pop();
 
     // Align the blocks
-    BasicBlock *current = builder->GetInsertBlock();
-    trueBlock->moveAfter(current);
+    LLIR::Block *current = builder->getInsertPoint();
+    builder->addBlockAfter(current, trueBlock);
 
     if (hasBranches) {
-        falseBlock->moveAfter(trueBlock);
-        endBlock->moveAfter(falseBlock);
+        builder->addBlockAfter(trueBlock, falseBlock);
+        builder->addBlockAfter(falseBlock, endBlock);
     } else {
-        endBlock->moveAfter(trueBlock);
+        builder->addBlockAfter(trueBlock, endBlock);
     }
 
-    builder->SetInsertPoint(trueBlock);
+    builder->setInsertPoint(trueBlock);
     bool hasBreak = false;
     bool hasEndingRet = false;
     for (auto stmt : condStmt->getBlock()) {
@@ -51,49 +50,51 @@ void Compiler::compileIfStatement(AstStatement *stmt) {
         if (stmt->getType() == AstType::Break) hasBreak = true;
     }
     if (condStmt->getBlock().back()->getType() == AstType::Return) hasEndingRet = true;
-    if (!hasBreak && !hasEndingRet) builder->CreateBr(endBlock);
+    if (!hasBreak && !hasEndingRet) builder->createBr(endBlock);
 
     // Branches
     bool hadElif = false;
     bool hadElse = false;
+    int subCount = 0;
 
     for (auto stmt : condStmt->getBranches()) {
         if (stmt->getType() == AstType::Elif) {
             AstElifStmt *elifStmt = static_cast<AstElifStmt *>(stmt);
             
-            BasicBlock *trueBlock2 = BasicBlock::Create(*context, "true" + std::to_string(blockCount), currentFunc);
-            BasicBlock *falseBlock2 = BasicBlock::Create(*context, "false" + std::to_string(blockCount), currentFunc);
+            LLIR::Block *trueBlock2 = new LLIR::Block(std::to_string(subCount) + "true" + std::to_string(blockCount));
+            LLIR::Block *falseBlock2 = new LLIR::Block(std::to_string(subCount) + "false" + std::to_string(blockCount));
+            ++subCount;
             
             logicalAndStack.push(falseBlock2);
             logicalOrStack.push(trueBlock2);
             
             // Align
-            if (!hadElif) builder->SetInsertPoint(falseBlock);
-            BasicBlock *current = builder->GetInsertBlock();
-            trueBlock2->moveAfter(current);
-            falseBlock2->moveAfter(trueBlock2);
+            if (!hadElif) builder->setInsertPoint(falseBlock);
+            LLIR::Block *current = builder->getInsertPoint();
+            builder->addBlockAfter(current, trueBlock2);
+            builder->addBlockAfter(trueBlock2, falseBlock2);
             
-            Value *cond = compileValue(stmt->getExpression());
-            builder->CreateCondBr(cond, trueBlock2, falseBlock2);
+            LLIR::Operand *cond = compileValue(stmt->getExpression(), DataType::Void, trueBlock2);
+            builder->createBr(falseBlock2);
             
             logicalAndStack.pop();
             logicalOrStack.pop();
             
-            builder->SetInsertPoint(trueBlock2);
+            builder->setInsertPoint(trueBlock2);
             bool hasBreak = false;
             bool hasEndingRet = false;
             for (auto stmt2 : elifStmt->getBlock()) {
                 compileStatement(stmt2);
             }
             if (elifStmt->getBlock().back()->getType() == AstType::Return) hasEndingRet = true;
-            if (!hasBreak && !hasEndingRet) builder->CreateBr(endBlock);
+            if (!hasBreak && !hasEndingRet) builder->createBr(endBlock);
             
-            builder->SetInsertPoint(falseBlock2);
+            builder->setInsertPoint(falseBlock2);
             hadElif = true;
         } else if (stmt->getType() == AstType::Else) {
             AstElseStmt *elseStmt = static_cast<AstElseStmt *>(stmt);
             
-            if (!hadElif) builder->SetInsertPoint(falseBlock);
+            if (!hadElif) builder->setInsertPoint(falseBlock);
             
             bool hasBreak = false;
             bool hasEndingRet = false;
@@ -101,50 +102,49 @@ void Compiler::compileIfStatement(AstStatement *stmt) {
                 compileStatement(stmt2);
             }
             if (elseStmt->getBlock().back()->getType() == AstType::Return) hasEndingRet = true;
-            if (!hasBreak && !hasEndingRet) builder->CreateBr(endBlock);
+            if (!hasBreak && !hasEndingRet) builder->createBr(endBlock);
             
             hadElse = true;
         }
     }
 
     if (hadElif && !hadElse) {
-        builder->CreateBr(endBlock);
+        builder->createBr(endBlock);
     }
 
     // Start at the end block
-    builder->SetInsertPoint(endBlock);
-    
+    builder->setInsertPoint(endBlock);
 }
 
 // Translates a while statement to LLVM
 void Compiler::compileWhileStatement(AstStatement *stmt) {
     AstWhileStmt *loop = static_cast<AstWhileStmt *>(stmt);
-
-    BasicBlock *loopBlock = BasicBlock::Create(*context, "loop_body" + std::to_string(blockCount), currentFunc);
-    BasicBlock *loopCmp = BasicBlock::Create(*context, "loop_cmp" + std::to_string(blockCount), currentFunc);
-    BasicBlock *loopEnd = BasicBlock::Create(*context, "loop_end" + std::to_string(blockCount), currentFunc);
+    
+    LLIR::Block *loopBlock = new LLIR::Block("loop_body" + std::to_string(blockCount));
+    LLIR::Block *loopCmp = new LLIR::Block("loop_cmp" + std::to_string(blockCount));
+    LLIR::Block *loopEnd = new LLIR::Block("loop_end" + std::to_string(blockCount));
     ++blockCount;
-
-    BasicBlock *current = builder->GetInsertBlock();
-    loopBlock->moveAfter(current);
-    loopCmp->moveAfter(loopBlock);
-    loopEnd->moveAfter(loopCmp);
+    
+    LLIR::Block *current = builder->getInsertPoint();
+    builder->addBlockAfter(current, loopBlock);
+    builder->addBlockAfter(loopBlock, loopCmp);
+    builder->addBlockAfter(loopCmp, loopEnd);
     
     breakStack.push(loopEnd);
     continueStack.push(loopCmp);
-
-    builder->CreateBr(loopCmp);
-    builder->SetInsertPoint(loopCmp);
-    Value *cond = compileValue(stmt->getExpression());
-    builder->CreateCondBr(cond, loopBlock, loopEnd);
-
-    builder->SetInsertPoint(loopBlock);
+    
+    builder->createBr(loopCmp);
+    builder->setInsertPoint(loopCmp);
+    LLIR::Operand *cond = compileValue(stmt->getExpression(), DataType::Void, loopBlock);
+    builder->createBr(loopEnd);
+    
+    builder->setInsertPoint(loopBlock);
     for (auto stmt : loop->getBlock()) {
         compileStatement(stmt);
     }
-    builder->CreateBr(loopCmp);
+    builder->createBr(loopCmp);
     
-    builder->SetInsertPoint(loopEnd);
+    builder->setInsertPoint(loopEnd);
     
     breakStack.pop();
     continueStack.pop();
