@@ -1,12 +1,22 @@
 cmake_minimum_required(VERSION 3.0.0)
 project(tl_frontend)
 
+add_custom_command(
+    OUTPUT ${CMAKE_BINARY_DIR}/src/lex.cpp
+           ${CMAKE_BINARY_DIR}/src/lex.hpp
+           ${CMAKE_BINARY_DIR}/src/lex_debug.cpp
+    COMMAND minilex ${CMAKE_SOURCE_DIR}/src/lex/lex
+    DEPENDS ${CMAKE_SOURCE_DIR}/src/lex/lex.py
+)
+include_directories(${CMAKE_BINARY_DIR}/src)
+
 set(SRC
     # Frontend sources
-    lex/Lex.cpp
+    #lex/Lex.cpp
+    ${CMAKE_BINARY_DIR}/src/lex.cpp
+    ${CMAKE_BINARY_DIR}/src/lex_debug.cpp
     
     debug/AstDebug.cpp
-    debug/LexDebug.cpp
     debug/Unparse.cpp
     
     parser/ErrorManager.cpp

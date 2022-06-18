@@ -91,8 +91,7 @@ bool Parser::parse() {
             case Const: code = buildConst(true); break;
             case Struct: code = buildStruct(); break;
             
-            case Eof:
-            case Nl: break;
+            case Eof: break;
             
             default: {
                 syntax->addError(scanner->getLine(), "Invalid token in global scope.");
@@ -161,10 +160,8 @@ bool Parser::buildBlock(AstBlock *block, AstIfStmt *parentBlock) {
             case Break: code = buildLoopCtrl(block, true); break;
             case Continue: code = buildLoopCtrl(block, false); break;
             
-            case Nl: break;
-            
             default: {
-                syntax->addError(scanner->getLine(), "Invalid token in expression.");
+                syntax->addError(scanner->getLine(), "Invalid token in block.");
                 token.print();
                 return false;
             }

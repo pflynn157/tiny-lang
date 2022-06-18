@@ -7,7 +7,7 @@
 #include <iostream>
 #include <cstdio>
 
-#include <lex/Lex.hpp>
+#include <lex.hpp>
 
 std::string getInputPath(std::string input) {
     std::string name = "";

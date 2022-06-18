@@ -1,3 +1,7 @@
+// IMPORTANT
+// This is the original lexical analyzer for reference purposes; not used
+
+
 //
 // Copyright 2021-2022 Patrick Flynn
 // This file is part of the Tiny Lang compiler.

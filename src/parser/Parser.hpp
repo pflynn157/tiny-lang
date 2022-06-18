@@ -8,7 +8,7 @@
 #include <string>
 #include <map>
 
-#include <lex/Lex.hpp>
+#include <lex.hpp>
 #include <parser/ErrorManager.hpp>
 #include <ast/ast.hpp>
 
