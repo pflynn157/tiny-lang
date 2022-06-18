@@ -11,7 +11,6 @@ include_directories(${LLVM_INCLUDE_DIRS})
 separate_arguments(LLVM_DEFINITIONS_LIST NATIVE_COMMAND ${LLVM_DEFINITIONS})
 add_definitions(${LLVM_DEFINITIONS})
 
-add_subdirectory(compiler)
 add_subdirectory(src)
 add_subdirectory(lib)
 
