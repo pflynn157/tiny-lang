@@ -4,7 +4,7 @@
 // Tiny Lang is licensed under the BSD-3 license. See the COPYING file for more information.
 //
 
-#include <LLIR/Compiler.hpp>
+#include "Compiler.hpp"
 #include <amd64/amd64.hpp>
 
 void Compiler::writeAssembly(bool printTransform) {

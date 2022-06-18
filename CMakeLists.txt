@@ -13,8 +13,8 @@ add_definitions(${LLVM_DEFINITIONS})
 
 option(LLIR "Use the LLIR backend" OFF)
 if (LLIR)
+    include_directories(llir/src)
     add_subdirectory(llir)
-else()
 endif()
 
 add_subdirectory(src)

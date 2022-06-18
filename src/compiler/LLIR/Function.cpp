@@ -5,7 +5,7 @@
 //
 #include <iostream>
 
-#include <LLIR/Compiler.hpp>
+#include "Compiler.hpp"
 #include <llir.hpp>
 
 //

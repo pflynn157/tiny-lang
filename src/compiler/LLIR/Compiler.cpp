@@ -8,7 +8,7 @@
 #include <exception>
 #include <algorithm>
 
-#include <LLIR/Compiler.hpp>
+#include "Compiler.hpp"
 
 Compiler::Compiler(AstTree *tree, CFlags cflags) {
     this->tree = tree;
@@ -61,6 +61,12 @@ void Compiler::debug() {
 // Compiles an individual statement
 void Compiler::compileStatement(AstStatement *stmt) {
     switch (stmt->getType()) {
+        // Expression statement
+        case AstType::ExprStmt: {
+            AstExprStatement *expr_stmt = static_cast<AstExprStatement *>(stmt);
+            compileValue(expr_stmt->getExpression(), expr_stmt->getDataType());
+        } break;
+    
         // A variable declaration (alloca) statement
         case AstType::VarDec: {
             AstVarDec *vd = static_cast<AstVarDec *>(stmt);
@@ -113,68 +119,6 @@ void Compiler::compileStatement(AstStatement *stmt) {
             }
         } break;
         
-        // A variable assignment
-        case AstType::VarAssign: {
-            AstVarAssign *va = static_cast<AstVarAssign *>(stmt);
-            LLIR::Reg *ptr = symtable[va->getName()];
-            DataType ptrType = typeTable[va->getName()];
-            LLIR::Operand *val = compileValue(stmt->getExpression(), ptrType);
-            
-            LLIR::Type *type = translateType(ptrType);
-            if (ptrType == DataType::Struct) {
-                std::string strTypeName = structVarTable[va->getName()];
-                type = structTable[strTypeName];
-            }
-            
-            builder->createStore(type, val, ptr);
-        } break;
-        
-        // An array assignment
-        case AstType::ArrayAssign: {
-            AstArrayAssign *pa = static_cast<AstArrayAssign *>(stmt);
-            LLIR::Operand *ptr = symtable[pa->getName()];
-            DataType ptrType = typeTable[pa->getName()];
-            DataType subType = ptrTable[pa->getName()];
-            
-            LLIR::Operand *index = compileValue(pa->getIndex());
-            LLIR::Operand *val = compileValue(pa->getExpression(), subType);
-            
-            if (ptrType == DataType::String) {
-            } else {
-                LLIR::Type *arrayPtrType = translateType(ptrType, subType);
-                LLIR::Type *arrayElementType = translateType(subType);
-                
-                LLIR::Operand *ptrLd = builder->createLoad(arrayPtrType, ptr);
-                LLIR::Operand *ep = builder->createGEP(arrayPtrType, ptrLd, index);
-                builder->createStore(arrayElementType, val, ep);
-            }
-        } break;
-        
-        // A structure assignment
-        case AstType::StructAssign: {
-            AstStructAssign *sa = static_cast<AstStructAssign *>(stmt);
-            LLIR::Operand *ptr = symtable[sa->getName()];
-            int index = getStructIndex(sa->getName(), sa->getMember());
-            
-            LLIR::Operand *val = compileValue(sa->getExpression(), sa->getMemberType());
-            
-            std::string strTypeName = structVarTable[sa->getName()];
-            LLIR::StructType *strType = structTable[strTypeName];
-            LLIR::Type *elementType = structElementTypeTable[strTypeName][index];
-            
-            if (std::find(structArgs.begin(), structArgs.end(), sa->getName()) != structArgs.end()) {
-                LLIR::PointerType *strPtrType = new LLIR::PointerType(strType);
-                LLIR::PointerType *elementPtrType = new LLIR::PointerType(elementType);
-                
-                ptr = builder->createLoad(strPtrType, ptr);
-                LLIR::Operand *ep = builder->createGEP(elementPtrType, ptr, new LLIR::Imm(index));
-                builder->createStore(elementType, val, ep);
-            } else {
-                builder->createStructStore(strType, ptr, index, val);
-            }
-            //builder->CreateStore(val, structPtr);
-        } break;
-        
         // Function call statements
         case AstType::FuncCallStmt: {
             compileFuncCallStatement(stmt);
@@ -210,7 +154,7 @@ void Compiler::compileStatement(AstStatement *stmt) {
 }
 
 // Converts an AST value to an LLVM value
-LLIR::Operand *Compiler::compileValue(AstExpression *expr, DataType dataType, LLIR::Block *destBlock) {
+LLIR::Operand *Compiler::compileValue(AstExpression *expr, DataType dataType, LLIR::Block *destBlock, bool isAssign) {
     LLIR::Type *type = translateType(dataType);
 
     switch (expr->getType()) {
@@ -253,7 +197,7 @@ LLIR::Operand *Compiler::compileValue(AstExpression *expr, DataType dataType, LL
                 return ptr;
             }
             
-            if (typeTable[id->getValue()] == DataType::Struct) return ptr;
+            if (typeTable[id->getValue()] == DataType::Struct || isAssign) return ptr;
             return builder->createLoad(type, ptr);
         } break;
         
@@ -269,6 +213,7 @@ LLIR::Operand *Compiler::compileValue(AstExpression *expr, DataType dataType, LL
                 
                 LLIR::Operand *ptrLd = builder->createLoad(strPtrType, ptr);
                 LLIR::Operand *ep = builder->createGEP(strPtrType, ptrLd, index);
+                if (isAssign) return ep;
                 return builder->createLoad(i8Type, ep);
             } else {
                 DataType subType = ptrTable[acc->getValue()];
@@ -277,6 +222,7 @@ LLIR::Operand *Compiler::compileValue(AstExpression *expr, DataType dataType, LL
                 
                 LLIR::Operand *ptrLd = builder->createLoad(arrayPtrType, ptr);
                 LLIR::Operand *ep = builder->createGEP(arrayPtrType, ptrLd, index);
+                if (isAssign) return ep;
                 return builder->createLoad(arrayElementType, ep);
             }
         } break;
@@ -296,6 +242,7 @@ LLIR::Operand *Compiler::compileValue(AstExpression *expr, DataType dataType, LL
                 
                 ptr = builder->createLoad(strPtrType, ptr);
                 LLIR::Operand *ep = builder->createGEP(elementPtrType, ptr, new LLIR::Imm(pos));
+                if (isAssign) return ep;
                 return builder->createLoad(elementType, ep);
             } else {
                 return builder->createStructLoad(strType, ptr, pos);
@@ -313,6 +260,36 @@ LLIR::Operand *Compiler::compileValue(AstExpression *expr, DataType dataType, LL
             }
             
             return builder->createCall(type, fc->getName(), args);
+        } break;
+        
+        case AstType::Assign: {
+            AstAssignOp *op = static_cast<AstAssignOp *>(expr);
+            AstExpression *lvalExpr = op->getLVal();
+            
+            std::string name = "";
+            switch (lvalExpr->getType()) {
+                case AstType::ID: name = static_cast<AstID *>(lvalExpr)->getValue(); break;
+                case AstType::ArrayAccess: {
+                    name = static_cast<AstArrayAccess *>(lvalExpr)->getValue();
+                } break;
+                case AstType::StructAccess: {
+                    name = static_cast<AstStructAccess *>(lvalExpr)->getName();
+                } break;
+                
+                default: {}
+            }
+            
+            LLIR::Operand *ptr = compileValue(lvalExpr, dataType, nullptr, true);
+            LLIR::Operand *rval = compileValue(op->getRVal(), dataType);
+            
+            DataType ptrType = typeTable[name];
+            LLIR::Type *type = translateType(ptrType);
+            if (ptrType == DataType::Struct) {
+                std::string strTypeName = structVarTable[name];
+                type = structTable[strTypeName];
+            }
+            
+            builder->createStore(type, rval, ptr);
         } break;
         
         case AstType::Neg: {

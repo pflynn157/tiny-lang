@@ -12,7 +12,7 @@
 #include <llir.hpp>
 #include <irbuilder.hpp>
 
-#include <ast.hpp>
+#include <ast/ast.hpp>
 
 struct CFlags {
     std::string name;
@@ -28,7 +28,7 @@ public:
     void link();
 protected:
     void compileStatement(AstStatement *stmt);
-    LLIR::Operand *compileValue(AstExpression *expr, DataType dataType = DataType::Void, LLIR::Block *destBlock = nullptr);
+    LLIR::Operand *compileValue(AstExpression *expr, DataType dataType = DataType::Void, LLIR::Block *destBlock = nullptr, bool isAssign = false);
     LLIR::Type *translateType(DataType dataType, DataType subType = DataType::Void, std::string typeName = "");
     int getStructIndex(std::string name, std::string member);
 
