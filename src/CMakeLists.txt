@@ -10,22 +10,13 @@ add_custom_command(
 )
 include_directories(${CMAKE_BINARY_DIR}/src)
 
-if (LLIR)
-    set(COMPILER_SRC
-        compiler/LLIR/Builder.cpp
-        compiler/LLIR/Compiler.cpp
-        compiler/LLIR/Flow.cpp
-        compiler/LLIR/Function.cpp
-    )
-else()
-    set(COMPILER_SRC
-        compiler/LLVM/Builder.cpp
-        compiler/LLVM/Compiler.cpp
-        compiler/LLVM/Flow.cpp
-        compiler/LLVM/Function.cpp
-        compiler/LLVM/Variable.cpp
-    )
-endif()
+set(COMPILER_SRC
+    compiler/Builder.cpp
+    compiler/Compiler.cpp
+    compiler/Flow.cpp
+    compiler/Function.cpp
+    compiler/Variable.cpp
+)
 
 set(SRC
     # Frontend sources
@@ -49,21 +40,15 @@ set(SRC
     ${COMPILER_SRC}
 )
 
-if (LLIR)
-    add_executable(tlc ${SRC} llir_main.cpp)
-    add_dependencies(tlc llir)
-    target_link_libraries(tlc llir)
-else()
-    add_executable(tlc ${SRC} main.cpp)
+add_executable(tlc ${SRC} main.cpp)
 
-    llvm_map_components_to_libnames(llvm_libs support core irreader target asmparser
-        X86AsmParser
-        X86CodeGen
-        X86Info
-    )
+llvm_map_components_to_libnames(llvm_libs support core irreader target asmparser
+    X86AsmParser
+    X86CodeGen
+    X86Info
+)
 
-    target_link_libraries(tlc
-        ${llvm_libs}
-    )
-endif()
+target_link_libraries(tlc
+    ${llvm_libs}
+)
 
