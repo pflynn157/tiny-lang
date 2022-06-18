@@ -5,13 +5,12 @@ find_package(LLVM REQUIRED CONFIG)
 
 add_compile_options(-std=c++17 -g)
 
-include_directories(frontend compiler)
+include_directories(src compiler)
 
 include_directories(${LLVM_INCLUDE_DIRS})
 separate_arguments(LLVM_DEFINITIONS_LIST NATIVE_COMMAND ${LLVM_DEFINITIONS})
 add_definitions(${LLVM_DEFINITIONS})
 
-add_subdirectory(frontend)
 add_subdirectory(compiler)
 add_subdirectory(src)
 add_subdirectory(lib)
