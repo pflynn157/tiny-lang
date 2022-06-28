@@ -40,7 +40,7 @@ void Compiler::compileStructDeclaration(AstStatement *stmt) {
     // Init the elements
     if (!sd->isNoInit()) {
         int index = 0;
-        ptr = builder->CreateLoad(var);
+        ptr = builder->CreateLoad(type, var);
         
         for (Var member : str->getItems()) {
             AstExpression *defaultExpr = str->getDefaultExpression(member.name);
