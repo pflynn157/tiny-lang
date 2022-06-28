@@ -60,14 +60,14 @@ flags=""
 echo "Running all tests..."
 echo ""
 
-#run_test 'test/basic/*.tl' 'sys' $flags
+run_test 'test/basic'
 run_test 'test/syntax'
-#run_test 'test/cond/*.tl' 'sys' $flags
-#run_test 'test/loop/*.tl' 'sys' $flags
-#run_test 'test/array/*.tl' 'sys' $flags
-#run_test 'test/func/*.tl' 'sys' $flags
-#run_test 'test/str/*.tl' 'sys' $flags
-#run_test 'test/struct/*.tl' 'sys' $flags
+run_test 'test/cond'
+run_test 'test/loop'
+run_test 'test/array'
+run_test 'test/func'
+run_test 'test/str'
+run_test 'test/struct'
 
 echo ""
 echo "$test_count tests passed successfully."
