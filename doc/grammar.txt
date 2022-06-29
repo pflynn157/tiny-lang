@@ -41,8 +41,12 @@ logical_expr:
     | expression OR expression
     ;
     
+assign_expr: expression ':=' expression
+    ;
+    
 binary_expr:
-      expression '+' expression
+      assign_expr
+    | expression '+' expression
     | expression '-' expression
     | expression '*' expression
     | expression '/' expression
@@ -82,17 +86,8 @@ var_declaration:
       VAR id_list ':' data_type ASSIGN expression ';'
     | VAR id_list ':' data_type '[' expression ']' ';'
     ;
-
-var_assign: ID ASSIGN expression ';'
-    ;
-    
-array_assign: ID '[' expression ']' ASSIGN expression ';'
-    ;
     
 struct_declaration: STRUCT ID : ID ';'
-    ;
-    
-struct_assign: ID '.' ID ASSIGN expression ';'
     ;
     
 constant_declaration: CONST ID ':' data_type ASSIGN const_expr ';'
@@ -125,17 +120,24 @@ import_list:
 import: IMPORT import_list ';'
     ;
     
+expr_statement: assign_expr ';'
+    ;
+    
+return:
+      RETURN ';'
+    | RETURN expression ';'
+    ;
+    
 statement:
       var_declaration
-    | var_assign
-    | array_assign
     | struct_declaration
-    | struct_assign
     | constant_declaration
     | function_call
     | conditional
     | loop
     | import
+    | expr_statement
+    | return
     ;
     
 statement_list:
