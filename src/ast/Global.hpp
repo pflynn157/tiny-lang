@@ -13,25 +13,19 @@
 class AstStatement;
 
 // Represents a function, external declaration, or global variable
-class AstGlobalStatement {
+class AstGlobalStatement : public AstNode {
 public:
-    explicit AstGlobalStatement() {}
-    explicit AstGlobalStatement(AstType type) {
-        this->type = type;
-    }
-    
-    AstType getType() { return type; }
+    explicit AstGlobalStatement() : AstNode(V_AstType::None) {}
+    explicit AstGlobalStatement(V_AstType type) : AstNode(type) {}
     
     virtual void print() {}
     virtual std::string dot(std::string parent) { return ""; }
-private:
-    AstType type = AstType::EmptyAst;
 };
 
 // Represents an extern function
 class AstExternFunction : public AstGlobalStatement {
 public:
-    explicit AstExternFunction(std::string name) : AstGlobalStatement(AstType::ExternFunc) {
+    explicit AstExternFunction(std::string name) : AstGlobalStatement(V_AstType::ExternFunc) {
         this->name = name;
     }
     
@@ -61,7 +55,7 @@ private:
 // Represents a function
 class AstFunction : public AstGlobalStatement {
 public:
-    explicit AstFunction(std::string name) : AstGlobalStatement(AstType::Func) {
+    explicit AstFunction(std::string name) : AstGlobalStatement(V_AstType::Func) {
         this->name = name;
         block = new AstBlock;
     }

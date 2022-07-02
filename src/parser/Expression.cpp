@@ -191,7 +191,7 @@ bool Parser::applyHigherPred(ExprContext *ctx) {
 
 // Applies operator associativity
 bool Parser::applyAssoc(ExprContext *ctx) {
-    AstType lastOp = AstType::EmptyAst;
+    V_AstType lastOp = V_AstType::None;
     while (ctx->opStack.size() > 0) {
         if (ctx->output.empty()) {
             syntax->addError(scanner->getLine(), "Invalid expression: No RVAL");
@@ -305,7 +305,7 @@ AstExpression *Parser::buildExpression(AstDataType *currentType, TokenType stopT
         }
         
         if (!ctx->lastWasOp && ctx->opStack.size() > 0) {
-            if (ctx->opStack.top()->getType() == AstType::Neg) {
+            if (ctx->opStack.top()->getType() == V_AstType::Neg) {
                 AstExpression *val = checkExpression(ctx->output.top(), ctx->varType);
                 ctx->output.pop();
                 

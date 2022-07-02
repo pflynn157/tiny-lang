@@ -13,7 +13,7 @@ AstExpression *Parser::checkCondExpression(AstExpression *toCheck) {
     AstExpression *expr = toCheck;
     
     switch (toCheck->getType()) {
-        case AstType::ID: {
+        case V_AstType::ID: {
             AstID *id = static_cast<AstID *>(toCheck);
             AstDataType *dataType = typeMap[id->getValue()];            
             AstEQOp *eq = new AstEQOp;
@@ -32,7 +32,7 @@ AstExpression *Parser::checkCondExpression(AstExpression *toCheck) {
             expr = eq;
         } break;
         
-        case AstType::I32L: {
+        case V_AstType::I32L: {
             AstEQOp *eq = new AstEQOp;
             eq->setLVal(expr);
             eq->setRVal(new AstI32(1));

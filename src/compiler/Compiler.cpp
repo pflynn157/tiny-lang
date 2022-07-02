@@ -48,14 +48,14 @@ void Compiler::compile() {
     // Build all other functions
     for (auto global : tree->getGlobalStatements()) {
         switch (global->getType()) {
-            case AstType::Func: {
+            case V_AstType::Func: {
                 symtable.clear();
                 typeTable.clear();
                 
                 compileFunction(global);
             } break;
             
-            case AstType::ExternFunc: {
+            case V_AstType::ExternFunc: {
                 compileExternFunction(global);
             } break;
 
@@ -79,13 +79,13 @@ void Compiler::emitLLVM(std::string path) {
 void Compiler::compileStatement(AstStatement *stmt) {
     switch (stmt->getType()) {
         // Expression statement
-        case AstType::ExprStmt: {
+        case V_AstType::ExprStmt: {
             AstExprStatement *expr_stmt = static_cast<AstExprStatement *>(stmt);
             compileValue(expr_stmt->getExpression());
         } break;
     
         // A variable declaration (alloca) statement
-        case AstType::VarDec: {
+        case V_AstType::VarDec: {
             AstVarDec *vd = static_cast<AstVarDec *>(stmt);
             Type *type = translateType(vd->getDataType());
             
@@ -95,35 +95,35 @@ void Compiler::compileStatement(AstStatement *stmt) {
         } break;
         
         // A structure declaration
-        case AstType::StructDec: compileStructDeclaration(stmt); break;
+        case V_AstType::StructDec: compileStructDeclaration(stmt); break;
         
         // Function call statements
-        case AstType::FuncCallStmt: {
+        case V_AstType::FuncCallStmt: {
             compileFuncCallStatement(stmt);
         } break;
         
         // A return statement
-        case AstType::Return: {
+        case V_AstType::Return: {
             compileReturnStatement(stmt);
         } break;
         
         // An IF statement
-        case AstType::If: {
+        case V_AstType::If: {
             compileIfStatement(stmt);
         } break;
         
         // A while loop
-        case AstType::While: {
+        case V_AstType::While: {
             compileWhileStatement(stmt);
         } break;
         
         // A break statement
-        case AstType::Break: {
+        case V_AstType::Break: {
             builder->CreateBr(breakStack.top());
         } break;
         
         // A continue statement
-        case AstType::Continue: {
+        case V_AstType::Continue: {
             builder->CreateBr(continueStack.top());
         } break;
         
@@ -134,37 +134,37 @@ void Compiler::compileStatement(AstStatement *stmt) {
 // Converts an AST value to an LLVM value
 Value *Compiler::compileValue(AstExpression *expr, bool isAssign) {
     switch (expr->getType()) {
-        case AstType::I8L: {
+        case V_AstType::I8L: {
             AstI8 *i8 = static_cast<AstI8 *>(expr);
             return builder->getInt8(i8->getValue());
         } break;
         
-        case AstType::I16L: {
+        case V_AstType::I16L: {
             AstI16 *i16 = static_cast<AstI16 *>(expr);
             return builder->getInt16(i16->getValue());
         } break;
         
-        case AstType::I32L: {
+        case V_AstType::I32L: {
             AstI32 *ival = static_cast<AstI32 *>(expr);
             return builder->getInt32(ival->getValue());
         } break;
         
-        case AstType::I64L: {
+        case V_AstType::I64L: {
             AstI64 *i64 = static_cast<AstI64 *>(expr);
             return builder->getInt64(i64->getValue());
         } break;
         
-        case AstType::CharL: {
+        case V_AstType::CharL: {
             AstChar *cval = static_cast<AstChar *>(expr);
             return builder->getInt8(cval->getValue());
         } break;
         
-        case AstType::StringL: {
+        case V_AstType::StringL: {
             AstString *str = static_cast<AstString *>(expr);
             return builder->CreateGlobalStringPtr(str->getValue());
         } break;
         
-        case AstType::ID: {
+        case V_AstType::ID: {
             AstID *id = static_cast<AstID *>(expr);
             AllocaInst *ptr = symtable[id->getValue()];
             Type *type = translateType(typeTable[id->getValue()]);
@@ -173,7 +173,7 @@ Value *Compiler::compileValue(AstExpression *expr, bool isAssign) {
             return builder->CreateLoad(type, ptr);
         } break;
         
-        case AstType::ArrayAccess: {
+        case V_AstType::ArrayAccess: {
             AstArrayAccess *acc = static_cast<AstArrayAccess *>(expr);
             AllocaInst *ptr = symtable[acc->getValue()];
             AstDataType *ptrType = typeTable[acc->getValue()];
@@ -199,9 +199,9 @@ Value *Compiler::compileValue(AstExpression *expr, bool isAssign) {
             }
         } break;
 
-        case AstType::StructAccess: return compileStructAccess(expr, isAssign);
+        case V_AstType::StructAccess: return compileStructAccess(expr, isAssign);
         
-        case AstType::FuncCallExpr: {
+        case V_AstType::FuncCallExpr: {
             AstFuncCallExpr *fc = static_cast<AstFuncCallExpr *>(expr);
             std::vector<Value *> args;
             
@@ -216,14 +216,14 @@ Value *Compiler::compileValue(AstExpression *expr, bool isAssign) {
             return builder->CreateCall(callee, args);
         } break;
         
-        case AstType::Neg: {
+        case V_AstType::Neg: {
             AstNegOp *op = static_cast<AstNegOp *>(expr);
             Value *val = compileValue(op->getVal());
             
             return builder->CreateNeg(val);
         } break;
         
-        case AstType::Assign: {
+        case V_AstType::Assign: {
             AstAssignOp *op = static_cast<AstAssignOp *>(expr);
             AstExpression *lvalExpr = op->getLVal();
             
@@ -233,8 +233,8 @@ Value *Compiler::compileValue(AstExpression *expr, bool isAssign) {
             builder->CreateStore(rval, ptr);
         } break;
         
-        case AstType::LogicalAnd:
-        case AstType::LogicalOr: {
+        case V_AstType::LogicalAnd:
+        case V_AstType::LogicalOr: {
             AstBinaryOp *op = static_cast<AstBinaryOp *>(expr);
             AstExpression *lvalExpr = op->getLVal();
             AstExpression *rvalExpr = op->getRVal();
@@ -250,10 +250,10 @@ Value *Compiler::compileValue(AstExpression *expr, bool isAssign) {
             trueBlock->moveAfter(current);
             
             // Create the conditional branch
-            if (expr->getType() == AstType::LogicalAnd) {
+            if (expr->getType() == V_AstType::LogicalAnd) {
                 BasicBlock *falseBlock = logicalAndStack.top();
                 builder->CreateCondBr(lval, trueBlock, falseBlock);
-            } else if (expr->getType() == AstType::LogicalOr) {
+            } else if (expr->getType() == V_AstType::LogicalOr) {
                 BasicBlock *trueBlock1 = logicalOrStack.top();
                 builder->CreateCondBr(lval, trueBlock1, trueBlock);
             }
@@ -263,19 +263,19 @@ Value *Compiler::compileValue(AstExpression *expr, bool isAssign) {
             return compileValue(rvalExpr);
         } break;
         
-        case AstType::Add:
-        case AstType::Sub: 
-        case AstType::Mul:
-        case AstType::Div:
-        case AstType::And:
-        case AstType::Or:
-        case AstType::Xor:
-        case AstType::EQ:
-        case AstType::NEQ:
-        case AstType::GT:
-        case AstType::LT:
-        case AstType::GTE:
-        case AstType::LTE: {
+        case V_AstType::Add:
+        case V_AstType::Sub: 
+        case V_AstType::Mul:
+        case V_AstType::Div:
+        case V_AstType::And:
+        case V_AstType::Or:
+        case V_AstType::Xor:
+        case V_AstType::EQ:
+        case V_AstType::NEQ:
+        case V_AstType::GT:
+        case V_AstType::LT:
+        case V_AstType::GTE:
+        case V_AstType::LTE: {
             AstBinaryOp *op = static_cast<AstBinaryOp *>(expr);
             AstExpression *lvalExpr = op->getLVal();
             AstExpression *rvalExpr = op->getRVal();
@@ -286,15 +286,15 @@ Value *Compiler::compileValue(AstExpression *expr, bool isAssign) {
             bool strOp = false;
             bool rvalStr = false;
             
-            if (lvalExpr->getType() == AstType::StringL || rvalExpr->getType() == AstType::StringL) {
+            if (lvalExpr->getType() == V_AstType::StringL || rvalExpr->getType() == V_AstType::StringL) {
                 strOp = true;
                 rvalStr = true;
-            } else if (lvalExpr->getType() == AstType::StringL && rvalExpr->getType() == AstType::CharL) {
+            } else if (lvalExpr->getType() == V_AstType::StringL && rvalExpr->getType() == V_AstType::CharL) {
                 strOp = true;
-            } else if (lvalExpr->getType() == AstType::ID && rvalExpr->getType() == AstType::CharL) {
+            } else if (lvalExpr->getType() == V_AstType::ID && rvalExpr->getType() == V_AstType::CharL) {
                 AstID *lvalID = static_cast<AstID *>(lvalExpr);
                 if (typeTable[lvalID->getValue()]->getType() == V_AstType::String) strOp = true;
-            } else if (lvalExpr->getType() == AstType::ID && rvalExpr->getType() == AstType::ID) {
+            } else if (lvalExpr->getType() == V_AstType::ID && rvalExpr->getType() == V_AstType::ID) {
                 AstID *lvalID = static_cast<AstID *>(lvalExpr);
                 AstID *rvalID = static_cast<AstID *>(rvalExpr);
                 
@@ -314,17 +314,17 @@ Value *Compiler::compileValue(AstExpression *expr, bool isAssign) {
                 args.push_back(lval);
                 args.push_back(rval);
             
-                if (op->getType() == AstType::EQ || op->getType() == AstType::NEQ) {
+                if (op->getType() == V_AstType::EQ || op->getType() == V_AstType::NEQ) {
                     Function *strcmp = mod->getFunction("stringcmp");
                     if (!strcmp) std::cerr << "Error: Corelib function \"stringcmp\" not found." << std::endl;
                     Value *strcmpCall = builder->CreateCall(strcmp, args);
                     
                     int cmpVal = 0;
-                    if (op->getType() == AstType::NEQ) cmpVal = 0;
+                    if (op->getType() == V_AstType::NEQ) cmpVal = 0;
                     Value *cmpValue = builder->getInt32(cmpVal);
                     
                     return builder->CreateICmpEQ(strcmpCall, cmpValue);
-                } else if (op->getType() == AstType::Add) {
+                } else if (op->getType() == V_AstType::Add) {
                     if (rvalStr) {
                         Function *callee = mod->getFunction("strcat_str");
                         if (!callee) std::cerr << "Error: corelib function \"strcat_str\" not found." << std::endl;
@@ -342,21 +342,21 @@ Value *Compiler::compileValue(AstExpression *expr, bool isAssign) {
             
             // Otherwise, build a normal comparison
             switch (expr->getType()) {
-                case AstType::Add: return builder->CreateAdd(lval, rval);
-                case AstType::Sub: return builder->CreateSub(lval, rval);
-                case AstType::Mul: return builder->CreateMul(lval, rval);
-                case AstType::Div: return builder->CreateSDiv(lval, rval);
+                case V_AstType::Add: return builder->CreateAdd(lval, rval);
+                case V_AstType::Sub: return builder->CreateSub(lval, rval);
+                case V_AstType::Mul: return builder->CreateMul(lval, rval);
+                case V_AstType::Div: return builder->CreateSDiv(lval, rval);
                 
-                case AstType::And: return builder->CreateAnd(lval, rval);
-                case AstType::Or:  return builder->CreateOr(lval, rval);
-                case AstType::Xor: return builder->CreateXor(lval, rval);
+                case V_AstType::And: return builder->CreateAnd(lval, rval);
+                case V_AstType::Or:  return builder->CreateOr(lval, rval);
+                case V_AstType::Xor: return builder->CreateXor(lval, rval);
                     
-                case AstType::EQ: return builder->CreateICmpEQ(lval, rval);
-                case AstType::NEQ: return builder->CreateICmpNE(lval, rval);
-                case AstType::GT: return builder->CreateICmpSGT(lval, rval);
-                case AstType::LT: return builder->CreateICmpSLT(lval, rval);
-                case AstType::GTE: return builder->CreateICmpSGE(lval, rval);
-                case AstType::LTE: return builder->CreateICmpSLE(lval, rval);
+                case V_AstType::EQ: return builder->CreateICmpEQ(lval, rval);
+                case V_AstType::NEQ: return builder->CreateICmpNE(lval, rval);
+                case V_AstType::GT: return builder->CreateICmpSGT(lval, rval);
+                case V_AstType::LT: return builder->CreateICmpSLT(lval, rval);
+                case V_AstType::GTE: return builder->CreateICmpSGE(lval, rval);
+                case V_AstType::LTE: return builder->CreateICmpSLE(lval, rval);
                     
                 default: {}
             }

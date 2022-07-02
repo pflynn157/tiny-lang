@@ -48,9 +48,9 @@ void Compiler::compileIfStatement(AstStatement *stmt) {
     bool hasEndingRet = false;
     for (auto stmt : condStmt->getBlock()) {
         compileStatement(stmt);
-        if (stmt->getType() == AstType::Break) hasBreak = true;
+        if (stmt->getType() == V_AstType::Break) hasBreak = true;
     }
-    if (condStmt->getBlock().back()->getType() == AstType::Return) hasEndingRet = true;
+    if (condStmt->getBlock().back()->getType() == V_AstType::Return) hasEndingRet = true;
     if (!hasBreak && !hasEndingRet) builder->CreateBr(endBlock);
 
     // Branches
@@ -58,7 +58,7 @@ void Compiler::compileIfStatement(AstStatement *stmt) {
     bool hadElse = false;
 
     for (auto stmt : condStmt->getBranches()) {
-        if (stmt->getType() == AstType::Elif) {
+        if (stmt->getType() == V_AstType::Elif) {
             AstElifStmt *elifStmt = static_cast<AstElifStmt *>(stmt);
             
             BasicBlock *trueBlock2 = BasicBlock::Create(*context, "true" + std::to_string(blockCount), currentFunc);
@@ -85,12 +85,12 @@ void Compiler::compileIfStatement(AstStatement *stmt) {
             for (auto stmt2 : elifStmt->getBlock()) {
                 compileStatement(stmt2);
             }
-            if (elifStmt->getBlock().back()->getType() == AstType::Return) hasEndingRet = true;
+            if (elifStmt->getBlock().back()->getType() == V_AstType::Return) hasEndingRet = true;
             if (!hasBreak && !hasEndingRet) builder->CreateBr(endBlock);
             
             builder->SetInsertPoint(falseBlock2);
             hadElif = true;
-        } else if (stmt->getType() == AstType::Else) {
+        } else if (stmt->getType() == V_AstType::Else) {
             AstElseStmt *elseStmt = static_cast<AstElseStmt *>(stmt);
             
             if (!hadElif) builder->SetInsertPoint(falseBlock);
@@ -100,7 +100,7 @@ void Compiler::compileIfStatement(AstStatement *stmt) {
             for (auto stmt2 : elseStmt->getBlock()) {
                 compileStatement(stmt2);
             }
-            if (elseStmt->getBlock().back()->getType() == AstType::Return) hasEndingRet = true;
+            if (elseStmt->getBlock().back()->getType() == V_AstType::Return) hasEndingRet = true;
             if (!hasBreak && !hasEndingRet) builder->CreateBr(endBlock);
             
             hadElse = true;

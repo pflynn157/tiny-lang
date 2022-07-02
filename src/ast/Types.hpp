@@ -8,12 +8,20 @@
 #include <string>
 #include <map>
 
-enum class AstType {
-    EmptyAst,
+//
+// Contains the variants for all AST nodes
+//
+enum class V_AstType {
+    None,
+    
+    // Global Statements
     ExternFunc,
     Func,
-    Return,
+    StructDef,
+    Block,
     
+    // Statements
+    Return,
     ExprStmt,
     
     FuncCallStmt,
@@ -30,6 +38,7 @@ enum class AstType {
     Break,
     Continue,
     
+    // Operators
     Neg,
     
     Assign,
@@ -52,6 +61,7 @@ enum class AstType {
     LogicalAnd,
     LogicalOr,
     
+    // Literals and identifiers
     CharL,
     I8L,
     I16L,
@@ -62,14 +72,8 @@ enum class AstType {
     ArrayAccess,
     StructAccess,
     
-    ExprList
-};
-
-//
-// Contains the variants for all AST nodes
-//
-enum class V_AstType {
-    None,
+    // Expression list
+    ExprList,
     
     // Data types
     Void,
@@ -164,8 +168,10 @@ class AstExpression;
 class AstStatement;
 
 // Represents a block
-class AstBlock {
+class AstBlock : public AstNode {
 public:
+    AstBlock() : AstNode(V_AstType::Block) {}
+
     void addStatement(AstStatement *stmt) { block.push_back(stmt); }
     void addStatements(std::vector<AstStatement *> block) { this->block = block; }
     std::vector<AstStatement *> getBlock() { return block; }
@@ -177,9 +183,9 @@ private:
 };
 
 // Represents a struct
-class AstStruct {
+class AstStruct : public AstNode {
 public:
-    explicit AstStruct(std::string name) {
+    explicit AstStruct(std::string name) : AstNode(V_AstType::StructDef) {
         this->name = name;
     }
     

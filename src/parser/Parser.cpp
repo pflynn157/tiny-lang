@@ -182,7 +182,7 @@ AstExpression *Parser::checkExpression(AstExpression *expr, AstDataType *varType
     if (!varType) return expr;
 
     switch (expr->getType()) {
-        case AstType::I32L: {
+        case V_AstType::I32L: {
             // Change to byte literals
             if (varType->getType() == V_AstType::Int8) {
                 AstI32 *i32 = static_cast<AstI32 *>(expr);

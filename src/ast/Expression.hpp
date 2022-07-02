@@ -12,25 +12,19 @@
 #include <ast/Types.hpp>
 
 // Represents an AST expression
-class AstExpression {
+class AstExpression : public AstNode {
 public:
-    explicit AstExpression() {}
-    explicit AstExpression(AstType type) {
-        this->type = type;
-    }
-    
-    AstType getType() { return type; }
+    explicit AstExpression() : AstNode(V_AstType::None) {}
+    explicit AstExpression(V_AstType type) : AstNode(type) {}
     
     virtual void print() {}
     virtual std::string dot(std::string parent) { return ""; }
-protected:
-    AstType type = AstType::EmptyAst;
 };
 
 // Holds a list of expressions
 class AstExprList : public AstExpression {
 public:
-    AstExprList() : AstExpression(AstType::ExprList) {}
+    AstExprList() : AstExpression(V_AstType::ExprList) {}
     
     void addExpression(AstExpression *expr) { list.push_back(expr); }
     std::vector<AstExpression *> getList() { return list; }
@@ -72,7 +66,7 @@ protected:
 class AstNegOp : public AstUnaryOp {
 public:
     AstNegOp() {
-        this->type = AstType::Neg;
+        this->type = V_AstType::Neg;
     }
     
     void print();
@@ -101,12 +95,12 @@ protected:
 class AstAssignOp : public AstBinaryOp {
 public:
     explicit AstAssignOp() {
-        this->type = AstType::Assign;
+        this->type = V_AstType::Assign;
         this->precedence = 16;
     }
     
     explicit AstAssignOp(AstExpression *lval, AstExpression *rval) {
-        this->type = AstType::Assign;
+        this->type = V_AstType::Assign;
         this->precedence = 16;
         this->lval = lval;
         this->rval = rval;
@@ -120,7 +114,7 @@ public:
 class AstAddOp : public AstBinaryOp {
 public:
     AstAddOp() {
-        this->type = AstType::Add;
+        this->type = V_AstType::Add;
         this->precedence = 4;
     }
     
@@ -132,7 +126,7 @@ public:
 class AstSubOp : public AstBinaryOp {
 public:
     AstSubOp() {
-        this->type = AstType::Sub;
+        this->type = V_AstType::Sub;
         this->precedence = 4;
     }
     
@@ -144,7 +138,7 @@ public:
 class AstMulOp : public AstBinaryOp {
 public:
     AstMulOp() {
-        this->type = AstType::Mul;
+        this->type = V_AstType::Mul;
         this->precedence = 3;
     }
     
@@ -156,7 +150,7 @@ public:
 class AstDivOp : public AstBinaryOp {
 public:
     AstDivOp() {
-        this->type = AstType::Div;
+        this->type = V_AstType::Div;
         this->precedence = 3;
     }
     
@@ -168,7 +162,7 @@ public:
 class AstAndOp : public AstBinaryOp {
 public:
     AstAndOp() {
-        this->type = AstType::And;
+        this->type = V_AstType::And;
         this->precedence = 8;
     }
     
@@ -180,7 +174,7 @@ public:
 class AstOrOp : public AstBinaryOp {
 public:
     AstOrOp() {
-        this->type = AstType::Or;
+        this->type = V_AstType::Or;
         this->precedence = 10;
     }
     
@@ -192,7 +186,7 @@ public:
 class AstXorOp : public AstBinaryOp {
 public:
     AstXorOp() {
-        this->type = AstType::Xor;
+        this->type = V_AstType::Xor;
         this->precedence = 9;
     }
     
@@ -204,7 +198,7 @@ public:
 class AstEQOp : public AstBinaryOp {
 public:
     AstEQOp() {
-        this->type = AstType::EQ;
+        this->type = V_AstType::EQ;
         this->precedence = 6;
     }
     
@@ -216,7 +210,7 @@ public:
 class AstNEQOp : public AstBinaryOp {
 public:
     AstNEQOp() {
-        this->type = AstType::NEQ;
+        this->type = V_AstType::NEQ;
         this->precedence = 6;
     }
     
@@ -228,7 +222,7 @@ public:
 class AstGTOp : public AstBinaryOp {
 public:
     AstGTOp() {
-        this->type = AstType::GT;
+        this->type = V_AstType::GT;
         this->precedence = 6;
     }
     
@@ -240,7 +234,7 @@ public:
 class AstLTOp : public AstBinaryOp {
 public:
     AstLTOp() {
-        this->type = AstType::LT;
+        this->type = V_AstType::LT;
         this->precedence = 6;
     }
     
@@ -252,7 +246,7 @@ public:
 class AstGTEOp : public AstBinaryOp {
 public:
     AstGTEOp() {
-        this->type = AstType::GTE;
+        this->type = V_AstType::GTE;
         this->precedence = 6;
     }
     
@@ -264,7 +258,7 @@ public:
 class AstLTEOp : public AstBinaryOp {
 public:
     AstLTEOp() {
-        this->type = AstType::LTE;
+        this->type = V_AstType::LTE;
         this->precedence = 6;
     }
     
@@ -276,7 +270,7 @@ public:
 class AstLogicalAndOp : public AstBinaryOp {
 public:
     AstLogicalAndOp() {
-        this->type = AstType::LogicalAnd;
+        this->type = V_AstType::LogicalAnd;
         this->precedence = 11;
     }
     
@@ -288,7 +282,7 @@ public:
 class AstLogicalOrOp : public AstBinaryOp {
 public:
     AstLogicalOrOp() {
-        this->type = AstType::LogicalOr;
+        this->type = V_AstType::LogicalOr;
         this->precedence = 12;
     }
     
@@ -299,7 +293,7 @@ public:
 // Represents a character literal
 class AstChar : public AstExpression {
 public:
-    explicit AstChar(char val) : AstExpression(AstType::CharL) {
+    explicit AstChar(char val) : AstExpression(V_AstType::CharL) {
         this->val = val;
     }
     
@@ -314,7 +308,7 @@ private:
 // TODO: Remove
 class AstI8 : public AstExpression {
 public:
-    explicit AstI8(uint8_t val) : AstExpression(AstType::I8L) {
+    explicit AstI8(uint8_t val) : AstExpression(V_AstType::I8L) {
         this->val = val;
     }
     
@@ -328,7 +322,7 @@ private:
 // TODO: Remove
 class AstI16 : public AstExpression {
 public:
-    explicit AstI16(uint16_t val) : AstExpression(AstType::I16L) {
+    explicit AstI16(uint16_t val) : AstExpression(V_AstType::I16L) {
         this->val = val;
     }
     
@@ -342,7 +336,7 @@ private:
 // TODO: Convert to uint64, rename AstInt
 class AstI32 : public AstExpression {
 public:
-    explicit AstI32(uint64_t val) : AstExpression(AstType::I32L) {
+    explicit AstI32(uint64_t val) : AstExpression(V_AstType::I32L) {
         this->val = val;
     }
     
@@ -359,7 +353,7 @@ private:
 // TODO: Remove
 class AstI64 : public AstExpression {
 public:
-    explicit AstI64(uint64_t val) : AstExpression(AstType::I64L) {
+    explicit AstI64(uint64_t val) : AstExpression(V_AstType::I64L) {
         this->val = val;
     }
     
@@ -372,7 +366,7 @@ private:
 // Represents a string literal
 class AstString : public AstExpression {
 public:
-    explicit AstString(std::string val) : AstExpression(AstType::StringL) {
+    explicit AstString(std::string val) : AstExpression(V_AstType::StringL) {
         this->val = val;
     }
     
@@ -386,7 +380,7 @@ private:
 // Represents a variable reference
 class AstID: public AstExpression {
 public:
-    explicit AstID(std::string val) : AstExpression(AstType::ID) {
+    explicit AstID(std::string val) : AstExpression(V_AstType::ID) {
         this->val = val;
     }
     
@@ -400,7 +394,7 @@ private:
 // Represents an array access
 class AstArrayAccess : public AstExpression {
 public:
-    explicit AstArrayAccess(std::string val) : AstExpression(AstType::ArrayAccess) {
+    explicit AstArrayAccess(std::string val) : AstExpression(V_AstType::ArrayAccess) {
         this->val = val;
     }
     
@@ -419,7 +413,7 @@ private:
 // Represents a structure access
 class AstStructAccess : public AstExpression {
 public:
-    explicit AstStructAccess(std::string var, std::string member) : AstExpression(AstType::StructAccess) {
+    explicit AstStructAccess(std::string var, std::string member) : AstExpression(V_AstType::StructAccess) {
         this->var = var;
         this->member = member;
     }
@@ -437,7 +431,7 @@ private:
 // Represents a function call
 class AstFuncCallExpr : public AstExpression {
 public:
-    explicit AstFuncCallExpr(std::string name) : AstExpression(AstType::FuncCallExpr) {
+    explicit AstFuncCallExpr(std::string name) : AstExpression(V_AstType::FuncCallExpr) {
         this->name = name;
     }
     

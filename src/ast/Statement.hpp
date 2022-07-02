@@ -16,31 +16,26 @@ class AstID;
 class AstInt;
 
 // Represents an AST statement
-class AstStatement {
+class AstStatement : public AstNode {
 public:
-    explicit AstStatement() {}
-    explicit AstStatement(AstType type) {
-        this->type = type;
-    }
+    explicit AstStatement() : AstNode(V_AstType::None) {}
+    explicit AstStatement(V_AstType type) : AstNode(type) {}
     
     void setExpression(AstExpression *expr) { this->expr = expr; }
     AstExpression *getExpression() { return expr; }
     bool hasExpression() { return expr != nullptr; }
     
-    AstType getType() { return type; }
-    
     virtual void print() {}
     virtual std::string dot(std::string parent) { return ""; }
 private:
     AstExpression *expr = nullptr;
-    AstType type = AstType::EmptyAst;
 };
 
 // Represents an AST expression statement
 // This is basically the same as a statement
 class AstExprStatement : public AstStatement {
 public:
-    explicit AstExprStatement() : AstStatement(AstType::ExprStmt) {}
+    explicit AstExprStatement() : AstStatement(V_AstType::ExprStmt) {}
     
     void setDataType(AstDataType *dataType) {
         this->dataType = dataType;
@@ -57,7 +52,7 @@ private:
 // Represents a function call statement
 class AstFuncCallStmt : public AstStatement {
 public:
-    explicit AstFuncCallStmt(std::string name) : AstStatement(AstType::FuncCallStmt) {
+    explicit AstFuncCallStmt(std::string name) : AstStatement(V_AstType::FuncCallStmt) {
         this->name = name;
     }
     
@@ -71,7 +66,7 @@ private:
 // Represents a return statement
 class AstReturnStmt : public AstStatement {
 public:
-    explicit AstReturnStmt() : AstStatement(AstType::Return) {}
+    explicit AstReturnStmt() : AstStatement(V_AstType::Return) {}
     
     void print();
     std::string dot(std::string parent) override;
@@ -80,7 +75,7 @@ public:
 // Represents a variable declaration
 class AstVarDec : public AstStatement {
 public:
-    explicit AstVarDec(std::string name, AstDataType *dataType) : AstStatement(AstType::VarDec) {
+    explicit AstVarDec(std::string name, AstDataType *dataType) : AstStatement(V_AstType::VarDec) {
         this->name = name;
         this->dataType = dataType;
     }
@@ -103,7 +98,7 @@ private:
 // Represents a structure declaration
 class AstStructDec : public AstStatement {
 public:
-    explicit AstStructDec(std::string varName, std::string structName) : AstStatement(AstType::StructDec) {
+    explicit AstStructDec(std::string varName, std::string structName) : AstStatement(V_AstType::StructDec) {
         this->varName = varName;
         this->structName = structName;
     }
@@ -125,7 +120,7 @@ private:
 // Represents a statement with a sub-block
 class AstBlockStmt : public AstStatement {
 public:
-    explicit AstBlockStmt(AstType type) : AstStatement(type) {
+    explicit AstBlockStmt(V_AstType type) : AstStatement(type) {
         block = new AstBlock;
     }
     
@@ -143,7 +138,7 @@ protected:
 // Represents a conditional statement
 class AstIfStmt : public AstBlockStmt {
 public:
-    explicit AstIfStmt() : AstBlockStmt(AstType::If) {}
+    explicit AstIfStmt() : AstBlockStmt(V_AstType::If) {}
     
     void addBranch(AstStatement *stmt) { branches.push_back(stmt); }
     std::vector<AstStatement *> getBranches() { return branches; }
@@ -156,7 +151,7 @@ private:
 
 class AstElifStmt : public AstBlockStmt {
 public:
-    explicit AstElifStmt() : AstBlockStmt(AstType::Elif) {}
+    explicit AstElifStmt() : AstBlockStmt(V_AstType::Elif) {}
     
     void print(int indent = 0);
     std::string dot(std::string parent) override;
@@ -164,7 +159,7 @@ public:
 
 class AstElseStmt : public AstBlockStmt {
 public:
-    explicit AstElseStmt() : AstBlockStmt(AstType::Else) {}
+    explicit AstElseStmt() : AstBlockStmt(V_AstType::Else) {}
     
     void print(int indent = 0);
     std::string dot(std::string parent) override;
@@ -173,7 +168,7 @@ public:
 // Represents a while statement
 class AstWhileStmt : public AstBlockStmt {
 public:
-    explicit AstWhileStmt() : AstBlockStmt(AstType::While) {}
+    explicit AstWhileStmt() : AstBlockStmt(V_AstType::While) {}
     
     void print(int indent = 0);
     std::string dot(std::string parent) override;
@@ -182,7 +177,7 @@ public:
 // Represents a break statement for a loop
 class AstBreak : public AstStatement {
 public:
-    explicit AstBreak() : AstStatement(AstType::Break) {}
+    explicit AstBreak() : AstStatement(V_AstType::Break) {}
     void print();
     std::string dot(std::string parent) override;
 };
@@ -190,7 +185,7 @@ public:
 // Represents a continue statement for a loop
 class AstContinue : public AstStatement {
 public:
-    explicit AstContinue() : AstStatement(AstType::Continue) {}
+    explicit AstContinue() : AstStatement(V_AstType::Continue) {}
     void print();
     std::string dot(std::string parent) override;
 };

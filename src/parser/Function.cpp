@@ -115,8 +115,8 @@ bool Parser::buildFunction(Token startToken, std::string className) {
     if (!buildBlock(func->getBlock())) return false;
     
     // Make sure we end with a return statement
-    AstType lastType = func->getBlock()->getBlock().back()->getType();
-    if (lastType == AstType::Return) {
+    V_AstType lastType = func->getBlock()->getBlock().back()->getType();
+    if (lastType == V_AstType::Return) {
         AstStatement *ret = func->getBlock()->getBlock().back();
         if (func->getDataType()->getType() == V_AstType::Void && ret->hasExpression()) {
             syntax->addError(scanner->getLine(), "Cannot return from void function.");

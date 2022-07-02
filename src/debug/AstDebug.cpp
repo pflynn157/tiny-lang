@@ -79,10 +79,10 @@ void AstBlock::print(int indent) {
     for (auto stmt : block) {
         for (int i = 0; i<indent; i++) std::cout << " ";
         switch (stmt->getType()) {
-            case AstType::If:
-            case AstType::Elif:
-            case AstType::Else:
-            case AstType::While: {
+            case V_AstType::If:
+            case V_AstType::Elif:
+            case V_AstType::Else:
+            case V_AstType::While: {
                 static_cast<AstBlockStmt *>(stmt)->print(indent);
             } break;
             
