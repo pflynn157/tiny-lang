@@ -78,6 +78,79 @@ enum class DataType {
     Struct
 };
 
+//
+// Contains the variants for all AST nodes
+//
+enum class V_AstType {
+    None,
+    
+    // Data types
+    Void,
+    Bool,
+    Char,
+    I8, U8,
+    I16, U16,
+    I32, U32,
+    I64, U64,
+    String,
+    Ptr,
+    Struct
+};
+
+//
+// The base of all AST nodes
+//
+class AstNode {
+public:
+    explicit AstNode() {}
+    explicit AstNode(V_AstType type) {
+        this->type = type;
+    }
+    
+    V_AstType getType() { return type; }
+    
+    virtual void print() {}
+protected:
+    V_AstType type = V_AstType::None;
+};
+
+//
+// The base of all AST data types
+//
+class AstDataType : public AstNode {
+public:
+    explicit AstDataType(V_AstType type) : AstNode(type) {}
+    void print() override {}
+};
+
+// Represents a pointer type
+class AstPointerType : public AstDataType {
+public:
+    explicit AstPointerType(AstDataType *baseType) : AstDataType(V_AstType::Ptr) {
+        this->baseType = baseType;
+    }
+    
+    AstDataType *getBaseType() { return baseType; }
+    
+    void print() override {}
+protected:
+    AstDataType *baseType = nullptr;
+};
+
+// Represents a structure type
+class AstStructType : public AstDataType {
+public:
+    explicit AstStructType(std::string name) : AstDataType(V_AstType::Struct) {
+        this->name = name;
+    }
+    
+    std::string getName() { return name; }
+    
+    void print() override {}
+protected:
+    std::string name = "";
+};
+
 struct Var {
     explicit Var() {}
     explicit Var(DataType type, DataType subType = DataType::Void, std::string name = "") {
