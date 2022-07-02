@@ -88,10 +88,10 @@ enum class V_AstType {
     Void,
     Bool,
     Char,
-    I8, U8,
-    I16, U16,
-    I32, U32,
-    I64, U64,
+    Int8,
+    Int16,
+    Int32,
+    Int64,
     String,
     Ptr,
     Struct
@@ -120,7 +120,15 @@ protected:
 class AstDataType : public AstNode {
 public:
     explicit AstDataType(V_AstType type) : AstNode(type) {}
-    void print() override {}
+    explicit AstDataType(V_AstType type, bool isUnsigned) : AstNode(type) {
+        this->isUnsigned = isUnsigned;
+    }
+    
+    void setUnsigned(bool isUnsigned) { this->isUnsigned = isUnsigned; }
+    
+    void print() override;
+protected:
+    bool isUnsigned = false;
 };
 
 // Represents a pointer type
@@ -132,7 +140,7 @@ public:
     
     AstDataType *getBaseType() { return baseType; }
     
-    void print() override {}
+    void print() override;
 protected:
     AstDataType *baseType = nullptr;
 };
@@ -146,7 +154,7 @@ public:
     
     std::string getName() { return name; }
     
-    void print() override {}
+    void print() override;
 protected:
     std::string name = "";
 };

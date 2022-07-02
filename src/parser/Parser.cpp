@@ -7,6 +7,7 @@
 #include <algorithm>
 
 #include <parser/Parser.hpp>
+#include <ast/ast_builder.hpp>
 
 Parser::Parser(std::string input) {
     this->input = input;
@@ -20,7 +21,7 @@ Parser::Parser(std::string input) {
     funcs.push_back("malloc");
     AstExternFunction *FT1 = new AstExternFunction("malloc");
     FT1->addArgument(Var(DataType::I32, DataType::Void, "size"));
-    FT1->setDataType(DataType::String);
+    FT1->setDataType(AstBuilder::buildStringType());
     tree->addGlobalStatement(FT1);
     
     //println(string)
@@ -28,7 +29,7 @@ Parser::Parser(std::string input) {
     AstExternFunction *FT2 = new AstExternFunction("println");
     FT2->setVarArgs();
     FT2->addArgument(Var(DataType::String, DataType::Void, "str"));
-    FT2->setDataType(DataType::Void);
+    FT2->setDataType(AstBuilder::buildVoidType());
     tree->addGlobalStatement(FT2);
     
     //print(string)
@@ -36,14 +37,14 @@ Parser::Parser(std::string input) {
     AstExternFunction *FT3 = new AstExternFunction("print");
     FT3->setVarArgs();
     FT3->addArgument(Var(DataType::String, DataType::Void, "str"));
-    FT3->setDataType(DataType::Void);
+    FT3->setDataType(AstBuilder::buildVoidType());
     tree->addGlobalStatement(FT3);
     
     //i32 strlen(string)
     funcs.push_back("strlen");
     AstExternFunction *FT4 = new AstExternFunction("strlen");
     FT4->addArgument(Var(DataType::String, DataType::Void, "str"));
-    FT4->setDataType(DataType::I32);
+    FT4->setDataType(AstBuilder::buildInt32Type());
     tree->addGlobalStatement(FT4);
     
     //i32 stringcmp(string, string)
@@ -51,7 +52,7 @@ Parser::Parser(std::string input) {
     AstExternFunction *FT5 = new AstExternFunction("stringcmp");
     FT5->addArgument(Var(DataType::String, DataType::Void, "str"));
     FT5->addArgument(Var(DataType::String, DataType::Void, "str"));
-    FT5->setDataType(DataType::I32);
+    FT5->setDataType(AstBuilder::buildInt32Type());
     tree->addGlobalStatement(FT5);
     
     //string strcat_str(string, string)
@@ -59,7 +60,7 @@ Parser::Parser(std::string input) {
     AstExternFunction *FT6 = new AstExternFunction("strcat_str");
     FT6->addArgument(Var(DataType::String, DataType::Void, "str"));
     FT6->addArgument(Var(DataType::String, DataType::Void, "str"));
-    FT6->setDataType(DataType::String);
+    FT6->setDataType(AstBuilder::buildStringType());
     tree->addGlobalStatement(FT6);
     
     //string strcat_char(string, char)
@@ -67,7 +68,7 @@ Parser::Parser(std::string input) {
     AstExternFunction *FT7 = new AstExternFunction("strcat_char");
     FT7->addArgument(Var(DataType::String, DataType::Void, "str"));
     FT7->addArgument(Var(DataType::Char, DataType::Void, "c"));
-    FT7->setDataType(DataType::String);
+    FT7->setDataType(AstBuilder::buildStringType());
     tree->addGlobalStatement(FT7);
 }
 
@@ -243,3 +244,57 @@ bool Parser::isFunc(std::string name) {
     }
     return false;
 }
+
+//
+// Builds a data type from the token stream
+//
+AstDataType *Parser::buildDataType() {
+    Token token = scanner->getNext();
+    AstDataType *dataType = nullptr;
+    
+    switch (token.type) {
+        case Bool: dataType = AstBuilder::buildBoolType(); break;
+        case Char: dataType = AstBuilder::buildCharType(); break;
+        case I8: dataType = AstBuilder::buildInt8Type(); break;
+        case U8: dataType = AstBuilder::buildInt8Type(true); break;
+        case I16: dataType = AstBuilder::buildInt16Type(); break;
+        case U16: dataType = AstBuilder::buildInt16Type(true); break;
+        case I32: dataType = AstBuilder::buildInt32Type(); break;
+        case U32: dataType = AstBuilder::buildInt32Type(true); break;
+        case I64: dataType = AstBuilder::buildInt64Type(); break;
+        case U64: dataType = AstBuilder::buildInt64Type(true); break;
+        case Str: dataType = AstBuilder::buildStringType(); break;
+        
+        case Id: {
+            bool isStruct = false;
+            for (auto s : tree->getStructs()) {
+                if (s->getName() == token.id_val) {
+                    isStruct = true;
+                    break;
+                }
+            }
+                
+            if (isStruct) {
+                dataType = AstBuilder::buildStructType(token.id_val);
+            }
+        } break;
+        
+        default: {}
+    }
+
+    token = scanner->getNext();
+    if (token.type == LBracket) {
+        token = scanner->getNext();
+        if (token.type != RBracket) {
+            syntax->addError(scanner->getLine(), "Invalid pointer type.");
+            return nullptr;
+        }
+        
+        dataType = AstBuilder::buildPointerType(dataType);
+    } else {
+        scanner->rewind(token);
+    }
+    
+    return dataType;
+}
+

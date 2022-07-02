@@ -71,6 +71,7 @@ protected:
     int isConstant(std::string name);
     bool isVar(std::string name);
     bool isFunc(std::string name);
+    AstDataType *buildDataType();
 private:
     std::string input = "";
     Scanner *scanner;

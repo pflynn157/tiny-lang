@@ -20,13 +20,13 @@ void Compiler::compileFunction(AstGlobalStatement *global) {
 
     std::vector<Var> astVarArgs = astFunc->getArguments();
     FunctionType *FT;
-    Type *funcType = translateType(astFunc->getDataType(), astFunc->getPtrType(), astFunc->getDataTypeName());
+    Type *funcType = translateType(astFunc->getDataType());
     //if (astFunc->getDataType() == DataType::Struct) {
     //    funcType = PointerType::getUnqual(funcType);
     //}
     currentFuncType = astFunc->getDataType();
-    if (currentFuncType == DataType::Struct)
-        funcTypeStruct = astFunc->getDataTypeName();
+    //if (currentFuncType == DataType::Struct) {
+    //    funcTypeStruct = astFunc->getDataTypeName();
     
     if (astVarArgs.size() == 0) {
         FT = FunctionType::get(funcType, false);
@@ -139,9 +139,10 @@ void Compiler::compileReturnStatement(AstStatement *stmt) {
     if (!stmt->hasExpression()) {
         builder->CreateRetVoid();
     } else if (stmt->hasExpression()) {
-        Value *val = compileValue(stmt->getExpression(), currentFuncType);
-        if (currentFuncType == DataType::Struct) {
-            StructType *type = structTable[funcTypeStruct];
+        Value *val = compileValue(stmt->getExpression());
+        if (currentFuncType->getType() == V_AstType::Struct) {
+            AstStructType *sType = static_cast<AstStructType *>(currentFuncType);
+            StructType *type = structTable[sType->getName()];
             Value *ld = builder->CreateLoad(type, val);
             builder->CreateRet(ld);
         } else {

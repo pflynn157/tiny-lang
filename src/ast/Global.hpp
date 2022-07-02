@@ -38,7 +38,7 @@ public:
     void addArgument(Var arg) { this->args.push_back(arg); }
     void setArguments(std::vector<Var> args) { this->args = args; }
     
-    void setDataType(DataType dataType) {
+    void setDataType(AstDataType *dataType) {
         this->dataType = dataType;
     }
     
@@ -46,7 +46,7 @@ public:
     bool isVarArgs() { return this->varargs; }
     
     std::string getName() { return name; }
-    DataType getDataType() { return dataType; }
+    AstDataType *getDataType() { return dataType; }
     std::vector<Var> getArguments() { return args; }
     
     void print() override;
@@ -54,7 +54,7 @@ public:
 private:
     std::string name = "";
     std::vector<Var> args;
-    DataType dataType = DataType::Void;
+    AstDataType *dataType;
     bool varargs = false;
 };
 
@@ -67,9 +67,7 @@ public:
     }
     
     std::string getName() { return name; }
-    DataType getDataType() { return dataType; }
-    DataType getPtrType() { return ptrType; }
-    std::string getDataTypeName() { return dtName; }
+    AstDataType *getDataType() { return dataType; }
     std::vector<Var> getArguments() { return args; }
     AstBlock *getBlock() { return block; }
     
@@ -81,13 +79,8 @@ public:
         block->addStatement(statement);
     }
     
-    void setDataType(DataType dataType, DataType ptrType) {
+    void setDataType(AstDataType *dataType) {
         this->dataType = dataType;
-        this->ptrType = ptrType;
-    }
-    
-    void setDataTypeName(std::string name) {
-        this->dtName = name;
     }
     
     void print() override;
@@ -96,7 +89,6 @@ private:
     std::string name = "";
     std::vector<Var> args;
     AstBlock *block;
-    DataType dataType = DataType::Void;
-    DataType ptrType = DataType::Void;
+    AstDataType *dataType;
     std::string dtName = "";
 };

@@ -44,7 +44,7 @@ void Compiler::compileStructDeclaration(AstStatement *stmt) {
         
         for (Var member : str->getItems()) {
             AstExpression *defaultExpr = str->getDefaultExpression(member.name);
-            Value *defaultVal = compileValue(defaultExpr, member.type);
+            Value *defaultVal = compileValue(defaultExpr);
             
             Value *ep = builder->CreateStructGEP(type1, ptr, index);
             builder->CreateStore(defaultVal, ep);

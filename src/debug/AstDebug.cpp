@@ -38,6 +38,37 @@ void AstTree::print() {
     }
 }
 
+//
+// Data Types
+//
+void AstDataType::print() {
+    if (isUnsigned) std::cout << "unsigned ";
+
+    switch (type) {
+        case V_AstType::Void: std::cout << "void"; break;
+        case V_AstType::Bool: std::cout << "bool"; break;
+        case V_AstType::Char: std::cout << "char"; break;
+        case V_AstType::Int8: std::cout << "int8"; break;
+        case V_AstType::Int16: std::cout << "int16"; break;
+        case V_AstType::Int32: std::cout << "int32"; break;
+        case V_AstType::Int64: std::cout << "int64"; break;
+        case V_AstType::String: std::cout << "string"; break;
+        default: {}
+    }
+}
+
+void AstPointerType::print() {
+    std::cout << "*";
+    baseType->print();
+}
+
+void AstStructType::print() {
+    std::cout << "struct(" << name << ")";
+}
+
+//
+// Global types
+//
 void AstExternFunction::print() {
     std::cout << "EXTERN FUNC " << name << "(";
     for (auto var : args) {
@@ -47,7 +78,8 @@ void AstExternFunction::print() {
         std::cout << ", ";
     }
     std::cout << ") ";
-    std::cout << " -> " << printDataType(dataType);
+    std::cout << " -> ";
+    dataType->print();
     std::cout << std::endl;
 }
 
@@ -63,7 +95,7 @@ void AstFunction::print() {
         std::cout << ", ";
     }
     std::cout << ") -> ";
-    std::cout << printDataType(dataType);
+    dataType->print();
     std::cout << std::endl;
     
     block->print();

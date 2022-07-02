@@ -82,7 +82,7 @@ void Compiler::compileStatement(AstStatement *stmt) {
         // Expression statement
         case AstType::ExprStmt: {
             AstExprStatement *expr_stmt = static_cast<AstExprStatement *>(stmt);
-            compileValue(expr_stmt->getExpression(), expr_stmt->getDataType());
+            compileValue(expr_stmt->getExpression());
         } break;
     
         // A variable declaration (alloca) statement
@@ -134,7 +134,7 @@ void Compiler::compileStatement(AstStatement *stmt) {
 }
 
 // Converts an AST value to an LLVM value
-Value *Compiler::compileValue(AstExpression *expr, DataType dataType, bool isAssign) {
+Value *Compiler::compileValue(AstExpression *expr, bool isAssign) {
     switch (expr->getType()) {
         case AstType::I8L: {
             AstI8 *i8 = static_cast<AstI8 *>(expr);
@@ -220,7 +220,7 @@ Value *Compiler::compileValue(AstExpression *expr, DataType dataType, bool isAss
         
         case AstType::Neg: {
             AstNegOp *op = static_cast<AstNegOp *>(expr);
-            Value *val = compileValue(op->getVal(), dataType);
+            Value *val = compileValue(op->getVal());
             
             return builder->CreateNeg(val);
         } break;
@@ -234,10 +234,10 @@ Value *Compiler::compileValue(AstExpression *expr, DataType dataType, bool isAss
             //    AstID *id = static_cast<AstID *>(lvalExpr);
             //    ptr = symtable[id->getValue()];
             //} else {
-                ptr = compileValue(lvalExpr, dataType, true);
+                ptr = compileValue(lvalExpr, true);
             //}
             
-            Value *rval = compileValue(op->getRVal(), dataType);
+            Value *rval = compileValue(op->getRVal());
             
             builder->CreateStore(rval, ptr);
         } break;
@@ -249,7 +249,7 @@ Value *Compiler::compileValue(AstExpression *expr, DataType dataType, bool isAss
             AstExpression *rvalExpr = op->getRVal();
             
             // We only want the LVal first
-            Value *lval = compileValue(lvalExpr, dataType);
+            Value *lval = compileValue(lvalExpr);
             
             // Create the blocks
             BasicBlock *trueBlock = BasicBlock::Create(*context, "true" + std::to_string(blockCount), currentFunc);
@@ -269,7 +269,7 @@ Value *Compiler::compileValue(AstExpression *expr, DataType dataType, bool isAss
             
             // Now, build the body of the second block
             builder->SetInsertPoint(trueBlock);
-            return compileValue(rvalExpr, dataType);
+            return compileValue(rvalExpr);
         } break;
         
         case AstType::Add:
@@ -291,8 +291,8 @@ Value *Compiler::compileValue(AstExpression *expr, DataType dataType, bool isAss
             AstExpression *lvalExpr = op->getLVal();
             AstExpression *rvalExpr = op->getRVal();
             
-            Value *lval = compileValue(lvalExpr, dataType);
-            Value *rval = compileValue(rvalExpr, dataType);
+            Value *lval = compileValue(lvalExpr);
+            Value *rval = compileValue(rvalExpr);
             
             bool strOp = false;
             bool rvalStr = false;
@@ -425,6 +425,36 @@ Type *Compiler::translateType(DataType dataType, DataType subType, std::string t
         } break;
         
         default: type = Type::getVoidTy(*context);
+    }
+    
+    return type;
+}
+
+Type *Compiler::translateType(AstDataType *dataType) {
+    Type *type;
+    
+    switch (dataType->getType()) {
+        case V_AstType::Void: type = Type::getVoidTy(*context); break;
+        case V_AstType::Bool: type = Type::getInt32Ty(*context); break;
+        case V_AstType::Char:
+        case V_AstType::Int8: type = Type::getInt8Ty(*context); break;
+        case V_AstType::Int16: type = Type::getInt16Ty(*context); break;
+        case V_AstType::Int32: type = Type::getInt32Ty(*context); break;
+        case V_AstType::Int64: type = Type::getInt64Ty(*context); break;
+        case V_AstType::String:  type = PointerType::getUnqual(Type::getInt8PtrTy(*context)); break;
+        
+        case V_AstType::Ptr: {
+            AstPointerType *ptrType = static_cast<AstPointerType *>(dataType);
+            Type *baseType = translateType(ptrType->getBaseType());
+            type = PointerType::getUnqual(baseType);
+        } break;
+        
+        case V_AstType::Struct: {
+            AstStructType *sType = static_cast<AstStructType *>(dataType);
+            type = structTable[sType->getName()];
+        } break;
+        
+        default: {}
     }
     
     return type;

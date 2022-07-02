@@ -32,8 +32,9 @@ public:
     void link();
 protected:
     void compileStatement(AstStatement *stmt);
-    Value *compileValue(AstExpression *expr, DataType dataType = DataType::Void, bool isAssign = false);
+    Value *compileValue(AstExpression *expr, bool isAssign = false);
     Type *translateType(DataType dataType, DataType subType = DataType::Void, std::string typeName = "");
+    Type *translateType(AstDataType *dataType);
     int getStructIndex(std::string name, std::string member);
 
     // Function.cpp
@@ -58,8 +59,7 @@ private:
     std::unique_ptr<Module> mod;
     std::unique_ptr<IRBuilder<>> builder;
     Function *currentFunc;
-    DataType currentFuncType = DataType::Void;
-    std::string funcTypeStruct = "";
+    AstDataType *currentFuncType;
     
     // The user-defined structure table
     std::map<std::string, StructType*> structTable;

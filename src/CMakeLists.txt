@@ -27,7 +27,6 @@ set(SRC
     ast/astdot.cpp
     
     debug/AstDebug.cpp
-    debug/Unparse.cpp
     
     parser/ErrorManager.cpp
     parser/Expression.cpp

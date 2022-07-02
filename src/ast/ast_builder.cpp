@@ -8,39 +8,35 @@ namespace AstBuilder {
 //
 // The builders for data types
 //
-AstDataType *buildVoid() {
+AstDataType *buildVoidType() {
     return new AstDataType(V_AstType::Void);
 }
 
-AstDataType *buildBool() {
+AstDataType *buildBoolType() {
     return new AstDataType(V_AstType::Bool);
 }
 
-AstDataType *buildChar() {
+AstDataType *buildCharType() {
     return new AstDataType(V_AstType::Char);
 }
 
-AstDataType *buildInt8(bool isUnsigned) {
-    if (isUnsigned) return new AstDataType(V_AstType::U8);
-    return new AstDataType(V_AstType::I8);
+AstDataType *buildInt8Type(bool isUnsigned) {
+    return new AstDataType(V_AstType::Int8, isUnsigned);
 }
 
-AstDataType *buildInt16(bool isUnsigned) {
-    if (isUnsigned) return new AstDataType(V_AstType::U16);
-    return new AstDataType(V_AstType::I16);
+AstDataType *buildInt16Type(bool isUnsigned) {
+    return new AstDataType(V_AstType::Int16, isUnsigned);
 }
 
-AstDataType *buildInt32(bool isUnsigned) {
-    if (isUnsigned) return new AstDataType(V_AstType::U32);
-    return new AstDataType(V_AstType::I32);
+AstDataType *buildInt32Type(bool isUnsigned) {
+    return new AstDataType(V_AstType::Int32, isUnsigned);
 }
 
-AstDataType *buildInt64(bool isUnsigned) {
-    if (isUnsigned) return new AstDataType(V_AstType::U64);
-    return new AstDataType(V_AstType::I64);
+AstDataType *buildInt64Type(bool isUnsigned) {
+    return new AstDataType(V_AstType::Int64, isUnsigned);
 }
 
-AstDataType *buildString() {
+AstDataType *buildStringType() {
     return new AstDataType(V_AstType::String);
 }
 

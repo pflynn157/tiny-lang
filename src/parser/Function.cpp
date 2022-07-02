@@ -7,6 +7,7 @@
 
 #include <parser/Parser.hpp>
 #include <ast/ast.hpp>
+#include <ast/ast_builder.hpp>
 
 // Returns the function arguments
 bool Parser::getFunctionArgs(std::vector<Var> &args) {
@@ -125,58 +126,14 @@ bool Parser::buildFunction(Token startToken, std::string className) {
     if (!getFunctionArgs(args)) return false;
 
     // Check to see if there's any return type
+    //std::string retName = "";       // TODO: Do we need this?
     token = scanner->getNext();
-    DataType funcType = DataType::Void;
-    DataType ptrType = DataType::Void;
-    std::string retName = "";
-    
+    AstDataType *dataType;
     if (token.type == Arrow) {
+        dataType = buildDataType();
         token = scanner->getNext();
-        switch (token.type) {
-            case Bool: funcType = DataType::Bool; break;
-            case Char: funcType = DataType::Char; break;
-            case I8: funcType = DataType::I8; break;
-            case U8: funcType = DataType::U8; break;
-            case I16: funcType = DataType::I16; break;
-            case U16: funcType = DataType::U16; break;
-            case I32: funcType = DataType::I32; break;
-            case U32: funcType = DataType::U32; break;
-            case I64: funcType = DataType::I64; break;
-            case U64: funcType = DataType::U64; break;
-            case Str: funcType = DataType::String; break;
-            
-            case Id: {
-                bool isStruct = false;
-                for (auto s : tree->getStructs()) {
-                    if (s->getName() == token.id_val) {
-                        isStruct = true;
-                        break;
-                    }
-                }
-                    
-                if (isStruct) {
-                    funcType = DataType::Struct;
-                    retName = token.id_val;
-                }
-            } break;
-            
-            default: {}
-        }
-    
-        token = scanner->getNext();
-        if (token.type == LBracket) {
-            token = scanner->getNext();
-            if (token.type != RBracket) {
-                syntax->addError(scanner->getLine(), "Invalid function type.");
-                return false;
-            }
-            
-            ptrType = funcType;
-            funcType = DataType::Ptr;
-            
-            token = scanner->getNext();
-        }
     }
+    else dataType = AstBuilder::buildVoidType();
     
     // Do syntax error check
     if (token.type == SemiColon && !isExtern) {
@@ -193,14 +150,13 @@ bool Parser::buildFunction(Token startToken, std::string className) {
     if (isExtern) {
         AstExternFunction *ex = new AstExternFunction(funcName);
         ex->setArguments(args);
-        ex->setDataType(funcType);
+        ex->setDataType(dataType);
         tree->addGlobalStatement(ex);
         return true;
     }
     
     AstFunction *func = new AstFunction(funcName);
-    func->setDataType(funcType, ptrType);
-    if (funcType == DataType::Struct) func->setDataTypeName(retName);
+    func->setDataType(dataType);
     func->setArguments(args);
     tree->addGlobalStatement(func);
     
@@ -212,7 +168,7 @@ bool Parser::buildFunction(Token startToken, std::string className) {
     AstType lastType = func->getBlock()->getBlock().back()->getType();
     if (lastType == AstType::Return) {
         AstStatement *ret = func->getBlock()->getBlock().back();
-        if (func->getDataType() == DataType::Void && ret->hasExpression()) {
+        if (func->getDataType()->getType() == V_AstType::Void && ret->hasExpression()) {
             syntax->addError(scanner->getLine(), "Cannot return from void function.");
             return false;
         } else if (!ret->hasExpression()) {
@@ -220,7 +176,7 @@ bool Parser::buildFunction(Token startToken, std::string className) {
             return false;
         }
     } else {
-        if (func->getDataType() == DataType::Void) {
+        if (func->getDataType()->getType() == V_AstType::Void) {
             func->addStatement(new AstReturnStmt);
         } else {
             syntax->addError(scanner->getLine(), "Expected return statement.");
