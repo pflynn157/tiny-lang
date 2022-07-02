@@ -17,9 +17,7 @@ bool Parser::getFunctionArgs(std::vector<Var> &args) {
         while (token.type != Eof && token.type != RParen) {
             Token t1 = token;
             Token t2 = scanner->getNext();
-            Token t3 = scanner->getNext();
             Var v;
-            v.subType = DataType::Void;
             
             if (t1.type != Id) {
                 syntax->addError(scanner->getLine(), "Invalid function argument: Expected name.");
@@ -31,65 +29,17 @@ bool Parser::getFunctionArgs(std::vector<Var> &args) {
                 return false;
             }
             
-            switch (t3.type) {
-                case Bool: v.type = DataType::Bool; break;
-                case Char: v.type = DataType::Char; break;
-                case I8: v.type = DataType::I8; break;
-                case U8: v.type = DataType::U8; break;
-                case I16: v.type = DataType::I16; break;
-                case U16: v.type = DataType::U16; break;
-                case I32: v.type = DataType::I32; break;
-                case U32: v.type = DataType::U32; break;
-                case I64: v.type = DataType::I64; break;
-                case U64: v.type = DataType::U64; break;
-                case Str: v.type = DataType::String; break;
-                
-                case Id: {
-                    bool isStruct = false;
-                    for (auto s : tree->getStructs()) {
-                        if (s->getName() == t3.id_val) {
-                            isStruct = true;
-                            break;
-                        }
-                    }
-                    
-                    if (isStruct) {
-                        v.type = DataType::Struct;
-                        v.typeName = t3.id_val;
-                    }
-                } break;
-                
-                default: {
-                    syntax->addError(scanner->getLine(), "Invalid function argument: Unknown type.");
-                    token.print();
-                    return false;
-                }
-            }
-            
+            v.type = buildDataType();
             v.name = t1.id_val;
             vars.push_back(t1.id_val);
             
             token = scanner->getNext();
             if (token.type == Comma) {
                 token = scanner->getNext();
-            } else if (token.type == LBracket) {
-                Token token1 = scanner->getNext();
-                Token token2 = scanner->getNext();
-                
-                if (token1.type != RBracket) {
-                    syntax->addError(scanner->getLine(), "Invalid type syntax.");
-                    return false;
-                }
-                
-                if (token2.type == Comma) token = scanner->getNext();
-                else token = token2;
-                
-                v.subType = v.type;
-                v.type = DataType::Ptr;
             }
             
             args.push_back(v);
-            typeMap[v.name] = std::pair<DataType, DataType>(v.type, v.subType);
+            typeMap[v.name] = v.type;
         }
     } else {
         scanner->rewind(token);
@@ -198,7 +148,7 @@ bool Parser::buildFunctionCallStmt(AstBlock *block, Token idToken) {
     AstFuncCallStmt *fc = new AstFuncCallStmt(idToken.id_val);
     block->addStatement(fc);
     
-    AstExpression *args = buildExpression(DataType::Void, SemiColon, false, true);
+    AstExpression *args = buildExpression(nullptr, SemiColon, false, true);
     if (!args) return false;
     fc->setExpression(args);
     
@@ -210,7 +160,7 @@ bool Parser::buildReturn(AstBlock *block) {
     AstReturnStmt *stmt = new AstReturnStmt;
     block->addStatement(stmt);
     
-    AstExpression *arg = buildExpression(DataType::Void);
+    AstExpression *arg = buildExpression(nullptr);
     if (!arg) return false;
     stmt->setExpression(arg);
     

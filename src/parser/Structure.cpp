@@ -9,6 +9,7 @@
 
 #include <parser/Parser.hpp>
 #include <ast/ast.hpp>
+#include <ast/ast_builder.hpp>
 
 // Parses and builds a structure
 bool Parser::buildStruct() {
@@ -57,45 +58,12 @@ bool Parser::buildStructMember(AstStruct *str, Token token) {
         return false;
     }
     
-    token = scanner->getNext();
-    DataType dataType = DataType::Void;
-        
-    switch (token.type) {
-        case Bool: dataType = DataType::Bool; break;
-        case Char: dataType = DataType::Char; break;
-        case I8: dataType = DataType::I8; break;
-        case U8: dataType = DataType::U8; break;
-        case I16: dataType = DataType::I16; break;
-        case U16: dataType = DataType::U16; break;
-        case I32: dataType = DataType::I32; break;
-        case U32: dataType = DataType::U32; break;
-        case I64: dataType = DataType::I64; break;
-        case U64: dataType = DataType::U64; break;
-        case Str: dataType = DataType::String; break;
-        
-        default: {}
-    }
+    AstDataType *dataType = buildDataType();
         
     // If its an array, build that. Otherwise, build the default value
     token = scanner->getNext();
         
-    if (token.type == LBracket) {
-        AstExpression *expr = buildExpression(DataType::I32, RBracket, true);
-        if (!expr) return false;
-                
-        token = scanner->getNext();
-        if (token.type != SemiColon) {
-            syntax->addError(scanner->getLine(), "Expected terminator.");
-            return false;
-        }
-            
-        Var v;
-        v.name = valName;
-        v.type = DataType::Ptr;
-        v.subType = dataType;
-            
-        str->addItem(v, expr);
-    } else if (token.type == Assign) {
+    if (token.type == Assign) {
         AstExpression *expr = nullptr;
         expr = buildExpression(dataType, SemiColon, true);
         if (!expr) return false;
@@ -153,6 +121,7 @@ bool Parser::buildStructDec(AstBlock *block) {
     
     // Now build the declaration and push back
     vars.push_back(name);
+    typeMap[name] = AstBuilder::buildStructType(structName);
     AstStructDec *dec = new AstStructDec(name, structName);
     block->addStatement(dec);
     
@@ -163,7 +132,7 @@ bool Parser::buildStructDec(AstBlock *block) {
     } else if (token.type == Assign) {
         dec->setNoInit(true);
         AstExprStatement *empty = new AstExprStatement;
-        AstExpression *arg = buildExpression(DataType::Struct);
+        AstExpression *arg = buildExpression(AstBuilder::buildStructType(structName));
         if (!arg) return false;
         
         AstID *id = new AstID(name);

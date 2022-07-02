@@ -13,7 +13,6 @@
 void Compiler::compileFunction(AstGlobalStatement *global) {
     symtable.clear();
     typeTable.clear();
-    ptrTable.clear();
     structVarTable.clear();
     
     AstFunction *astFunc = static_cast<AstFunction *>(global);
@@ -28,8 +27,8 @@ void Compiler::compileFunction(AstGlobalStatement *global) {
     } else {
         std::vector<Type *> args;
         for (auto var : astVarArgs) {
-            Type *type = translateType(var.type, var.subType, var.typeName);
-            if (var.type == DataType::Struct) {
+            Type *type = translateType(var.type);
+            if (var.type->getType() == V_AstType::Struct) {
                 type = PointerType::getUnqual(type);
             }
             args.push_back(type);
@@ -50,19 +49,17 @@ void Compiler::compileFunction(AstGlobalStatement *global) {
             Var var = astVarArgs.at(i);
             
             // Build the alloca for the local var
-            Type *type = translateType(var.type, var.subType, var.typeName);
-            if (var.type == DataType::Struct) {
+            Type *type = translateType(var.type);
+            if (var.type->getType() == V_AstType::Struct) {
                 symtable[var.name] = (AllocaInst *)func->getArg(i);
                 typeTable[var.name] = var.type;
-                ptrTable[var.name] = var.subType;
-                structVarTable[var.name] = var.typeName;
+                structVarTable[var.name] = static_cast<AstStructType *>(var.type)->getName();
                 continue;
             }
             
             AllocaInst *alloca = builder->CreateAlloca(type);
             symtable[var.name] = alloca;
             typeTable[var.name] = var.type;
-            ptrTable[var.name] = var.subType;
             
             // Store the variable
             Value *param = func->getArg(i);
@@ -91,7 +88,7 @@ void Compiler::compileExternFunction(AstGlobalStatement *global) {
     } else {
         std::vector<Type *> args;
         for (auto var : astVarArgs) {
-            Type *type = translateType(var.type, var.subType);
+            Type *type = translateType(var.type);
             args.push_back(type);
         }
         

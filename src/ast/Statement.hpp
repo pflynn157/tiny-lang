@@ -42,19 +42,16 @@ class AstExprStatement : public AstStatement {
 public:
     explicit AstExprStatement() : AstStatement(AstType::ExprStmt) {}
     
-    void setDataType(DataType dataType, DataType ptrType = DataType::Void) {
+    void setDataType(AstDataType *dataType) {
         this->dataType = dataType;
-        this->ptrType = ptrType;
     }
     
-    DataType getDataType() { return dataType; }
-    DataType getPtrType() { return ptrType; }
+    AstDataType *getDataType() { return dataType; }
     
     void print();
     std::string dot(std::string parent) override;
 private:
-    DataType dataType = DataType::Void;
-    DataType ptrType = DataType::Void;
+    AstDataType *dataType;
 };
 
 // Represents a function call statement
@@ -83,18 +80,16 @@ public:
 // Represents a variable declaration
 class AstVarDec : public AstStatement {
 public:
-    explicit AstVarDec(std::string name, DataType dataType) : AstStatement(AstType::VarDec) {
+    explicit AstVarDec(std::string name, AstDataType *dataType) : AstStatement(AstType::VarDec) {
         this->name = name;
         this->dataType = dataType;
     }
     
-    void setDataType(DataType dataType) { this->dataType = dataType; }
-    void setPtrType(DataType dataType) { this->ptrType = dataType; }
+    void setDataType(AstDataType *dataType) { this->dataType = dataType; }
     void setPtrSize(AstExpression *size) { this->size = size; }
     
     std::string getName() { return name; }
-    DataType getDataType() { return dataType; }
-    DataType getPtrType() { return ptrType; }
+    AstDataType *getDataType() { return dataType; }
     AstExpression *getPtrSize() { return size; }
     
     void print();
@@ -102,8 +97,7 @@ public:
 private:
     std::string name = "";
     AstExpression *size = nullptr;
-    DataType dataType = DataType::Void;
-    DataType ptrType = DataType::Void;
+    AstDataType *dataType;
 };
 
 // Represents a structure declaration

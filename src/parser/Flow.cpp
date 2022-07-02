@@ -15,21 +15,16 @@ AstExpression *Parser::checkCondExpression(AstExpression *toCheck) {
     switch (toCheck->getType()) {
         case AstType::ID: {
             AstID *id = static_cast<AstID *>(toCheck);
-            DataType dataType = typeMap[id->getValue()].first;
-            
+            AstDataType *dataType = typeMap[id->getValue()];            
             AstEQOp *eq = new AstEQOp;
             eq->setLVal(id);
             
-            switch (dataType) {
-                case DataType::Bool: eq->setRVal(new AstI32(1)); break;
-                case DataType::I8:
-                case DataType::U8: eq->setRVal(new AstI8(1)); break;
-                case DataType::I16:
-                case DataType::U16: eq->setRVal(new AstI16(1)); break;
-                case DataType::I32:
-                case DataType::U32: eq->setRVal(new AstI32(1)); break;
-                case DataType::I64:
-                case DataType::U64: eq->setRVal(new AstI64(1)); break;
+            switch (dataType->getType()) {
+                case V_AstType::Bool: eq->setRVal(new AstI32(1)); break;
+                case V_AstType::Int8: eq->setRVal(new AstI8(1)); break;
+                case V_AstType::Int16: eq->setRVal(new AstI16(1)); break;
+                case V_AstType::Int32: eq->setRVal(new AstI32(1)); break;
+                case V_AstType::Int64: eq->setRVal(new AstI64(1)); break;
                 
                 default: {}
             }
@@ -53,7 +48,7 @@ AstExpression *Parser::checkCondExpression(AstExpression *toCheck) {
 // Builds a conditional statement
 bool Parser::buildConditional(AstBlock *block) {
     AstIfStmt *cond = new AstIfStmt;
-    AstExpression *arg = buildExpression(DataType::Void, Then);
+    AstExpression *arg = buildExpression(nullptr, Then);
     if (!arg) return false;
     cond->setExpression(arg);
     block->addStatement(cond);
@@ -69,7 +64,7 @@ bool Parser::buildConditional(AstBlock *block) {
 // Builds an ELIF statement
 bool Parser::buildElif(AstIfStmt *block) {
     AstElifStmt *elif = new AstElifStmt;
-    AstExpression *arg = buildExpression(DataType::Void, Then);
+    AstExpression *arg = buildExpression(nullptr, Then);
     if (!arg) return false;
     elif->setExpression(arg);
     block->addBranch(elif);
@@ -94,7 +89,7 @@ bool Parser::buildElse(AstIfStmt *block) {
 // Builds a while statement
 bool Parser::buildWhile(AstBlock *block) {
     AstWhileStmt *loop = new AstWhileStmt;
-    AstExpression *arg = buildExpression(DataType::Void, Do);
+    AstExpression *arg = buildExpression(nullptr, Do);
     if (!arg) return false;
     loop->setExpression(arg);
     block->addStatement(loop);

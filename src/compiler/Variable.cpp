@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include "Compiler.hpp"
+#include <ast/ast_builder.hpp>
 
 // Compiles a structure declaration
 void Compiler::compileStructDeclaration(AstStatement *stmt) {
@@ -15,7 +16,7 @@ void Compiler::compileStructDeclaration(AstStatement *stmt) {
     
     AllocaInst *var = builder->CreateAlloca(type);
     symtable[sd->getVarName()] = var;
-    typeTable[sd->getVarName()] = DataType::Struct;
+    typeTable[sd->getVarName()] = AstBuilder::buildStructType(sd->getStructName());
     structVarTable[sd->getVarName()] = sd->getStructName();
     
     // Find the corresponding AST structure

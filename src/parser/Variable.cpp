@@ -9,6 +9,7 @@
 
 #include <parser/Parser.hpp>
 #include <ast/ast.hpp>
+#include <ast/ast_builder.hpp>
 
 // Builds a variable declaration
 // A variable declaration is composed of an Alloca and optionally, an assignment
@@ -42,35 +43,14 @@ bool Parser::buildVariableDec(AstBlock *block) {
         token = scanner->getNext();
     }
     
-    token = scanner->getNext();
-    DataType dataType = DataType::Void;
-    bool isString = false;
-    
-    switch (token.type) {
-        case Bool: dataType = DataType::Bool; break;
-        case Char: dataType = DataType::Char; break;
-        case I8: dataType = DataType::I8; break;
-        case U8: dataType = DataType::U8; break;
-        case I16: dataType = DataType::I16; break;
-        case U16: dataType = DataType::U16; break;
-        case I32: dataType = DataType::I32; break;
-        case U32: dataType = DataType::U32; break;
-        case I64: dataType = DataType::I64; break;
-        case U64: dataType = DataType::U64; break;
-        case Str: dataType = DataType::String; break;
-        
-        default: {
-            syntax->addError(scanner->getLine(), "Invalid data type.");
-            return false;
-        }
-    }
-    
+    AstDataType *dataType = buildDataType(false);
     token = scanner->getNext();
     
     // We have an array
     if (token.type == LBracket) {
-        AstVarDec *empty = new AstVarDec("", DataType::Ptr);
-        AstExpression *arg = buildExpression(DataType::I32, RBracket);
+        dataType = AstBuilder::buildPointerType(dataType);
+        AstVarDec *empty = new AstVarDec("", dataType);
+        AstExpression *arg = buildExpression(AstBuilder::buildInt32Type(), RBracket);
         if (!arg) return false;
         empty->setExpression(arg); 
         
@@ -82,14 +62,13 @@ bool Parser::buildVariableDec(AstBlock *block) {
         
         for (std::string name : toDeclare) {
             vars.push_back(name);
-            AstVarDec *vd = new AstVarDec(name, DataType::Ptr);
+            AstVarDec *vd = new AstVarDec(name, dataType);
             block->addStatement(vd);
             vd->setExpression(empty->getExpression());
-            vd->setPtrType(dataType);
             
             // Create an assignment to a malloc call
             AstExprStatement *va = new AstExprStatement;
-            va->setDataType(DataType::Ptr, dataType);
+            va->setDataType(dataType);
             block->addStatement(va);
             
             AstID *id = new AstID(name);
@@ -104,9 +83,10 @@ bool Parser::buildVariableDec(AstBlock *block) {
             callMalloc->setArgExpression(list);
             
             AstI32 *size;
-            if (dataType == DataType::I32 | dataType == DataType::U32) size = new AstI32(4);
-            else if (dataType == DataType::I64 || dataType == DataType::U64) size = new AstI32(8);
-            else if (dataType == DataType::String) size = new AstI32(8);
+            AstDataType *baseType = static_cast<AstPointerType *>(dataType)->getBaseType();
+            if (baseType->getType() == V_AstType::Int32) size = new AstI32(4);
+            else if (baseType->getType() == V_AstType::Int64) size = new AstI32(8);
+            else if (baseType->getType() == V_AstType::String) size = new AstI32(8);
             else size = new AstI32(1);
             
             AstMulOp *op = new AstMulOp;
@@ -117,7 +97,7 @@ bool Parser::buildVariableDec(AstBlock *block) {
             // Finally, set the size of the declaration
             vd->setPtrSize(vd->getExpression());
             
-            typeMap[name] = std::pair<DataType, DataType>(DataType::Ptr, dataType);
+            typeMap[name] = dataType;
         }
     
     // We're at the end of the declaration
@@ -135,8 +115,7 @@ bool Parser::buildVariableDec(AstBlock *block) {
             AstVarDec *vd = new AstVarDec(name, dataType);
             block->addStatement(vd);
             
-            auto typePair = std::pair<DataType, DataType>(dataType, DataType::Void);
-            typeMap[name] = typePair;
+            typeMap[name] = dataType;
             
             AstID *id = new AstID(name);
             AstAssignOp *assign = new AstAssignOp(id, arg);
@@ -153,14 +132,14 @@ bool Parser::buildVariableDec(AstBlock *block) {
 
 // Builds a variable or an array assignment
 bool Parser::buildVariableAssign(AstBlock *block, Token idToken) {
-    DataType dataType = typeMap[idToken.id_val].first;
-    DataType ptrType = typeMap[idToken.id_val].second;
+    AstDataType *dataType = typeMap[idToken.id_val];
     
-    AstExpression *expr = buildExpression((dataType == DataType::Ptr) ? dataType : ptrType);
+    // TODO: This abomination is temporar
+    AstExpression *expr = buildExpression(dataType);
     if (!expr) return false;
     
     AstExprStatement *stmt = new AstExprStatement;
-    stmt->setDataType(dataType, ptrType);
+    stmt->setDataType(dataType);
     stmt->setExpression(expr);
     block->addStatement(stmt);
     
@@ -186,27 +165,7 @@ bool Parser::buildConst(bool isGlobal) {
     }
     
     // Get the data type
-    token = scanner->getNext();
-    DataType dataType = DataType::Void;
-    
-    switch (token.type) {
-        case Bool: dataType = DataType::Bool; break;
-        case Char: dataType = DataType::Char; break;
-        case I8: dataType = DataType::I8; break;
-        case U8: dataType = DataType::U8; break;
-        case I16: dataType = DataType::I16; break;
-        case U16: dataType = DataType::U16; break;
-        case I32: dataType = DataType::I32; break;
-        case U32: dataType = DataType::U32; break;
-        case I64: dataType = DataType::I64; break;
-        case U64: dataType = DataType::U64; break;
-        case Str: dataType = DataType::String; break;
-        
-        default: {
-            syntax->addError(scanner->getLine(), "Unknown data type.");
-            return false;
-        }
-    }
+    AstDataType *dataType = buildDataType(false);
     
     // Final syntax check
     token = scanner->getNext();
@@ -221,9 +180,9 @@ bool Parser::buildConst(bool isGlobal) {
     
     // Put it all together
     if (isGlobal) {
-        globalConsts[name] = std::pair<DataType, AstExpression*>(dataType, expr);
+        globalConsts[name] = std::pair<AstDataType *, AstExpression*>(dataType, expr);
     } else {
-        localConsts[name] = std::pair<DataType, AstExpression*>(dataType, expr);
+        localConsts[name] = std::pair<AstDataType *, AstExpression*>(dataType, expr);
     }
     
     return true;

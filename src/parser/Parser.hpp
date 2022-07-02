@@ -54,7 +54,7 @@ protected:
     struct ExprContext {
         std::stack<AstExpression *> output;
         std::stack<AstOp *> opStack;
-        DataType varType;
+        AstDataType *varType;
         bool lastWasOp = true;
     };
     
@@ -63,24 +63,24 @@ protected:
     bool buildIDExpr(Token token, ExprContext *ctx);
     bool applyHigherPred(ExprContext *ctx);
     bool applyAssoc(ExprContext *ctx);
-    AstExpression *buildExpression(DataType currentType, TokenType stopToken = SemiColon, bool isConst = false, bool buildList = false);
-    AstExpression *checkExpression(AstExpression *expr, DataType varType);
+    AstExpression *buildExpression(AstDataType *currentType, TokenType stopToken = SemiColon, bool isConst = false, bool buildList = false);
+    AstExpression *checkExpression(AstExpression *expr, AstDataType *varType);
     
     bool buildBlock(AstBlock *block, AstIfStmt *parentBlock = nullptr);
     AstExpression *checkCondExpression(AstExpression *toCheck);
     int isConstant(std::string name);
     bool isVar(std::string name);
     bool isFunc(std::string name);
-    AstDataType *buildDataType();
+    AstDataType *buildDataType(bool checkBrackets = true);
 private:
     std::string input = "";
     Scanner *scanner;
     AstTree *tree;
     ErrorManager *syntax;
     
-    std::map<std::string, std::pair<DataType,DataType>> typeMap;
-    std::map<std::string, std::pair<DataType, AstExpression*>> globalConsts;
-    std::map<std::string, std::pair<DataType, AstExpression*>> localConsts;
+    std::map<std::string, AstDataType *> typeMap;
+    std::map<std::string, std::pair<AstDataType *, AstExpression*>> globalConsts;
+    std::map<std::string, std::pair<AstDataType *, AstExpression*>> localConsts;
     std::vector<std::string> vars;
     std::vector<std::string> funcs;
 };

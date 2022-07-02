@@ -65,19 +65,6 @@ enum class AstType {
     ExprList
 };
 
-enum class DataType {
-    Void,
-    Bool,
-    Char,
-    I8, U8,
-    I16, U16,
-    I32, U32,
-    I64, U64,
-    String,
-    Ptr,
-    Struct
-};
-
 //
 // Contains the variants for all AST nodes
 //
@@ -120,15 +107,17 @@ protected:
 class AstDataType : public AstNode {
 public:
     explicit AstDataType(V_AstType type) : AstNode(type) {}
-    explicit AstDataType(V_AstType type, bool isUnsigned) : AstNode(type) {
-        this->isUnsigned = isUnsigned;
+    explicit AstDataType(V_AstType type, bool _isUnsigned) : AstNode(type) {
+        this->_isUnsigned = _isUnsigned;
     }
     
-    void setUnsigned(bool isUnsigned) { this->isUnsigned = isUnsigned; }
+    void setUnsigned(bool _isUnsigned) { this->_isUnsigned = _isUnsigned; }
+    
+    bool isUnsigned() { return _isUnsigned; }
     
     void print() override;
 protected:
-    bool isUnsigned = false;
+    bool _isUnsigned = false;
 };
 
 // Represents a pointer type
@@ -161,16 +150,13 @@ protected:
 
 struct Var {
     explicit Var() {}
-    explicit Var(DataType type, DataType subType = DataType::Void, std::string name = "") {
+    explicit Var(AstDataType *type, std::string name = "") {
         this->type = type;
-        this->subType = subType;
         this->name = name;
     }
 
     std::string name;
-    DataType type;
-    DataType subType;
-    std::string typeName;
+    AstDataType *type;
 };
 
 // Forward declarations
@@ -201,20 +187,16 @@ public:
         items.push_back(var);
         defaultExpressions[var.name] = defaultExpression;
         
-        switch (var.type) {
-            case DataType::Char:
-            case DataType::I8:
-            case DataType::U8: size += 1; break;
-            case DataType::I16:
-            case DataType::U16: size += 2; break;
-            case DataType::Bool:
-            case DataType::I32:
-            case DataType::U32: size += 4; break;
-            case DataType::String:
-            case DataType::Ptr:
-            case DataType::Struct:
-            case DataType::I64:
-            case DataType::U64: size += 8; break;
+        switch (var.type->getType()) {
+            case V_AstType::Char:
+            case V_AstType::Int8: size += 1; break;
+            case V_AstType::Int16: size += 2; break;
+            case V_AstType::Bool:
+            case V_AstType::Int32: size += 4; break;
+            case V_AstType::String:
+            case V_AstType::Ptr:
+            case V_AstType::Struct:
+            case V_AstType::Int64: size += 8; break;
             
             default: {}
         }

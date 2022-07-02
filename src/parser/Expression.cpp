@@ -7,6 +7,7 @@
 
 #include <parser/Parser.hpp>
 #include <ast/ast.hpp>
+#include <ast/ast_builder.hpp>
 
 // Builds a constant expression value
 AstExpression *Parser::buildConstExpr(Token token) {
@@ -96,16 +97,17 @@ bool Parser::buildIDExpr(Token token, ExprContext *ctx) {
     int currentLine = scanner->getLine();
 
     std::string name = token.id_val;
-    if (ctx->varType == DataType::Void) {
-        ctx->varType = typeMap[name].first;
-        if (ctx->varType == DataType::Ptr) ctx->varType = typeMap[name].second;
+    if (ctx->varType && ctx->varType->getType() == V_AstType::Void) {
+        ctx->varType = typeMap[name];
+        if (ctx->varType && ctx->varType->getType() == V_AstType::Ptr)
+            ctx->varType = static_cast<AstPointerType *>(ctx->varType)->getBaseType();
     }
     
     token = scanner->getNext();
     if (token.type == LBracket) {
         //AstExpression *index = nullptr;
         //buildExpression(nullptr, DataType::I32, RBracket, EmptyToken, &index);
-        AstExpression *index = buildExpression(DataType::I32, RBracket);
+        AstExpression *index = buildExpression(AstBuilder::buildInt32Type(), RBracket);
         
         AstArrayAccess *acc = new AstArrayAccess(name);
         acc->setIndex(index);
@@ -229,9 +231,10 @@ bool Parser::applyAssoc(ExprContext *ctx) {
 }
 
 // Our new expression builder
-AstExpression *Parser::buildExpression(DataType currentType, TokenType stopToken, bool isConst, bool buildList) {
+AstExpression *Parser::buildExpression(AstDataType *currentType, TokenType stopToken, bool isConst, bool buildList) {
     ExprContext *ctx = new ExprContext;
-    ctx->varType = currentType;
+    if (currentType) ctx->varType = currentType;
+    else ctx->varType = AstBuilder::buildVoidType();
     
     AstExprList *list = new AstExprList;
     bool isList = buildList;

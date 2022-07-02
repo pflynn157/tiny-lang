@@ -33,7 +33,6 @@ public:
 protected:
     void compileStatement(AstStatement *stmt);
     Value *compileValue(AstExpression *expr, bool isAssign = false);
-    Type *translateType(DataType dataType, DataType subType = DataType::Void, std::string typeName = "");
     Type *translateType(AstDataType *dataType);
     int getStructIndex(std::string name, std::string member);
 
@@ -68,8 +67,7 @@ private:
     
     // Symbol table
     std::map<std::string, AllocaInst *> symtable;
-    std::map<std::string, DataType> typeTable;
-    std::map<std::string, DataType> ptrTable;
+    std::map<std::string, AstDataType *> typeTable;
     
     // Block stack
     int blockCount = 0;

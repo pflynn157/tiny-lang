@@ -20,7 +20,7 @@ Parser::Parser(std::string input) {
     //string malloc(string)
     funcs.push_back("malloc");
     AstExternFunction *FT1 = new AstExternFunction("malloc");
-    FT1->addArgument(Var(DataType::I32, DataType::Void, "size"));
+    FT1->addArgument(Var(AstBuilder::buildInt32Type(), "size"));
     FT1->setDataType(AstBuilder::buildStringType());
     tree->addGlobalStatement(FT1);
     
@@ -28,7 +28,7 @@ Parser::Parser(std::string input) {
     funcs.push_back("println");
     AstExternFunction *FT2 = new AstExternFunction("println");
     FT2->setVarArgs();
-    FT2->addArgument(Var(DataType::String, DataType::Void, "str"));
+    FT2->addArgument(Var(AstBuilder::buildStringType(), "str"));
     FT2->setDataType(AstBuilder::buildVoidType());
     tree->addGlobalStatement(FT2);
     
@@ -36,38 +36,38 @@ Parser::Parser(std::string input) {
     funcs.push_back("print");
     AstExternFunction *FT3 = new AstExternFunction("print");
     FT3->setVarArgs();
-    FT3->addArgument(Var(DataType::String, DataType::Void, "str"));
+    FT3->addArgument(Var(AstBuilder::buildStringType(), "str"));
     FT3->setDataType(AstBuilder::buildVoidType());
     tree->addGlobalStatement(FT3);
     
     //i32 strlen(string)
     funcs.push_back("strlen");
     AstExternFunction *FT4 = new AstExternFunction("strlen");
-    FT4->addArgument(Var(DataType::String, DataType::Void, "str"));
+    FT4->addArgument(Var(AstBuilder::buildStringType(), "str"));
     FT4->setDataType(AstBuilder::buildInt32Type());
     tree->addGlobalStatement(FT4);
     
     //i32 stringcmp(string, string)
     funcs.push_back("stringcmp");
     AstExternFunction *FT5 = new AstExternFunction("stringcmp");
-    FT5->addArgument(Var(DataType::String, DataType::Void, "str"));
-    FT5->addArgument(Var(DataType::String, DataType::Void, "str"));
+    FT5->addArgument(Var(AstBuilder::buildStringType(), "str"));
+    FT5->addArgument(Var(AstBuilder::buildStringType(), "str"));
     FT5->setDataType(AstBuilder::buildInt32Type());
     tree->addGlobalStatement(FT5);
     
     //string strcat_str(string, string)
     funcs.push_back("strcat_str");
     AstExternFunction *FT6 = new AstExternFunction("strcat_str");
-    FT6->addArgument(Var(DataType::String, DataType::Void, "str"));
-    FT6->addArgument(Var(DataType::String, DataType::Void, "str"));
+    FT6->addArgument(Var(AstBuilder::buildStringType(), "str"));
+    FT6->addArgument(Var(AstBuilder::buildStringType(), "str"));
     FT6->setDataType(AstBuilder::buildStringType());
     tree->addGlobalStatement(FT6);
     
     //string strcat_char(string, char)
     funcs.push_back("strcat_char");
     AstExternFunction *FT7 = new AstExternFunction("strcat_char");
-    FT7->addArgument(Var(DataType::String, DataType::Void, "str"));
-    FT7->addArgument(Var(DataType::Char, DataType::Void, "c"));
+    FT7->addArgument(Var(AstBuilder::buildStringType(), "str"));
+    FT7->addArgument(Var(AstBuilder::buildCharType(), "c"));
     FT7->setDataType(AstBuilder::buildStringType());
     tree->addGlobalStatement(FT7);
 }
@@ -178,23 +178,25 @@ bool Parser::buildBlock(AstBlock *block, AstIfStmt *parentBlock) {
 
 // This is meant mainly for literals; it checks to make sure all the types in
 // the expression agree in type. LLVM will have a problem if not
-AstExpression *Parser::checkExpression(AstExpression *expr, DataType varType) {
+AstExpression *Parser::checkExpression(AstExpression *expr, AstDataType *varType) {
+    if (!varType) return expr;
+
     switch (expr->getType()) {
         case AstType::I32L: {
             // Change to byte literals
-            if (varType == DataType::I8 || varType == DataType::U8) {
+            if (varType->getType() == V_AstType::Int8) {
                 AstI32 *i32 = static_cast<AstI32 *>(expr);
                 AstI8 *byte = new AstI8(i32->getValue());
                 expr = byte;
                 
             // Change to word literals
-            } else if (varType == DataType::I16 || varType == DataType::U16) {
+            } else if (varType->getType() == V_AstType::Int16) {
                 AstI32 *i32 = static_cast<AstI32 *>(expr);
                 AstI16 *i16 = new AstI16(i32->getValue());
                 expr = i16;
                 
             // Change to qword literals
-            } else if (varType == DataType::I64 || varType == DataType::U64) {
+            } else if (varType->getType() == V_AstType::Int64) {
                 AstI32 *i32 = static_cast<AstI32 *>(expr);
                 AstI64 *i64 = new AstI64(i32->getValue());
                 expr = i64;
@@ -248,7 +250,7 @@ bool Parser::isFunc(std::string name) {
 //
 // Builds a data type from the token stream
 //
-AstDataType *Parser::buildDataType() {
+AstDataType *Parser::buildDataType(bool checkBrackets) {
     Token token = scanner->getNext();
     AstDataType *dataType = nullptr;
     
@@ -282,17 +284,19 @@ AstDataType *Parser::buildDataType() {
         default: {}
     }
 
-    token = scanner->getNext();
-    if (token.type == LBracket) {
+    if (checkBrackets) {
         token = scanner->getNext();
-        if (token.type != RBracket) {
-            syntax->addError(scanner->getLine(), "Invalid pointer type.");
-            return nullptr;
+        if (token.type == LBracket) {
+            token = scanner->getNext();
+            if (token.type != RBracket) {
+                syntax->addError(scanner->getLine(), "Invalid pointer type.");
+                return nullptr;
+            }
+            
+            dataType = AstBuilder::buildPointerType(dataType);
+        } else {
+            scanner->rewind(token);
         }
-        
-        dataType = AstBuilder::buildPointerType(dataType);
-    } else {
-        scanner->rewind(token);
     }
     
     return dataType;

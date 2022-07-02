@@ -34,7 +34,7 @@ void Compiler::compile() {
         std::vector<Type *> elementTypes;
         
         for (auto v : str->getItems()) {
-            Type *t = translateType(v.type, v.subType);
+            Type *t = translateType(v.type);
             elementTypes.push_back(t);
         }
         
@@ -51,7 +51,6 @@ void Compiler::compile() {
             case AstType::Func: {
                 symtable.clear();
                 typeTable.clear();
-                ptrTable.clear();
                 
                 compileFunction(global);
             } break;
@@ -71,7 +70,7 @@ void Compiler::debug() {
 
 void Compiler::emitLLVM(std::string path) {
     std::error_code errorCode;
-    raw_fd_ostream writer(path, errorCode);//, sys::fs::OF_None);
+    raw_fd_ostream writer(path, errorCode);
     
     mod->print(writer, NULL);
 }
@@ -88,12 +87,11 @@ void Compiler::compileStatement(AstStatement *stmt) {
         // A variable declaration (alloca) statement
         case AstType::VarDec: {
             AstVarDec *vd = static_cast<AstVarDec *>(stmt);
-            Type *type = translateType(vd->getDataType(), vd->getPtrType());
+            Type *type = translateType(vd->getDataType());
             
             AllocaInst *var = builder->CreateAlloca(type);
             symtable[vd->getName()] = var;
             typeTable[vd->getName()] = vd->getDataType();
-            ptrTable[vd->getName()] = vd->getPtrType();
         } break;
         
         // A structure declaration
@@ -169,19 +167,19 @@ Value *Compiler::compileValue(AstExpression *expr, bool isAssign) {
         case AstType::ID: {
             AstID *id = static_cast<AstID *>(expr);
             AllocaInst *ptr = symtable[id->getValue()];
-            Type *type = translateType(typeTable[id->getValue()], ptrTable[id->getValue()]);
+            Type *type = translateType(typeTable[id->getValue()]);
             
-            if (typeTable[id->getValue()] == DataType::Struct || isAssign) return ptr;
+            if (typeTable[id->getValue()]->getType() == V_AstType::Struct || isAssign) return ptr;
             return builder->CreateLoad(type, ptr);
         } break;
         
         case AstType::ArrayAccess: {
             AstArrayAccess *acc = static_cast<AstArrayAccess *>(expr);
             AllocaInst *ptr = symtable[acc->getValue()];
-            DataType ptrType = typeTable[acc->getValue()];
+            AstDataType *ptrType = typeTable[acc->getValue()];
             Value *index = compileValue(acc->getIndex());
             
-            if (ptrType == DataType::String) {
+            if (ptrType->getType() == V_AstType::String) {
                 PointerType *strPtrType = Type::getInt8PtrTy(*context);
                 Type *i8Type = Type::getInt8Ty(*context);
                 
@@ -190,8 +188,8 @@ Value *Compiler::compileValue(AstExpression *expr, bool isAssign) {
                 if (isAssign) return ep;
                 else return builder->CreateLoad(i8Type, ep);
             } else {
-                DataType subType = ptrTable[acc->getValue()];
-                Type *arrayPtrType = translateType(ptrType, subType);
+                AstDataType *subType = static_cast<AstPointerType *>(ptrType)->getBaseType();
+                Type *arrayPtrType = translateType(ptrType);
                 Type *arrayElementType = translateType(subType);
                 
                 Value *ptrLd = builder->CreateLoad(arrayPtrType, ptr);
@@ -295,17 +293,17 @@ Value *Compiler::compileValue(AstExpression *expr, bool isAssign) {
                 strOp = true;
             } else if (lvalExpr->getType() == AstType::ID && rvalExpr->getType() == AstType::CharL) {
                 AstID *lvalID = static_cast<AstID *>(lvalExpr);
-                if (typeTable[lvalID->getValue()] == DataType::String) strOp = true;
+                if (typeTable[lvalID->getValue()]->getType() == V_AstType::String) strOp = true;
             } else if (lvalExpr->getType() == AstType::ID && rvalExpr->getType() == AstType::ID) {
                 AstID *lvalID = static_cast<AstID *>(lvalExpr);
                 AstID *rvalID = static_cast<AstID *>(rvalExpr);
                 
-                if (typeTable[lvalID->getValue()] == DataType::String) strOp = true;
-                if (typeTable[rvalID->getValue()] == DataType::String) {
+                if (typeTable[lvalID->getValue()]->getType() == V_AstType::String) strOp = true;
+                if (typeTable[rvalID->getValue()]->getType() == V_AstType::String) {
                     strOp = true;
                     rvalStr = true;
-                } else if (typeTable[rvalID->getValue()] == DataType::Char ||
-                           typeTable[rvalID->getValue()] == DataType::I8) {
+                } else if (typeTable[rvalID->getValue()]->getType() == V_AstType::Char ||
+                           typeTable[rvalID->getValue()]->getType() == V_AstType::Int8) {
                     strOp = true;          
                 }
             }
@@ -368,57 +366,6 @@ Value *Compiler::compileValue(AstExpression *expr, bool isAssign) {
     }
     
     return nullptr;
-}
-
-Type *Compiler::translateType(DataType dataType, DataType subType, std::string typeName) {
-    Type *type;
-            
-    switch (dataType) {
-        case DataType::Char:
-        case DataType::I8:
-        case DataType::U8: type = Type::getInt8Ty(*context); break;
-        
-        case DataType::I16:
-        case DataType::U16: type = Type::getInt16Ty(*context); break;
-        
-        case DataType::Bool:
-        case DataType::I32:
-        case DataType::U32: type = Type::getInt32Ty(*context); break;
-        
-        case DataType::I64:
-        case DataType::U64: type = Type::getInt64Ty(*context); break;
-        
-        case DataType::String: type = Type::getInt8PtrTy(*context); break;
-        
-        case DataType::Ptr: {
-            switch (subType) {
-                case DataType::Char:
-                case DataType::I8:
-                case DataType::U8: type = Type::getInt8PtrTy(*context); break;
-                
-                case DataType::I16:
-                case DataType::U16: type = Type::getInt16PtrTy(*context); break;
-                
-                case DataType::I32:
-                case DataType::U32: type = Type::getInt32PtrTy(*context); break;
-                
-                case DataType::I64:
-                case DataType::U64: type = Type::getInt64PtrTy(*context); break;
-                
-                case DataType::String: type = PointerType::getUnqual(Type::getInt8PtrTy(*context)); break;
-                
-                default: {}
-            }
-        } break;
-        
-        case DataType::Struct: {
-            return structTable[typeName];
-        } break;
-        
-        default: type = Type::getVoidTy(*context);
-    }
-    
-    return type;
 }
 
 Type *Compiler::translateType(AstDataType *dataType) {

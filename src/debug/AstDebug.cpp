@@ -7,26 +7,6 @@
 
 #include <ast/ast.hpp>
 
-std::string printDataType(DataType dataType) {
-    switch (dataType) {
-        case DataType::Void: return "void";
-        case DataType::Bool: return "bool";
-        case DataType::Char: return "char";
-        case DataType::I8: return "i8";
-        case DataType::U8: return "u8";
-        case DataType::I16: return "i16";
-        case DataType::U16: return "u16";
-        case DataType::I32: return "i32";
-        case DataType::U32: return "u32";
-        case DataType::I64: return "i64";
-        case DataType::U64: return "u64";
-        case DataType::String: return "string";
-        case DataType::Ptr: return "ptr";
-        case DataType::Struct: return "struct";
-    }
-    return "";
-}
-
 void AstTree::print() {
     std::cout << "FILE: " << file << std::endl;
     std::cout << std::endl;
@@ -42,7 +22,7 @@ void AstTree::print() {
 // Data Types
 //
 void AstDataType::print() {
-    if (isUnsigned) std::cout << "unsigned ";
+    if (_isUnsigned) std::cout << "unsigned ";
 
     switch (type) {
         case V_AstType::Void: std::cout << "void"; break;
@@ -72,9 +52,7 @@ void AstStructType::print() {
 void AstExternFunction::print() {
     std::cout << "EXTERN FUNC " << name << "(";
     for (auto var : args) {
-        std::cout << printDataType(var.type);
-        if (var.subType != DataType::Void)
-            std::cout << "*" << printDataType(var.subType);
+        var.type->print();
         std::cout << ", ";
     }
     std::cout << ") ";
@@ -87,11 +65,7 @@ void AstFunction::print() {
     std::cout << std::endl;
     std::cout << "FUNC " << name << "(";
     for (auto var : args) {
-        std::cout << printDataType(var.type);
-        if (var.subType != DataType::Void)
-            std::cout << "*" << printDataType(var.subType);
-        if (var.type == DataType::Struct)
-            std::cout << "[" << var.typeName << "]";
+        var.type->print();
         std::cout << ", ";
     }
     std::cout << ") -> ";
@@ -121,11 +95,8 @@ void AstStruct::print() {
     std::cout << "STRUCT " << name << std::endl;
     
     for (auto var : items) {
-        std::cout << var.name << " : " << printDataType(var.type);
-        if (var.subType != DataType::Void)
-            std::cout << "*" << printDataType(var.subType);
-        if (var.type == DataType::Struct)
-            std::cout << "[" << var.typeName << "]";
+        std::cout << var.name << " : ";
+        var.type->print();
         std::cout << " ";
         defaultExpressions[var.name]->print();
         std::cout << std::endl;
@@ -134,10 +105,8 @@ void AstStruct::print() {
 }
 
 void AstExprStatement::print() {
-    std::cout << "EXPR " << printDataType(dataType);
-    if (ptrType != DataType::Void) {
-        std::cout << "*" << printDataType(ptrType);
-    }
+    std::cout << "EXPR ";
+    if (dataType) dataType->print();
     
     std::cout << " ";
     getExpression()->print();
@@ -157,9 +126,9 @@ void AstReturnStmt::print() {
 }
 
 void AstVarDec::print() {
-    std::cout << "VAR_DEC " << name << " : " << printDataType(dataType);
-    if (ptrType != DataType::Void) {
-        std::cout << "*" << printDataType(ptrType);
+    std::cout << "VAR_DEC " << name << " : ";
+    dataType->print();
+    if (dataType->getType() == V_AstType::Ptr) {
         std::cout << "[";
         size->print();
         std::cout << "]";
