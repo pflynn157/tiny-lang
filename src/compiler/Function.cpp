@@ -21,12 +21,7 @@ void Compiler::compileFunction(AstGlobalStatement *global) {
     std::vector<Var> astVarArgs = astFunc->getArguments();
     FunctionType *FT;
     Type *funcType = translateType(astFunc->getDataType());
-    //if (astFunc->getDataType() == DataType::Struct) {
-    //    funcType = PointerType::getUnqual(funcType);
-    //}
     currentFuncType = astFunc->getDataType();
-    //if (currentFuncType == DataType::Struct) {
-    //    funcTypeStruct = astFunc->getDataTypeName();
     
     if (astVarArgs.size() == 0) {
         FT = FunctionType::get(funcType, false);

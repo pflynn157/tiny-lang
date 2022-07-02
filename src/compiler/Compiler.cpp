@@ -228,15 +228,8 @@ Value *Compiler::compileValue(AstExpression *expr, bool isAssign) {
         case AstType::Assign: {
             AstAssignOp *op = static_cast<AstAssignOp *>(expr);
             AstExpression *lvalExpr = op->getLVal();
-            Value *ptr;
             
-            //if (lvalExpr->getType() == AstType::ID) {
-            //    AstID *id = static_cast<AstID *>(lvalExpr);
-            //    ptr = symtable[id->getValue()];
-            //} else {
-                ptr = compileValue(lvalExpr, true);
-            //}
-            
+            Value *ptr = compileValue(lvalExpr, true);
             Value *rval = compileValue(op->getRVal());
             
             builder->CreateStore(rval, ptr);
@@ -285,8 +278,6 @@ Value *Compiler::compileValue(AstExpression *expr, bool isAssign) {
         case AstType::LT:
         case AstType::GTE:
         case AstType::LTE: {
-        //case AstType::LogicalAnd:
-        //case AstType::LogicalOr: {
             AstBinaryOp *op = static_cast<AstBinaryOp *>(expr);
             AstExpression *lvalExpr = op->getLVal();
             AstExpression *rvalExpr = op->getRVal();
