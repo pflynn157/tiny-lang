@@ -1,24 +1,16 @@
 
-struct S1 is
-    x : i32 := 10;
-    y : i32 := 20;
-end
-
-func printStruct(s:S1) is
-    println("X: %d", s.x);
-    println("Y: %d", s.y);
-end
-
 func main -> i32 is
-    struct s : S1;
+    var x : i32 := 20;
     
-    println("Before:");
-    printStruct(s);
+    if x = 10 then
+        return 1;
+    elif x = 20 then
+        return 2;
+    elif x = 30 then
+        return 3;
+    else
+        return 4;
+    end
     
-    s.x := 25;
-    
-    println("After:");
-    printStruct(s);
-    
-    return 0;
+    return 5;
 end

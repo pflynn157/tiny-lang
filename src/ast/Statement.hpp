@@ -136,33 +136,21 @@ protected:
 };
 
 // Represents a conditional statement
-class AstIfStmt : public AstBlockStmt {
+class AstIfStmt : public AstStatement {
 public:
-    explicit AstIfStmt() : AstBlockStmt(V_AstType::If) {}
+    explicit AstIfStmt() : AstStatement(V_AstType::If) {}
     
-    void addBranch(AstStatement *stmt) { branches.push_back(stmt); }
-    std::vector<AstStatement *> getBranches() { return branches; }
+    void setTrueBlock(AstBlock *block) { trueBlock = block; }
+    void setFalseBlock(AstBlock *block) { falseBlock = block; }
     
-    void print(int indent = 0);
+    AstBlock *getTrueBlock() { return trueBlock; }
+    AstBlock *getFalseBlock() { return falseBlock; }
+    
+    void print(int indent);
     std::string dot(std::string parent) override;
 private:
-    std::vector<AstStatement *> branches;
-};
-
-class AstElifStmt : public AstBlockStmt {
-public:
-    explicit AstElifStmt() : AstBlockStmt(V_AstType::Elif) {}
-    
-    void print(int indent = 0);
-    std::string dot(std::string parent) override;
-};
-
-class AstElseStmt : public AstBlockStmt {
-public:
-    explicit AstElseStmt() : AstBlockStmt(V_AstType::Else) {}
-    
-    void print(int indent = 0);
-    std::string dot(std::string parent) override;
+    AstBlock *trueBlock = nullptr;
+    AstBlock *falseBlock = nullptr;
 };
 
 // Represents a while statement

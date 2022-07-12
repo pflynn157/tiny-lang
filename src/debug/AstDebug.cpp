@@ -76,12 +76,15 @@ void AstFunction::print() {
 }
 
 void AstBlock::print(int indent) {
+    for (int i = 0; i<indent; i++) std::cout << " ";
+    std::cout << "{" << std::endl;
+    
     for (auto stmt : block) {
         for (int i = 0; i<indent; i++) std::cout << " ";
         switch (stmt->getType()) {
-            case V_AstType::If:
-            case V_AstType::Elif:
-            case V_AstType::Else:
+            case V_AstType::If: {
+                static_cast<AstIfStmt *>(stmt)->print(indent);
+            } break;
             case V_AstType::While: {
                 static_cast<AstBlockStmt *>(stmt)->print(indent);
             } break;
@@ -89,6 +92,9 @@ void AstBlock::print(int indent) {
             default: stmt->print();
         }
     }
+    
+    for (int i = 0; i<indent; i++) std::cout << " ";
+    std::cout << "}" << std::endl;
 }
 
 void AstStruct::print() {
@@ -146,27 +152,8 @@ void AstIfStmt::print(int indent) {
     std::cout << "IF ";
     getExpression()->print();
     std::cout << " THEN" << std::endl;
-    block->print(indent + 4);
-    
-    for (auto br : branches) {
-        for (int i = 0; i<indent; i++) std::cout << " ";
-        static_cast<AstBlockStmt *>(br)->print(indent);
-    }
-    
-    for (int i = 0; i<indent; i++) std::cout << " ";
-    std::cout << "end" << std::endl;
-}
-
-void AstElifStmt::print(int indent) {
-    std::cout << "ELIF ";
-    getExpression()->print();
-    std::cout << " THEN" << std::endl;
-    block->print(indent + 4);
-}
-
-void AstElseStmt::print(int indent) {
-    std::cout << "ELSE" << std::endl;
-    block->print(indent + 4);
+    trueBlock->print(indent+4);
+    falseBlock->print(indent+4);
 }
 
 void AstWhileStmt::print(int indent) {

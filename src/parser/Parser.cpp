@@ -115,7 +115,7 @@ bool Parser::parse() {
 }
 
 // Builds a statement block
-bool Parser::buildBlock(AstBlock *block, AstIfStmt *parentBlock) {
+bool Parser::buildBlock(AstBlock *block, AstNode *parent) {
     Token token = scanner->getNext();
     while (token.type != End && token.type != Eof) {
         bool code = true;
@@ -148,11 +148,13 @@ bool Parser::buildBlock(AstBlock *block, AstIfStmt *parentBlock) {
             // Handle conditionals
             case If: code = buildConditional(block); break;
             case Elif: {
-                code = buildElif(parentBlock);
+                AstIfStmt *condParent = static_cast<AstIfStmt *>(parent);
+                code = buildConditional(condParent->getFalseBlock());
                 end = true;
             } break;
             case Else: {
-                code = buildElse(parentBlock);
+                AstIfStmt *condParent = static_cast<AstIfStmt *>(parent);
+                buildBlock(condParent->getFalseBlock());
                 end = true;
             } break;
             

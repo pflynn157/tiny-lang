@@ -152,32 +152,8 @@ std::string AstIfStmt::dot(std::string parent) {
     output += parent + " -> " + name + ";\n";
     
     output += getExpression()->dot(name);
-    output += block->dot(name);
-    for (auto br : branches) output += br->dot(name);
-    
-    return output;
-}
-
-std::string AstElifStmt::dot(std::string parent) {
-    std::string name = "cond" + std::to_string(idx);
-    ++idx;
-    
-    std::string output = name + "[label=\"elif\"];\n";
-    output += parent + " -> " + name + ";\n";
-    
-    output += getExpression()->dot(name);
-    output += block->dot(name);
-    
-    return output;
-}
-
-std::string AstElseStmt::dot(std::string parent) {
-    std::string name = "cond" + std::to_string(idx);
-    ++idx;
-    
-    std::string output = name + "[label=\"else\"];\n";
-    output += parent + " -> " + name + ";\n";
-    output += block->dot(name);
+    output += trueBlock->dot(name);
+    output += falseBlock->dot(name);
     
     return output;
 }

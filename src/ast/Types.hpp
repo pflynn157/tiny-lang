@@ -31,8 +31,6 @@ enum class V_AstType {
     StructDec,
     
     If,
-    Elif,
-    Else,
     While,
     
     Break,

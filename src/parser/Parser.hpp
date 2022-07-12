@@ -40,8 +40,6 @@ protected:
     
     // Flow.cpp
     bool buildConditional(AstBlock *block);
-    bool buildElif(AstIfStmt *block);
-    bool buildElse(AstIfStmt *block);
     bool buildWhile(AstBlock *block);
     bool buildLoopCtrl(AstBlock *block, bool isBreak);
     
@@ -66,7 +64,7 @@ protected:
     AstExpression *buildExpression(AstDataType *currentType, TokenType stopToken = SemiColon, bool isConst = false, bool buildList = false);
     AstExpression *checkExpression(AstExpression *expr, AstDataType *varType);
     
-    bool buildBlock(AstBlock *block, AstIfStmt *parentBlock = nullptr);
+    bool buildBlock(AstBlock *block, AstNode *parent = nullptr);
     AstExpression *checkCondExpression(AstExpression *toCheck);
     int isConstant(std::string name);
     bool isVar(std::string name);

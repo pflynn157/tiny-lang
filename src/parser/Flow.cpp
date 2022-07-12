@@ -56,33 +56,11 @@ bool Parser::buildConditional(AstBlock *block) {
     AstExpression *expr = checkCondExpression(cond->getExpression());
     cond->setExpression(expr);
     
-    buildBlock(cond->getBlockStmt(), cond);
+    AstBlock *trueBlock = new AstBlock;
+    cond->setTrueBlock(trueBlock);
+    cond->setFalseBlock(new AstBlock);
+    buildBlock(trueBlock, cond);
     
-    return true;
-}
-
-// Builds an ELIF statement
-bool Parser::buildElif(AstIfStmt *block) {
-    AstElifStmt *elif = new AstElifStmt;
-    AstExpression *arg = buildExpression(nullptr, Then);
-    if (!arg) return false;
-    elif->setExpression(arg);
-    block->addBranch(elif);
-    
-    AstExpression *expr = checkCondExpression(elif->getExpression());
-    elif->setExpression(expr);
-    
-    buildBlock(elif->getBlockStmt(), block);
-    
-    return true;
-}
-
-// Builds an ELSE statement
-bool Parser::buildElse(AstIfStmt *block) {
-    AstElseStmt *elsee = new AstElseStmt;
-    block->addBranch(elsee);
-    
-    buildBlock(elsee->getBlockStmt());
     return true;
 }
 
