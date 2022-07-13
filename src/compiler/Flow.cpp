@@ -77,7 +77,7 @@ void Compiler::compileWhileStatement(AstStatement *stmt) {
     builder->CreateCondBr(cond, loopBlock, loopEnd);
 
     builder->SetInsertPoint(loopBlock);
-    for (auto stmt : loop->getBlock()) {
+    for (auto stmt : loop->getBlock()->getBlock()) {
         compileStatement(stmt);
     }
     builder->CreateBr(loopCmp);

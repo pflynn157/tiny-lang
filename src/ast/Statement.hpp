@@ -117,24 +117,6 @@ private:
     bool noInit = false;
 };
 
-// Represents a statement with a sub-block
-class AstBlockStmt : public AstStatement {
-public:
-    explicit AstBlockStmt(V_AstType type) : AstStatement(type) {
-        block = new AstBlock;
-    }
-    
-    void addStatement(AstStatement *stmt) { block->addStatement(stmt); }
-    
-    AstBlock *getBlockStmt() { return block; }
-    std::vector<AstStatement *> getBlock() { return block->getBlock(); }
-    
-    virtual void print(int indent = 0) {}
-    virtual std::string dot(std::string parent) { return ""; }
-protected:
-    AstBlock *block;
-};
-
 // Represents a conditional statement
 class AstIfStmt : public AstStatement {
 public:
@@ -154,12 +136,17 @@ private:
 };
 
 // Represents a while statement
-class AstWhileStmt : public AstBlockStmt {
+class AstWhileStmt : public AstStatement {
 public:
-    explicit AstWhileStmt() : AstBlockStmt(V_AstType::While) {}
+    explicit AstWhileStmt() : AstStatement(V_AstType::While) {}
+    
+    void setBlock(AstBlock *block) { this->block = block; }
+    AstBlock *getBlock() { return block; }
     
     void print(int indent = 0);
     std::string dot(std::string parent) override;
+private:
+    AstBlock *block = nullptr;
 };
 
 // Represents a break statement for a loop

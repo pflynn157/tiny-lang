@@ -75,7 +75,9 @@ bool Parser::buildWhile(AstBlock *block) {
     AstExpression *expr = checkCondExpression(loop->getExpression());
     loop->setExpression(expr);
     
-    buildBlock(loop->getBlockStmt());
+    AstBlock *block2 = new AstBlock;
+    buildBlock(block2);
+    loop->setBlock(block2);
     
     return true;
 }

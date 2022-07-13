@@ -86,7 +86,7 @@ void AstBlock::print(int indent) {
                 static_cast<AstIfStmt *>(stmt)->print(indent);
             } break;
             case V_AstType::While: {
-                static_cast<AstBlockStmt *>(stmt)->print(indent);
+                static_cast<AstWhileStmt *>(stmt)->print(indent);
             } break;
             
             default: stmt->print();
