@@ -44,6 +44,7 @@ enum class V_AstType {
     Sub,
     Mul,
     Div,
+    Mod,
     
     And,
     Or,

@@ -227,6 +227,14 @@ void AstDivOp::print() {
     std::cout << ")";
 }
 
+void AstModOp::print() {
+    std::cout << "(";
+    lval->print();
+    std::cout << ") % (";
+    rval->print();
+    std::cout << ")";
+}
+
 void AstAndOp::print() {
     std::cout << "(";
     lval->print();

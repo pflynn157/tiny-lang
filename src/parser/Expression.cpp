@@ -31,6 +31,7 @@ bool Parser::buildOperator(Token token, ExprContext *ctx) {
         case Minus:
         case Mul:
         case Div:
+        case Mod:
         case And:
         case Or:
         case Xor:
@@ -50,6 +51,7 @@ bool Parser::buildOperator(Token token, ExprContext *ctx) {
                 case Plus: op = new AstAddOp; break;
                 case Mul: op = new AstMulOp; break;
                 case Div: op = new AstDivOp; break;
+                case Mod: op = new AstModOp; break;
                 case And: op = new AstAndOp; break;
                 case Or: op = new AstOrOp; break;
                 case Xor: op = new AstXorOp; break;
@@ -261,6 +263,7 @@ AstExpression *Parser::buildExpression(AstDataType *currentType, TokenType stopT
             case Minus:
             case Mul:
             case Div:
+            case Mod:
             case And:
             case Or:
             case Xor:

@@ -267,6 +267,7 @@ Value *Compiler::compileValue(AstExpression *expr, bool isAssign) {
         case V_AstType::Sub: 
         case V_AstType::Mul:
         case V_AstType::Div:
+        case V_AstType::Mod:
         case V_AstType::And:
         case V_AstType::Or:
         case V_AstType::Xor:
@@ -346,6 +347,7 @@ Value *Compiler::compileValue(AstExpression *expr, bool isAssign) {
                 case V_AstType::Sub: return builder->CreateSub(lval, rval);
                 case V_AstType::Mul: return builder->CreateMul(lval, rval);
                 case V_AstType::Div: return builder->CreateSDiv(lval, rval);
+                case V_AstType::Mod: return builder->CreateSRem(lval, rval);
                 
                 case V_AstType::And: return builder->CreateAnd(lval, rval);
                 case V_AstType::Or:  return builder->CreateOr(lval, rval);

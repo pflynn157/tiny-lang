@@ -271,6 +271,17 @@ std::string AstDivOp::dot(std::string parent) {
     return output;
 }
 
+std::string AstModOp::dot(std::string parent) {
+    std::string name = "mod" + std::to_string(idx);
+    ++idx;
+    
+    std::string output = name + "[label=\"%\"];\n";
+    output += parent + " -> " + name + ";\n";
+    output += getLVal()->dot(name);
+    output += getRVal()->dot(name);
+    return output;
+}
+
 std::string AstAndOp::dot(std::string parent) {
     std::string name = "and" + std::to_string(idx);
     ++idx;

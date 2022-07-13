@@ -158,6 +158,18 @@ public:
     std::string dot(std::string parent) override;
 };
 
+// Represents the modulus operation
+class AstModOp : public AstBinaryOp {
+public:
+    AstModOp() {
+        this->type = V_AstType::Mod;
+        this->precedence = 3;
+    }
+    
+    void print();
+    std::string dot(std::string parent) override;
+};
+
 // Represents a division operation
 class AstAndOp : public AstBinaryOp {
 public:

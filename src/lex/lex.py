@@ -23,7 +23,7 @@ keywords = [
 symbols = [
     (".", "Dot"), (";", "SemiColon"), (",", "Comma"),
     ("(", "LParen"), (")", "RParen"), ("[", "LBracket"), ("]", "RBracket"),
-    ("+", "Plus"), ("-", "Minus"), ("*", "Mul"), ("/", "Div"),
+    ("+", "Plus"), ("-", "Minus"), ("*", "Mul"), ("/", "Div"), ("%", "Mod"),
     ("&", "And"), ("|", "Or"), ("^", "Xor"),
     (":", "Colon"),
     (">", "GT"), (">=", "GTE"),
