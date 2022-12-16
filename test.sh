@@ -1,7 +1,8 @@
 #!/bin/bash
 
 test_count=0
-TLC="build/src/tlc"
+#TLC="build/src/tlc"
+TLC="build/backend/llvm/tlc"
 
 function run_test() {
     for entry in $1/*.tl

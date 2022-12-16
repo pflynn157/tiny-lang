@@ -8,15 +8,6 @@ add_custom_command(
     COMMAND minilex ${CMAKE_SOURCE_DIR}/src/lex/lex
     DEPENDS ${CMAKE_SOURCE_DIR}/src/lex/lex.py
 )
-include_directories(${CMAKE_BINARY_DIR}/src)
-
-set(COMPILER_SRC
-    compiler/Builder.cpp
-    compiler/Compiler.cpp
-    compiler/Flow.cpp
-    compiler/Function.cpp
-    compiler/Variable.cpp
-)
 
 set(SRC
     # Frontend sources
@@ -37,20 +28,7 @@ set(SRC
     parser/Variable.cpp
     
     preproc/Preproc.cpp
-    
-    # Compile sources
-    ${COMPILER_SRC}
 )
 
-add_executable(tlc ${SRC} main.cpp)
-
-llvm_map_components_to_libnames(llvm_libs support core irreader target asmparser
-    X86AsmParser
-    X86CodeGen
-    X86Info
-)
-
-target_link_libraries(tlc
-    ${llvm_libs}
-)
+add_library(tlcparser ${SRC})
 
