@@ -65,7 +65,7 @@ bool Parser::buildStructMember(AstStruct *str, Token token) {
         
     if (token.type == Assign) {
         AstExpression *expr = nullptr;
-        expr = buildExpression(dataType, SemiColon, true);
+        expr = buildExpression(nullptr, dataType, SemiColon, true);
         if (!expr) return false;
                 
         Var v;
@@ -120,8 +120,7 @@ bool Parser::buildStructDec(AstBlock *block) {
     }
     
     // Now build the declaration and push back
-    vars.push_back(name);
-    typeMap[name] = AstBuilder::buildStructType(structName);
+    block->addSymbol(name, AstBuilder::buildStructType(structName));
     AstStructDec *dec = new AstStructDec(name, structName);
     block->addStatement(dec);
     
@@ -132,7 +131,7 @@ bool Parser::buildStructDec(AstBlock *block) {
     } else if (token.type == Assign) {
         dec->setNoInit(true);
         AstExprStatement *empty = new AstExprStatement;
-        AstExpression *arg = buildExpression(AstBuilder::buildStructType(structName));
+        AstExpression *arg = buildExpression(block, AstBuilder::buildStructType(structName));
         if (!arg) return false;
         
         AstID *id = new AstID(name);

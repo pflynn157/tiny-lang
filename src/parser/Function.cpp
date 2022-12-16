@@ -10,7 +10,7 @@
 #include <ast/ast_builder.hpp>
 
 // Returns the function arguments
-bool Parser::getFunctionArgs(std::vector<Var> &args) {
+bool Parser::getFunctionArgs(AstBlock *block, std::vector<Var> &args) {
     Token token = scanner->getNext();
     if (token.type == LParen) {
         token = scanner->getNext();
@@ -31,7 +31,6 @@ bool Parser::getFunctionArgs(std::vector<Var> &args) {
             
             v.type = buildDataType();
             v.name = t1.id_val;
-            vars.push_back(t1.id_val);
             
             token = scanner->getNext();
             if (token.type == Comma) {
@@ -39,7 +38,7 @@ bool Parser::getFunctionArgs(std::vector<Var> &args) {
             }
             
             args.push_back(v);
-            typeMap[v.name] = v.type;
+            block->addSymbol(v.name, v.type);
         }
     } else {
         scanner->rewind(token);
@@ -50,9 +49,7 @@ bool Parser::getFunctionArgs(std::vector<Var> &args) {
 
 // Builds a function
 bool Parser::buildFunction(Token startToken, std::string className) {
-    typeMap.clear();
     localConsts.clear();
-    vars.clear();
     
     Token token;
     bool isExtern = false;
@@ -73,7 +70,8 @@ bool Parser::buildFunction(Token startToken, std::string className) {
     
     // Get arguments
     std::vector<Var> args;
-    if (!getFunctionArgs(args)) return false;
+    AstBlock *block = new AstBlock;
+    if (!getFunctionArgs(block, args)) return false;
 
     // Check to see if there's any return type
     //std::string retName = "";       // TODO: Do we need this?
@@ -109,6 +107,7 @@ bool Parser::buildFunction(Token startToken, std::string className) {
     func->setDataType(dataType);
     func->setArguments(args);
     tree->addGlobalStatement(func);
+    func->getBlock()->mergeSymbols(block);
     
     // Build the body
     int stopLayer = 0;
@@ -139,16 +138,18 @@ bool Parser::buildFunction(Token startToken, std::string className) {
 
 // Builds a function call
 bool Parser::buildFunctionCallStmt(AstBlock *block, Token idToken) {
+    std::string name = idToken.id_val;
+
     // Make sure the function exists
-    if (!isFunc(idToken.id_val)) {
+    if (!isFunc(name)) {
         syntax->addError(scanner->getLine(), "Unknown function.");
         return false;
     }
 
-    AstFuncCallStmt *fc = new AstFuncCallStmt(idToken.id_val);
+    AstFuncCallStmt *fc = new AstFuncCallStmt(name);
     block->addStatement(fc);
     
-    AstExpression *args = buildExpression(nullptr, SemiColon, false, true);
+    AstExpression *args = buildExpression(block, nullptr, SemiColon, false, true);
     if (!args) return false;
     fc->setExpression(args);
     
@@ -160,7 +161,7 @@ bool Parser::buildReturn(AstBlock *block) {
     AstReturnStmt *stmt = new AstReturnStmt;
     block->addStatement(stmt);
     
-    AstExpression *arg = buildExpression(nullptr);
+    AstExpression *arg = buildExpression(block, nullptr);
     if (!arg) return false;
     stmt->setExpression(arg);
     

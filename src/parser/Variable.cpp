@@ -50,7 +50,7 @@ bool Parser::buildVariableDec(AstBlock *block) {
     if (token.type == LBracket) {
         dataType = AstBuilder::buildPointerType(dataType);
         AstVarDec *empty = new AstVarDec("", dataType);
-        AstExpression *arg = buildExpression(AstBuilder::buildInt32Type(), RBracket);
+        AstExpression *arg = buildExpression(block, AstBuilder::buildInt32Type(), RBracket);
         if (!arg) return false;
         empty->setExpression(arg); 
         
@@ -61,7 +61,6 @@ bool Parser::buildVariableDec(AstBlock *block) {
         }
         
         for (std::string name : toDeclare) {
-            vars.push_back(name);
             AstVarDec *vd = new AstVarDec(name, dataType);
             block->addStatement(vd);
             vd->setExpression(empty->getExpression());
@@ -97,7 +96,7 @@ bool Parser::buildVariableDec(AstBlock *block) {
             // Finally, set the size of the declaration
             vd->setPtrSize(vd->getExpression());
             
-            typeMap[name] = dataType;
+            block->addSymbol(name, dataType);
         }
     
     // We're at the end of the declaration
@@ -107,15 +106,12 @@ bool Parser::buildVariableDec(AstBlock *block) {
         
     // Otherwise, we have a regular variable
     } else {
-        AstExpression *arg = buildExpression(dataType);
+        AstExpression *arg = buildExpression(block, dataType);
         if (!arg) return false;
     
         for (std::string name : toDeclare) {
-            vars.push_back(name);
             AstVarDec *vd = new AstVarDec(name, dataType);
             block->addStatement(vd);
-            
-            typeMap[name] = dataType;
             
             AstID *id = new AstID(name);
             AstAssignOp *assign = new AstAssignOp(id, arg);
@@ -124,6 +120,9 @@ bool Parser::buildVariableDec(AstBlock *block) {
             va->setDataType(dataType);
             va->setExpression(assign);
             block->addStatement(va);
+            
+            // Add the variable to the blocks symbol table
+            block->addSymbol(name, dataType);
         }
     }
     
@@ -132,10 +131,10 @@ bool Parser::buildVariableDec(AstBlock *block) {
 
 // Builds a variable or an array assignment
 bool Parser::buildVariableAssign(AstBlock *block, Token idToken) {
-    AstDataType *dataType = typeMap[idToken.id_val];
+    AstDataType *dataType = block->getDataType(idToken.id_val);
     
-    // TODO: This abomination is temporar
-    AstExpression *expr = buildExpression(dataType);
+    // TODO: This abomination is temporary
+    AstExpression *expr = buildExpression(block, dataType);
     if (!expr) return false;
     
     AstExprStatement *stmt = new AstExprStatement;
@@ -175,7 +174,7 @@ bool Parser::buildConst(bool isGlobal) {
     }
     
     // Build the expression. We create a dummy statement for this
-    AstExpression *expr = buildExpression(dataType, SemiColon, true);
+    AstExpression *expr = buildExpression(nullptr, dataType, SemiColon, true);
     if (!expr) return false;
     
     // Put it all together
