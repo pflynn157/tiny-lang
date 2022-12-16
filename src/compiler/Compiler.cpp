@@ -4,7 +4,7 @@
 // Tiny Lang is licensed under the BSD-3 license. See the COPYING file for more information.
 //
 #include "llvm/IR/BasicBlock.h"
-#include "llvm/Support/TargetRegistry.h"
+#include "llvm/MC/TargetRegistry.h"
 #include "llvm/Support/CommandLine.h"
 
 using namespace llvm;
